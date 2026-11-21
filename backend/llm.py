@@ -80,7 +80,6 @@ _RETRYABLE = ("503", "429", "500", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "DEADLIN
 
 
 def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
-def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
     """
     Call Gemini in strict JSON mode with multi-model fallback and fast failover.
     """
