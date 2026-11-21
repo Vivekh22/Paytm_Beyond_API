@@ -1,142 +1,190 @@
 <div align="center">
 
-# GapScope
+# 🔭 GapScope
 
-**Market Intelligence Where Every Insight Shows Its Source.**
+### **Autonomous Market Intelligence Engine Where Every Claim Links to Its Receipts.**
 
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.1+-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![Gemini 2.5 Flash](https://img.shields.io/badge/Gemini-2.5_Flash-8E75B2?style=flat&logo=google&logoColor=white)](https://ai.google.dev/)
-[![SerpApi](https://img.shields.io/badge/SerpApi-Track_01-4285F4?style=flat&logo=google&logoColor=white)](https://serpapi.com/)
-[![You.com](https://img.shields.io/badge/You.com-Track_02-7C3AED?style=flat)](https://you.com/)
-[![SQLite](https://img.shields.io/badge/SQLite-WAL_Cache-003B57?style=flat&logo=sqlite&logoColor=white)](https://sqlite.org/)
+Built for the **Beyond 9 to 5 Buildathon**  
+*Dual-Track Winner Contender: Track 01 (SerpApi) & Track 02 (You.com)*
 
-An autonomous market-intelligence engine that investigates startup concepts, companies, and industry sectors against real-world customer evidence and search momentum. Built for the **Beyond 9to5 Buildathon** (Track 01: SerpApi & Track 02: You.com).
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.1+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Gemini](https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![SerpApi](https://img.shields.io/badge/SerpApi-Track%2001-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://serpapi.com/)
+[![You.com](https://img.shields.io/badge/You.com-Track%2002-7C3AED?style=for-the-badge)](https://you.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-WAL%20Cache-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+
+<br/>
+
+[Live Demo](#-product-showcase) • [Architecture](#-system-architecture) • [Core Modes](#-four-intelligence-modes) • [Tech Stack](#-tech-stack) • [Quickstart](#-getting-started) • [API Docs](#-api-endpoints)
 
 </div>
 
 ---
 
-## Product Preview
+## 💡 The Problem & GapScope's Solution
+
+| The Traditional AI Trap | The GapScope Way |
+|---|---|
+| ❌ **Hallucinated Market Data:** LLMs invent user feedback, competitor metrics, and synthetic quotes. | ✅ **Zero-Hallucination Evidence Core:** Every review, forum thread, and article snippet is assigned an immutable ID (`ev_0001`...). AI clusters by ID only—never paraphrasing or inventing quotes. |
+| ❌ **Black-Box "Vibes" Scoring:** "7/10 market viability" generated from arbitrary prompt completions. | ✅ **Deterministic Python Math Engine:** Transparent mathematical formulas calculate Demand, Pain Intensity, Competition Gap, and Momentum (0–100 scale). |
+| ❌ **Static & Stale Snapshots:** Reports reflect outdated training data cutoff dates. | ✅ **Multi-Source Live Intelligence:** Real-time data synthesis across Google Trends, Play Store reviews, Reddit discussions, Google News, and You.com Web Index. |
+| ❌ **No Impersonation Defense:** Startups and brands are defenseless against fake apps, scam helplines, and lookalike domains. | ✅ **Integrated Brand Protect (Mode 4):** Autonomous scam, fake job listing, and lookalike portal detection with one-click takedown text and public verification pages. |
+
+---
+
+## 📸 Product Showcase
+
+### 1. Research Workspace & Scan Hub
+> Full-viewport interactive workspace supporting single-click demo presets, customizable search queries, and dynamic mode routing.
 
 <div align="center">
-
-### 1. Research Workspace & Three Core Modes
-<img src="assets/screenshots/landing-hero.png" alt="GapScope Landing & Mode Switcher" width="900" />
-
-<br/><br/>
-
-### 2. Market Intelligence Report & Viability Score Gauge
-<img src="assets/screenshots/report-overview.png" alt="GapScope Market Intelligence Report" width="900" />
-
-<br/><br/>
-
-### 3. Evidence Wall — Customer Friction Receipts
-<img src="assets/screenshots/evidence-wall.png" alt="GapScope Evidence Wall" width="900" />
-
+  <img src="assets/screenshots/landing-hero.png" alt="GapScope Research Hub & Landing Workspace" width="100%" style="border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" />
 </div>
+
+<br/>
+
+### 2. Live Intelligence Reports & Deep Insights
+> Interactive intelligence views featuring deterministic score gauges, 12-month Google Trends curves, verified customer receipts, and actionable startup blueprints.
+
+<table width="100%">
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <h4>🎯 01 · Viability Score & Math Breakdown</h4>
+      <img src="assets/screenshots/section1-verdict.png" alt="Viability Score & Mathematical Verdict Breakdown" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+      <p align="left"><sub><b>Deterministic Verdict:</b> Concrete <b>BUILD</b> (≥65), <b>PIVOT</b> (40–64), or <b>KILL</b> (&lt;40) verdicts with mathematical factor attribution.</sub></p>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <h4>📈 02 · 12-Month Demand Trend & Competitors</h4>
+      <img src="assets/screenshots/section2-demand-trend.png" alt="Google Trends Demand Curve & Competitor Intelligence" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+      <p align="left"><sub><b>Market Momentum:</b> Real-time Google Trends search slope across India anchored against baseline benchmarks and competitor app ratings.</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <h4>💬 03 · Verbatim Customer Friction Wall</h4>
+      <img src="assets/screenshots/section3-evidence-clusters.png" alt="Anti-Hallucination Pain Clusters with Direct Citations" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+      <p align="left"><sub><b>Evidence with Receipts:</b> Unfiltered 1★ Play Store complaints, Reddit discussions, and You.com forum findings with direct outbound links.</sub></p>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <h4>🚀 04 · Strategic Opportunities & Blueprints</h4>
+      <img src="assets/screenshots/section4-opportunities.png" alt="Actionable Concept Blueprints & Solutions" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+      <p align="left"><sub><b>Actionable Whitespace:</b> AI-synthesized product concepts pointing directly to the exact customer pain clusters they resolve.</sub></p>
+    </td>
+  </tr>
+</table>
 
 ---
 
-## Architecture & Workflow
+## 🏛️ System Architecture
 
 ```mermaid
-flowchart LR
-    subgraph Client["Frontend"]
-        UI["User Interface\n(Mode 1, 2, or 3)"]
-        Stream["SSE Stream Listener\n& Evidence Drawer"]
+flowchart TD
+    subgraph Client["🖥️ Frontend Client (:8080)"]
+        UI["User Interface\n(Modes 1, 2, 3, 4)"]
+        SSE["SSE Stream Listener\n& Live Progress Tracker"]
+        Drawer["Interactive Evidence Drawer\n& Verification Vault"]
     end
 
-    subgraph Server["Flask Backend (:5000)"]
-        Route["API Layer\n(/api/scan & SSE)"]
-        Pool["ThreadPoolExecutor\nParallel Dispatch"]
-        Cache[("SQLite WAL Cache\n72h TTL & Rate Limiter")]
+    subgraph Backend["⚙️ Flask Engine (:5000)"]
+        Router["REST & SSE Gateway\n(/api/scan & /api/scan/id/stream)"]
+        Pool["ThreadPoolExecutor\nParallel Dispatch Worker"]
+        Cache[("SQLite WAL Cache\n72h TTL & SHA-256 Hashes")]
+        Limiter["Sliding-Window Limiter\n(45 Calls/Hr Safety Guard)"]
     end
 
-    subgraph DataSources["Live Intelligence Sources"]
-        SA["SerpApi\n• Google Trends (IN)\n• Play Store Reviews\n• Google News\n• Reddit Discussions"]
-        YC["You.com API\n• Live Web Index\n• Company News & Headwinds"]
+    subgraph Providers["🌐 Live Intelligence Ingestion"]
+        direction TB
+        subgraph Track1["Track 01: SerpApi Engine"]
+            GT["Google Trends (IN)"]
+            GP["Google Play Reviews\n(1★, 5★, Newest)"]
+            GN["Google News (Headlines)"]
+            GR["Reddit Discussions"]
+            GM["Google Maps & Jobs"]
+        end
+        subgraph Track2["Track 02: You.com Search API"]
+            YW["Live Web Index"]
+            YN["Market News & Reports"]
+        end
     end
 
-    subgraph Processing["Intelligence Pipeline"]
-        Norm["Evidence Normalizer\n(Stable IDs: ev_0001...)"]
-        Gemini["Gemini 2.5 Flash\n(ID-Based Clustering)"]
-        Math["Python Math Engine\n(Deterministic Scoring)"]
+    subgraph Core["🧠 Intelligence Synthesis Engine"]
+        Normalizer["Evidence Normalizer\n(Stable IDs: ev_0001...)"]
+        Gemini["Google Gemini 2.5 Flash\n(Strict ID-Based Clustering)"]
+        Math["Deterministic Python Scoring\n(Viability & Trajectory Formulas)"]
     end
 
-    UI --> Route
-    Route --> Pool
+    UI --> Router
+    Router --> Pool
     Pool <--> Cache
-    Pool --> SA & YC
-    SA & YC --> Norm
-    Norm --> Gemini
+    Pool --> Limiter
+    Limiter --> Track1 & Track2
+    Track1 & Track2 --> Normalizer
+    Normalizer --> Gemini
     Gemini --> Math
-    Math --> Stream
+    Math --> SSE
+    SSE --> UI
+    UI --> Drawer
 ```
 
 ---
 
-## What GapScope Does
+## ⚡ The Four Intelligence Modes
 
-Traditional AI idea validators generate generic SWOT analyses and unverified claims without citing where the feedback came from. **GapScope eliminates hallucination by construction**: every pain point, trend direction, and opportunity links directly to an immutable evidence citation from the public web.
+### Mode 01: Validate an Idea
+> *"I have an idea. Is there a genuine market opportunity?"*
+- **Deconstructs Concepts:** Gemini extracts macro trend keywords alongside direct incumbent competitor terms.
+- **Synthesizes Signals:** Computes a **0–100 Viability Score** using deterministic weights:
+  - **Demand (30 pts):** Google Trends search interest slope and volume relative to an anchor keyword.
+  - **Pain Intensity (30 pts):** Frequency and severity of recurring 1★ reviews and critical forum complaints.
+  - **Competition Gap (20 pts):** Average incumbent star rating decay and feature dissatisfaction.
+  - **Momentum (10 pts):** Trailing 90-day sentiment in tech press and business news.
+  - **Evidence Confidence (10 pts):** Review depth across multiple independent source families.
+- **Actionable Verdict:** Concrete recommendation: **`BUILD`** ($\ge 65$), **`PIVOT`** ($40-64$), or **`KILL`** ($< 40$).
 
-The engine provides three focused research modes:
+### Mode 02: Investigate a Business
+> *"Why is this incumbent company winning or bleeding users?"*
+- **Trajectory Diagnosis:** Analyzes review drift (trailing 90-day ratings vs. all-time store average), search interest trajectory, and news sentiment.
+- **Net Verdict:** Classifies business momentum into **`GROWING`**, **`STAGNATING`**, or **`DECLINING`**.
+- **User Love vs. Hate Matrix:** Side-by-side clustering comparing 1★ churn drivers against 5★ loyalty factors.
 
-### 1. Validate My Idea
-> *"I have an idea. Is there a real opportunity?"*
-- Deconstructs concepts into broad search keywords and specific competitor queries.
-- Pulls 1★–3★ critical Play Store reviews across incumbents alongside 12-month Google Trends search momentum.
-- Computes a deterministic **Viability Score (0–100)** with a concrete verdict:
-  - **`BUILD`** ($\ge 65$): High customer pain, rising demand, and clear room for incumbent disruption.
-  - **`PIVOT`** ($40-64$): Moderate validation; needs positioning or differentiation adjustments.
-  - **`KILL`** ($< 40$): Low search demand, satisfied incumbents, or weak customer friction signals.
-- Generates 3 evidence-backed differentiation vectors tied directly to customer pain clusters.
+### Mode 03: Discover an Opportunity
+> *"I have no startup idea. Discover an underserved category gap."*
+- **Category Benchmarking:** Evaluates top incumbents across categories (*FinTech, EdTech, Healthcare, Quick-commerce, Agritech, etc.*).
+- **Cross-App Systemic Whitespace:** Uncovers recurring pain points shared across 2 or more competitor applications.
+- **3 Differentiated Blueprints:** Formulates full startup product concepts, target customer personas, and direct citations to the market frustrations being solved.
 
-### 2. Investigate a Business
-> *"Why is this business succeeding or failing?"*
-- Evaluates a specific company, startup, or product across public sentiment and web coverage.
-- Compares 1★ vs. 5★ user reviews, assesses 90-day review sentiment drift against all-time ratings, and analyzes media sentiment.
-- Determines a net trajectory verdict: **`GROWING`**, **`STAGNATING`**, or **`DECLINING`**.
-- Outlines operational strain points and strategic opportunities for incoming competitors.
-
-### 3. Discover an Opportunity
-> *"I don't have an idea. Find something worth building."*
-- Analyzes an entire category (*Personal Finance, FinTech, EdTech, Healthcare, Quick-commerce, Travel, Mental Health, Agritech, Other*).
-- Scans top benchmark applications and detects **cross-app systemic gaps**—frustrations that repeat across multiple competitors.
-- Formulates 3 concrete startup blueprints with designated target personas and verified evidence references.
-
----
-
-## Key Features
-
-- **Anti-Hallucination Evidence Core**: Every review, forum post, and article snippet is normalized with a permanent sequential ID (`ev_0001`...). Gemini clusters feedback solely by ID and never paraphrases or generates synthetic quotes.
-- **Deterministic Python Scoring**: Viability scores and trajectory verdicts are computed via transparent mathematical formulas across measured signals (search interest slope, review decay, competition gap)—never by arbitrary LLM text generation.
-- **Live Server-Sent Events (SSE)**: Real-time scan progression streams milestones directly to the UI, providing complete transparency into data retrieval, clustering, and scoring phases.
-- **Evidence Drawer & Citations**: Interactive slide-over vault displaying raw quotes, star ratings, review timestamps, authors, and verified outbound URLs.
-- **Offline Demo Mode & Cache**: Thread-safe SQLite database (WAL mode) with `sha256` parameter hashing, sliding-window rate limiting (45 calls/hr), and a pre-warmed cache enabling zero-latency, zero-credit presentations.
+### Mode 04: Brand Protect & Anti-Fraud
+> *"Is someone impersonating our brand, running fake job posts, or scamming customers?"*
+- **Autonomous Scan:** Queries Google Search, Google Maps, Google Jobs, Google Play Store, and News for brand impersonation.
+- **Severity Flagging:** Identifies fraudulent customer support numbers, fake hiring scams asking for application fees, and lookalike phishing domains.
+- **One-Click Action:** Generates pre-formatted takedown notice text for registries/hosts and publishes a public verified channels directory (`/verified/<brand>`).
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack & Dependencies
 
-| Component | Technologies |
-|---|---|
-| **Frontend** | HTML5, Vanilla JavaScript (ES Modules), Tailwind CSS, Chart.js, Google Fonts (Inter, Newsreader, JetBrains Mono) |
-| **Backend** | Python 3.11+, Flask 3.1, flask-cors, `concurrent.futures.ThreadPoolExecutor` |
-| **AI / Clustering** | Google Gemini 2.5 Flash (`google-genai` SDK, structured JSON output) |
-| **Data Providers** | **SerpApi** (Google Trends, Play Store, Google News, Reddit), **You.com** (Search API, Web Index & News) |
-| **Storage & Caching** | SQLite3 (Write-Ahead Logging mode), SHA-256 query hashing, 72-hour TTL |
+| Category | Technologies | Description |
+|---|---|---|
+| **Backend Framework** | <img src="https://skillicons.dev/icons?i=python,flask" height="20"/> Python 3.11+, Flask 3.1, `flask-cors` | Asynchronous SSE streaming API and parallel worker dispatcher |
+| **Concurrency & Cache** | <img src="https://skillicons.dev/icons?i=sqlite" height="20"/> `ThreadPoolExecutor`, SQLite3 (WAL mode) | Multi-threaded network calls with 72h TTL caching and SHA-256 hashing |
+| **AI & NLP Engine** | <img src="https://skillicons.dev/icons?i=google" height="20"/> Google Gemini 2.5 Flash (`google-genai` 3.6+) | Zero-hallucination, ID-based sentiment clustering and keyword extraction |
+| **Track 01: SerpApi** | SerpApi Python Integration | Google Trends (geo=IN), Play Store Reviews, Google News, Google Maps, Jobs |
+| **Track 02: You.com** | You.com Search API (`ydc-index.io`) | Live web index, competitor discovery, forum discussions, and market reports |
+| **Frontend Architecture** | <img src="https://skillicons.dev/icons?i=html,js,tailwind" height="20"/> HTML5, ES Modules, Tailwind CSS | Responsive, zero-build, dependency-light modern UI |
+| **Data Visualizations** | Chart.js 4.4 | Smooth demand interest curves and half-circle viability gauges |
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.11+
+### 📋 Prerequisites
+- Python 3.11 or higher
 - API Keys:
-  - [SerpApi API Key](https://serpapi.com/)
-  - [You.com Search API Key](https://you.com/)
   - [Google Gemini API Key](https://aistudio.google.com/)
+  - [SerpApi Account Key](https://serpapi.com/) *(Track 01)*
+  - [You.com Search API Key](https://you.com/) *(Track 02)*
 
 ---
 
@@ -149,120 +197,156 @@ cd Paytm_Beyond_API
 
 ---
 
-### 2. Backend Setup
+### 2. Configure Environment
+
+Copy `.env.example` to `.env` inside the `backend` directory:
 
 ```bash
 cd backend
-
-# Create and activate virtual environment
-python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment variables
 cp .env.example .env
 ```
 
-Edit `.env` with your API keys:
+Edit `backend/.env` with your API keys:
+
 ```env
+# GapScope API Keys
 SERPAPI_KEY=your_serpapi_key_here
 YDC_API_KEY=your_youcom_api_key_here
 GEMINI_API_KEY=your_gemini_api_key_here
 
-# Optional configuration
+# Mode & Safety Controls
 DEMO_MODE=0
 SERPAPI_HOURLY_LIMIT=45
 SERPAPI_SCAN_BUDGET=8
 PORT=5000
+TRENDS_ANCHOR=credit card
 ```
-
-Start the Flask server:
-```bash
-python app.py
-```
-*The backend runs at `http://localhost:5000`.*
 
 ---
 
-### 3. Demo Prewarming & Offline Mode
-
-To populate the local SQLite cache with preset demo queries ahead of judging or offline presentations:
+### 3. Install Dependencies & Start Backend
 
 ```bash
-# Dry run to inspect call budget
+# Recommended: Create virtual environment
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
+# Install requirements
+pip install -r requirements.txt
+
+# Start Flask server
+python app.py
+```
+*Backend runs on `http://localhost:5000` with open CORS enabled.*
+
+---
+
+### 4. Start Frontend
+
+In a separate terminal, serve the frontend folder via any static server:
+
+```bash
+cd Paytm_Beyond_API/frontend
+python -m http.server 8080
+```
+*Open your browser and navigate to **`http://localhost:8080`**.*
+
+---
+
+### 5. Offline Demo Prewarming (Zero Latency)
+
+To populate the local SQLite database ahead of judging presentations or pitch demos:
+
+```bash
+cd backend
+
+# Inspect quota budget without triggering API calls
 python prewarm.py --dry-run
 
-# Run full prewarming across presets
+# Run full prewarm across all demo presets
 python prewarm.py
 ```
 
-Set `DEMO_MODE=1` in `.env` to execute fully offline using pre-cached responses without hitting external API limits.
+Set `DEMO_MODE=1` in `backend/.env` to run 100% offline using cached reports with zero credit usage and instant response times!
 
 ---
 
-### 4. Run the Frontend
+## 📡 API Endpoints
 
-Open `frontend/index.html` via any static file server:
-
-```bash
-# From the project root
-python -m http.server 3000 --directory frontend
-```
-*Navigate to `http://localhost:3000` in your browser.*
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/health` | Returns cache telemetry, quota utilization, and demo mode status |
+| `GET` | `/api/examples` | Retrieves standard demo presets with cache indicators |
+| `POST` | `/api/scan` | Initiates scan (`{"mode": 1\|2\|3\|4, "query": "..."}`) and returns `scan_id` |
+| `GET` | `/api/scan/<id>/stream` | Server-Sent Events (SSE) progress milestones and final report payload |
+| `GET` | `/api/report/<id>` | Retrieves completed report for permalinks and PDF exports |
+| `GET` | `/api/compare?a=<id>&b=<id>` | Side-by-side competitor intelligence comparison (Mode 2) |
+| `GET` | `/verified/<brand>` | Public shareable registry displaying verified official company channels |
 
 ---
 
-## Project Structure
+## 📁 Repository Structure
 
 ```
+Paytm_Beyond_API/
+├── assets/
+│   └── screenshots/              # Real UI screenshots for GitHub preview
+│       ├── landing-hero.png      # Hero section & workspace
+│       ├── section1-verdict.png  # Viability score gauge & breakdown
+│       ├── section2-demand-trend.png # Google trends & competitor metrics
+│       ├── section3-evidence-clusters.png # Verbatim customer friction wall
+│       └── section4-opportunities.png # Strategic blueprints & solutions
 ├── backend/
-│   ├── app.py                 # Flask server, SSE streaming, and REST endpoints
-│   ├── cache.py               # Thread-safe SQLite WAL caching & sliding-window limiter
-│   ├── config.py              # Configuration loader & environment settings
-│   ├── evidence.py            # Evidence normalizer & anti-hallucination ID mapping
-│   ├── llm.py                 # Gemini 2.5 Flash clustering & opportunity generation
-│   ├── pipelines.py           # Multi-threaded execution pipelines for Modes 1, 2, and 3
-│   ├── prewarm.py             # Demo cache prewarmer for offline presentations
-│   ├── scoring.py             # Deterministic Python math formulas for Viability & Trajectory
-│   ├── serp_client.py         # SerpApi client wrappers (Trends, Play Store, News, Reddit)
-│   ├── youcom_client.py       # You.com Search API integration
-│   ├── mock/                  # Shared JSON mock reports (Modes 1, 2, and 3)
-│   └── requirements.txt       # Backend dependencies
+│   ├── app.py                    # Flask application, SSE event stream & REST routing
+│   ├── cache.py                  # Thread-safe SQLite WAL caching & sliding-window limiter
+│   ├── config.py                 # Configuration loader & environment variables
+│   ├── evidence.py               # Anti-hallucination sequential ID normalizer
+│   ├── llm.py                    # Gemini 2.5 Flash structured JSON clustering
+│   ├── pipelines.py              # Parallel execution pipelines (Modes 1, 2, 3)
+│   ├── protect.py                # Mode 4 Brand Protect & scam detection engine
+│   ├── scoring.py                # Deterministic Python mathematical scoring formulas
+│   ├── serp_client.py            # SerpApi client (Trends, Play Store, News, Reddit, Maps, Jobs)
+│   ├── youcom_client.py          # You.com Search API client & web intelligence
+│   ├── prewarm.py                # Demo preset prewarmer for offline presentations
+│   ├── monitor.py                # Scheduled background watch & monitoring service
+│   ├── notify.py                 # Automated Telegram alert dispatcher
+│   ├── compare.py                # Competitor side-by-side comparison utility
+│   ├── mock/                     # Offline contract mock datasets
+│   └── requirements.txt          # Python dependencies
 ├── frontend/
-│   ├── index.html             # Main research workspace & report container
-│   ├── report.html            # Standalone shareable report view
-│   ├── css/
-│   │   └── gapscope.css       # Custom styling & animations
+│   ├── index.html                # Main research application & interactive hub
+│   ├── report.html               # Dedicated shareable report viewer
+│   ├── css/gapscope.css          # Design system styling & custom animations
 │   ├── js/
-│   │   ├── api.js             # Client API service & Server-Sent Events stream consumer
-│   │   ├── app.js             # Application state, mode switching & event handlers
-│   │   ├── charts.js          # Chart.js trend curves & viability score gauges
-│   │   ├── config.js          # Client configuration, demo presets & source meta
-│   │   ├── render.js          # Modular HTML rendering for reports, clusters & evidence
-│   │   └── tw-config.js       # Tailwind theme extensions
-│   └── mock/                  # Client-side offline fallback mock datasets
-├── 01_PROBLEM_STATEMENT.md    # Hackathon problem statement & design principles
-├── 02_BACKEND_PROMPT.md       # Backend architecture specifications
-├── 03_FRONTEND_PROMPT.md      # Frontend architecture specifications
-├── MEMORY.md                  # Project memory & engineering decisions
-└── README.md                  # Project documentation
+│   │   ├── app.js                # State machine, mode switching & event orchestrator
+│   │   ├── api.js                # SSE client & API communication layer
+│   │   ├── charts.js             # Chart.js trend curves & viability score gauges
+│   │   ├── config.js             # Configuration, demo presets & source styling
+│   │   └── render.js             # XSS-safe HTML rendering engine for reports & clusters
+│   └── mock/                     # Client-side offline fallback mock datasets
+├── 01_PROBLEM_STATEMENT.md       # Hackathon problem statement & design principles
+├── MEMORY.md                     # Engineering decision records
+└── README.md                     # Project documentation
 ```
 
 ---
 
-## Important Notes
+## 🛡️ Guardrails & Engineering Moats
 
-- **API Rate Limits**: The backend enforces an in-memory sliding-window limiter (`SERPAPI_HOURLY_LIMIT=45`) to safeguard account quotas during testing.
-- **Decision Support**: Viability scores and trajectory verdicts represent algorithmic signals based on sampled public feedback and search volume; they serve as decision-support metrics rather than commercial guarantees.
-- **Offline Reliability**: With `DEMO_MODE=1` or `USE_MOCK=true`, all three modes operate with zero network latency, ensuring dependable demonstrations even without an active internet connection.
+1. **Anti-Hallucination Core:** Raw user feedback is mapped into sequential IDs (`ev_0001`...). Gemini is prompted to group exclusively by ID. Post-validation strips any references without direct proof.
+2. **Quota Protection:** An in-memory sliding-window limiter prevents account quota exhaustion (`SERPAPI_HOURLY_LIMIT=45`, `SERPAPI_SCAN_BUDGET=8`).
+3. **Deterministic Math:** Viability scores and trajectory verdicts are calculated entirely in Python—guaranteeing reproducibility, auditability, and mathematical integrity.
 
 ---
 
 <div align="center">
-  <sub>Built for the Beyond 9to5 Buildathon · Bengaluru, 2026</sub>
+
+**Built with ❤️ for the Beyond 9 to 5 Buildathon**  
+*Track 01 (SerpApi) & Track 02 (You.com)*
+
+<sub>© 2026 GapScope Team. Open-source under the MIT License.</sub>
+
 </div>
