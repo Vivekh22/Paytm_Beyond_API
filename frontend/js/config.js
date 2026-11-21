@@ -5,10 +5,12 @@
 
 export const CONFIG = {
   // Live Backend URL
-  API_BASE: 'http://localhost:5000',
+  API_BASE: (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'http://localhost:5000',
 
-  // Mock-first flag: true means simulated network and mock JSON reports
-  USE_MOCK: true,
+  // Mock-first flag: true on production preview/Vercel, false on local with running backend
+  USE_MOCK: !(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'),
 
   // Demo presets for one-click instant evaluation
   EXAMPLE_PRESETS: [
