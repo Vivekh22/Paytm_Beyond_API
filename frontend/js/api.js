@@ -48,7 +48,7 @@ export async function getExamples() {
  * @param {number} mode 1: validate, 2: investigate, 3: discover
  * @param {string} query 
  */
-export async function startScan(mode, query) {
+export async function startScan(mode, query, official = null) {
   if (CONFIG.USE_MOCK) {
     // Generate a simulated scan id
     const scanId = `mock_${mode}_${Math.random().toString(36).substring(2, 8)}`;
@@ -58,7 +58,7 @@ export async function startScan(mode, query) {
   const res = await fetch(`${CONFIG.API_BASE}/api/scan`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode: Number(mode), query: query.trim() })
+    body: JSON.stringify({ mode: Number(mode), query: query.trim(), ...(official ? { official } : {}) })
   });
 
   if (!res.ok) {
@@ -184,4 +184,17 @@ export async function getReport(scanId) {
     throw new Error(`Report not found (HTTP ${res.status})`);
   }
   return await res.json();
+}
+
+/**
+ * Mark a Protect finding as genuine (hidden from later scans of this brand)
+ */
+export async function allowFinding(brand, type, value) {
+  const res = await fetch(`${CONFIG.API_BASE}/api/protect/allow`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ brand, type, value })
+  });
+  if (!res.ok) throw new Error(`Could not save (HTTP ${res.status})`);
+  return res.json();
 }

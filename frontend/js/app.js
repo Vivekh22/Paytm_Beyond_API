@@ -4,7 +4,7 @@
  */
 
 import { CONFIG } from './config.js';
-import { startScan, streamScan, getReport, getExamples } from './api.js';
+import { startScan, streamScan, getReport, getExamples, allowFinding } from './api.js';
 import {
   esc,
   formatDate,
@@ -14,13 +14,15 @@ import {
   renderReceiptsSection,
   renderOpportunities,
   renderNewsSection,
+  renderFindingsSection,
   renderDrawerContent
 } from './render.js';
 import { renderScoreGauge, renderTrendLineChart, destroyChart } from './charts.js';
 
 // Application State
 const state = {
-  mode: 1, // 1: validate, 2: investigate, 3: discover
+  mode: 1, // 1: validate, 2: investigate, 3: discover, 4: protect
+  examples: [],
   query: '',
   activeReport: null,
   activeStreamController: null,
@@ -41,6 +43,14 @@ const dom = {
   modeBtn1: document.getElementById('modeBtn1'),
   modeBtn2: document.getElementById('modeBtn2'),
   modeBtn3: document.getElementById('modeBtn3'),
+  modeBtn4: document.getElementById('modeBtn4'),
+  modeHint: document.getElementById('modeHint'),
+  protectFieldsWrapper: document.getElementById('protectFieldsWrapper'),
+  officialDomainsInput: document.getElementById('officialDomainsInput'),
+  officialPhonesInput: document.getElementById('officialPhonesInput'),
+  officialAppsInput: document.getElementById('officialAppsInput'),
+  examplesLabel: document.getElementById('examplesLabel'),
+  findingsSection: document.getElementById('findingsSection'),
   scanForm: document.getElementById('scanForm'),
   textInputWrapper: document.getElementById('textInputWrapper'),
   scanQueryInput: document.getElementById('scanQueryInput'),
@@ -134,54 +144,78 @@ function updateCreditMeter(credits = {}) {
 /**
  * Switch Active Mode (1, 2, or 3)
  */
-function switchMode(newMode) {
-  state.mode = Number(newMode);
+const MODE_META = {
+  1: { slug: 'validate', name: 'Validate an idea', placeholder: 'e.g. UPI expense tracker for college students',
+       label: 'Describe your idea', hint: 'Describe an idea. You get a 0–100 score, BUILD / PIVOT / KILL, and the complaints competitors ignore.' },
+  2: { slug: 'investigate', name: 'Investigate a business', placeholder: 'e.g. Dunzo, Cult.fit, Swiggy Instamart',
+       label: 'Name a business or app', hint: 'Name a company or app. You get GROWING / STAGNATING / DECLINING, a month-by-month timeline and what users love and hate.' },
+  3: { slug: 'discover', name: 'Discover an opportunity', placeholder: '',
+       label: 'Pick a category', hint: 'Pick a category. GapScope scans its top 5 apps and finds the complaints they share.' },
+  4: { slug: 'protect', name: 'Protect a brand', placeholder: 'e.g. Blue Dart, IRCTC, your college name',
+       label: 'Brand or organisation name', hint: 'Name a brand. GapScope finds numbers, job posts, websites and apps using its name that don’t match its official records.' }
+};
+const SLUG_TO_MODE = { validate: 1, investigate: 2, discover: 3, protect: 4 };
 
-  const buttons = [
-    { btn: dom.modeBtn1, m: 1 },
-    { btn: dom.modeBtn2, m: 2 },
-    { btn: dom.modeBtn3, m: 3 }
-  ];
+function switchMode(newMode) {
+  state.mode = [1, 2, 3, 4].includes(Number(newMode)) ? Number(newMode) : 1;
+  const meta = MODE_META[state.mode];
 
   // Styling is driven by aria-selected (Tailwind aria-selected: variants in index.html)
-  buttons.forEach(({ btn, m }) => {
+  [dom.modeBtn1, dom.modeBtn2, dom.modeBtn3, dom.modeBtn4].forEach((btn, i) => {
     if (!btn) return;
-    btn.setAttribute('aria-selected', m === state.mode ? 'true' : 'false');
-    btn.tabIndex = m === state.mode ? 0 : -1;
+    btn.setAttribute('aria-selected', i + 1 === state.mode ? 'true' : 'false');
+    btn.tabIndex = i + 1 === state.mode ? 0 : -1;
+  });
+  document.querySelectorAll('.nav-mode').forEach(a => {
+    a.setAttribute('aria-current', Number(a.getAttribute('data-mode')) === state.mode ? 'true' : 'false');
   });
 
-  if (state.mode === 3) {
-    dom.textInputWrapper.classList.add('hidden');
-    dom.categoryGridWrapper.classList.remove('hidden');
-  } else {
-    dom.textInputWrapper.classList.remove('hidden');
-    dom.categoryGridWrapper.classList.add('hidden');
-    if (state.mode === 1) {
-      dom.scanQueryInput.placeholder = 'e.g. UPI expense tracker for college students';
-      dom.scanQueryInput.setAttribute('aria-label', 'Describe your idea');
-    } else {
-      dom.scanQueryInput.placeholder = 'e.g. Dunzo, Cult.fit, Swiggy Instamart';
-      dom.scanQueryInput.setAttribute('aria-label', 'Name a business');
-    }
+  if (dom.modeHint) dom.modeHint.textContent = meta.hint;
+  const isDiscover = state.mode === 3;
+  dom.textInputWrapper.classList.toggle('hidden', isDiscover);
+  dom.categoryGridWrapper.classList.toggle('hidden', !isDiscover);
+  if (dom.protectFieldsWrapper) dom.protectFieldsWrapper.classList.toggle('hidden', state.mode !== 4);
+  if (!isDiscover) {
+    dom.scanQueryInput.placeholder = meta.placeholder;
+    dom.scanQueryInput.setAttribute('aria-label', meta.label);
   }
 
   dom.otherCategoryInputRow.classList.add('hidden');
+  renderExamplePills();
+}
+
+function splitList(v) {
+  return String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+}
+
+function readOfficialRecords() {
+  if (!dom.officialDomainsInput) return null;
+  const official = {
+    domains: splitList(dom.officialDomainsInput.value),
+    phones: splitList(dom.officialPhonesInput.value),
+    app_ids: splitList(dom.officialAppsInput.value)
+  };
+  return (official.domains.length || official.phones.length || official.app_ids.length) ? official : null;
 }
 
 /**
  * Render Example Pills under search
  */
 async function loadExamplePills() {
-  if (!dom.examplePillsContainer) return;
+  state.examples = await getExamples();
+  renderExamplePills();
+}
 
-  const examples = await getExamples();
+function renderExamplePills() {
+  if (!dom.examplePillsContainer) return;
+  const examples = (state.examples || []).filter(ex => Number(ex.mode) === state.mode);
+  if (dom.examplesLabel) dom.examplesLabel.textContent = examples.length ? `Examples · ${MODE_META[state.mode].name}` : '';
   dom.examplePillsContainer.innerHTML = examples.map(ex => `
     <button type="button" class="example-pill inline-flex min-h-[40px] items-center gap-2 rounded-full border border-stone-400 bg-white px-3.5 text-sm font-medium hover:border-stone-950"
       data-mode="${esc(ex.mode)}"
       data-query="${esc(ex.query)}">
-      <span class="font-mono text-xs text-stone-500">0${esc(ex.mode)}</span>
       <span>${esc(ex.label)}</span>
-      <span class="rounded bg-orange-500 px-1.5 py-px font-mono text-[11px] font-semibold text-stone-950">${esc(ex.badge || '⚡ instant')}</span>
+      ${ex.cached ? '<span class="rounded bg-orange-500 px-1.5 py-px font-mono text-[11px] font-semibold text-stone-950" title="Saved result: loads without new API calls">instant</span>' : ''}
     </button>
   `).join('');
 
@@ -271,7 +305,7 @@ async function executeScan(mode, query) {
     state.activeStreamController = null;
   }
 
-  window.location.hash = `mode=${mode}&q=${encodeURIComponent(cleanQuery)}`;
+  history.replaceState(null, '', `#mode=${mode}&q=${encodeURIComponent(cleanQuery)}`);
 
   dom.scanErrorCard.classList.add('hidden');
   dom.reportContainer.classList.add('hidden');
@@ -285,7 +319,7 @@ async function executeScan(mode, query) {
   dom.progressArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   try {
-    const scanResponse = await startScan(mode, cleanQuery);
+    const scanResponse = await startScan(mode, cleanQuery, mode === 4 ? readOfficialRecords() : null);
     const scanId = scanResponse.scan_id || `scan_${Date.now()}`;
     
     state.activeStreamController = streamScan(scanId, handleProgressEvent, {
@@ -363,8 +397,23 @@ function renderReport(report) {
   dom.competitorsCountBadge.textContent = `${competitors.length} found`;
   dom.competitorsList.innerHTML = renderCompetitors(competitors);
 
-  // 6. Receipts / Clusters Section
-  dom.receiptsSection.innerHTML = renderReceiptsSection(report);
+  // Market context (trend + competitors) only when there is something to show
+  const marketCtx = document.getElementById('marketContextSection');
+  if (marketCtx) marketCtx.classList.toggle('hidden', report.mode === 4 || (!report.trend && !competitors.length));
+
+  // 6a. Protect findings (Mode 4)
+  if (dom.findingsSection) {
+    if (report.mode === 4) {
+      dom.findingsSection.innerHTML = renderFindingsSection(report);
+      dom.findingsSection.classList.remove('hidden');
+    } else {
+      dom.findingsSection.innerHTML = '';
+      dom.findingsSection.classList.add('hidden');
+    }
+  }
+
+  // 6b. Receipts / Clusters Section
+  dom.receiptsSection.innerHTML = report.mode === 4 ? '' : renderReceiptsSection(report);
 
   // 7. Opportunities Section
   if (report.opportunities && report.opportunities.length) {
@@ -389,7 +438,33 @@ function renderReport(report) {
 
   dom.reportContainer.classList.remove('hidden');
   attachReportInteractions(report);
+  attachFindingActions(report);
   dom.reportContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Protect (Mode 4): copy report text, mark a finding as allowed
+ */
+function attachFindingActions(report) {
+  if (!dom.findingsSection || report.mode !== 4) return;
+  dom.findingsSection.querySelectorAll('.btn-copy-report').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.getAttribute('data-report-text') || '';
+      navigator.clipboard.writeText(text).then(() => showToast('Report text copied')).catch(() => showToast('Copy failed'));
+    });
+  });
+  dom.findingsSection.querySelectorAll('.btn-allow-finding').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        await allowFinding(report.query, btn.getAttribute('data-type'), btn.getAttribute('data-value'));
+        const card = btn.closest('article');
+        if (card) card.remove();
+        showToast('Marked as allowed: hidden from future scans');
+      } catch (err) {
+        showToast(err.message || 'Could not save');
+      }
+    });
+  });
 }
 
 /**
@@ -551,6 +626,11 @@ function initHashRoute() {
   const hash = window.location.hash.replace(/^#/, '');
   if (!hash) return false;
 
+  if (SLUG_TO_MODE[hash]) {
+    openModeInput(SLUG_TO_MODE[hash]);
+    return true;
+  }
+
   const params = new URLSearchParams(hash);
   const mode = Number(params.get('mode')) || 1;
   const q = params.get('q');
@@ -567,13 +647,32 @@ function initHashRoute() {
 /**
  * Wire Global Event Handlers
  */
+function goToScan() {
+  dom.searchHub.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const target = state.mode === 3 ? dom.categoryChips.querySelector('.cat-chip') : dom.scanQueryInput;
+  setTimeout(() => target && target.focus({ preventScroll: true }), 350);
+}
+
+// Jump straight to a mode's input field (header links, #validate etc.)
+function openModeInput(mode) {
+  switchMode(mode);
+  history.replaceState(null, '', `#${MODE_META[state.mode].slug}`);
+  goToScan();
+}
+
 function setupEventHandlers() {
-  // "Start a scan" buttons (header, hero, closing CTA)
-  const goToScan = () => {
-    dom.searchHub.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    const target = state.mode === 3 ? dom.categoryChips.querySelector('.cat-chip') : dom.scanQueryInput;
-    setTimeout(() => target && target.focus({ preventScroll: true }), 350);
-  };
+  // Header / mobile navigation: one link per mode, straight to its input field
+  document.querySelectorAll('.nav-mode').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModeInput(Number(a.getAttribute('data-mode')));
+    });
+  });
+  window.addEventListener('hashchange', () => {
+    const slug = window.location.hash.replace(/^#/, '');
+    if (SLUG_TO_MODE[slug]) openModeInput(SLUG_TO_MODE[slug]);
+  });
+
   document.querySelectorAll('.js-start-scan').forEach(btn => btn.addEventListener('click', goToScan));
 
   // Mode bubbles, scoring cards and footer links that preselect a mode
@@ -612,7 +711,7 @@ function setupEventHandlers() {
   if (dismissWarningsBtn) dismissWarningsBtn.addEventListener('click', () => dom.reportWarnings.classList.add('hidden'));
 
   // Arrow-key navigation within the mode tablist
-  const tabs = [dom.modeBtn1, dom.modeBtn2, dom.modeBtn3];
+  const tabs = [dom.modeBtn1, dom.modeBtn2, dom.modeBtn3, dom.modeBtn4];
   tabs.forEach((btn, i) => {
     btn.addEventListener('keydown', (e) => {
       if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
@@ -627,6 +726,7 @@ function setupEventHandlers() {
   dom.modeBtn1.addEventListener('click', () => switchMode(1));
   dom.modeBtn2.addEventListener('click', () => switchMode(2));
   dom.modeBtn3.addEventListener('click', () => switchMode(3));
+  dom.modeBtn4.addEventListener('click', () => switchMode(4));
 
   // Category chip selection in Mode 3
   dom.categoryChips.querySelectorAll('.cat-chip').forEach(chip => {

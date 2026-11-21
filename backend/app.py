@@ -360,9 +360,14 @@ h1{{font-size:24px}}h2{{font-size:16px;margin-top:28px;color:#525252}}li{{margin
 def get_examples():
     """
     GET /api/examples
-    Returns standard demo presets.
+    Returns standard demo presets, with cached=true when a saved report exists (loads instantly).
     """
-    return jsonify(DEMO_PRESETS)
+    out = []
+    for p in DEMO_PRESETS:
+        item = {k: v for k, v in p.items() if k != "official"}
+        item["cached"] = find_latest_report(p["mode"], p["query"]) is not None
+        out.append(item)
+    return jsonify(out)
 
 
 @app.route("/api/health", methods=["GET"])

@@ -11,42 +11,19 @@ export const CONFIG = {
   USE_MOCK: false,
 
   // Demo presets for one-click instant evaluation
+  // Fallback only, used if /api/examples can't be reached. Must match backend DEMO_PRESETS.
   EXAMPLE_PRESETS: [
-    {
-      mode: 1,
-      query: 'UPI expense tracker for college students',
-      label: 'UPI expense tracker',
-      badge: '⚡ instant',
-      category: 'Finance'
-    },
-    {
-      mode: 2,
-      query: 'Dunzo',
-      label: 'Dunzo',
-      badge: '⚡ instant',
-      category: 'Quick-commerce'
-    },
-    {
-      mode: 3,
-      query: 'Personal Finance',
-      label: 'Personal Finance',
-      badge: '⚡ instant',
-      category: 'Finance'
-    },
-    {
-      mode: 1,
-      query: 'AI career coach for engineering graduates',
-      label: 'AI career coach',
-      badge: '⚡ instant',
-      category: 'EdTech'
-    },
-    {
-      mode: 2,
-      query: 'Cult.fit',
-      label: 'Cult.fit',
-      badge: '⚡ instant',
-      category: 'Health'
-    }
+    { mode: 1, query: 'UPI expense tracker for college students', label: 'UPI Expense Tracker' },
+    { mode: 1, query: 'AI tutor for JEE aspirants', label: 'AI Tutor for JEE' },
+    { mode: 1, query: 'Pet care booking app in Bengaluru', label: 'Pet Care Booking' },
+    { mode: 2, query: 'Dunzo', label: 'Dunzo' },
+    { mode: 2, query: 'Swiggy Instamart', label: 'Swiggy Instamart' },
+    { mode: 2, query: 'Cult.fit', label: 'Cult.fit' },
+    { mode: 3, query: 'Personal Finance', label: 'Personal Finance' },
+    { mode: 3, query: 'EdTech', label: 'EdTech' },
+    { mode: 3, query: 'Healthcare', label: 'Healthcare' },
+    { mode: 4, query: 'Blue Dart', label: 'Blue Dart' },
+    { mode: 4, query: 'IRCTC', label: 'IRCTC' }
   ],
 
   // Source styling tokens (outlined mono pills, one tint per source)
@@ -55,7 +32,11 @@ export const CONFIG = {
     reddit:      { name: 'Reddit',       letter: 'R', pillClass: 'border-orange-600 text-orange-700',               textClass: 'text-orange-700' },
     google_news: { name: 'Google News',  letter: 'N', pillClass: 'border-blue-700 text-blue-800',                   textClass: 'text-blue-800' },
     you_web:     { name: 'You.com Web',  letter: 'Y', pillClass: 'border-violet-700 bg-violet-50 text-violet-800',  textClass: 'text-violet-800' },
-    you_news:    { name: 'You.com News', letter: 'Y', pillClass: 'border-dashed border-violet-600 text-violet-700', textClass: 'text-violet-700' }
+    you_news:    { name: 'You.com News', letter: 'Y', pillClass: 'border-dashed border-violet-600 text-violet-700', textClass: 'text-violet-700' },
+    google_search: { name: 'Google Search', letter: 'G', pillClass: 'border-sky-700 text-sky-800',    textClass: 'text-sky-800' },
+    google_maps:   { name: 'Google Maps',   letter: 'M', pillClass: 'border-emerald-700 text-emerald-800', textClass: 'text-emerald-800' },
+    google_jobs:   { name: 'Google Jobs',   letter: 'J', pillClass: 'border-indigo-700 text-indigo-800', textClass: 'text-indigo-800' },
+    app_store:     { name: 'App Store',     letter: 'A', pillClass: 'border-stone-700 text-stone-800',  textClass: 'text-stone-800' }
   },
 
   // Scoring thresholds

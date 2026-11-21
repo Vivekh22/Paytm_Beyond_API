@@ -29,6 +29,7 @@ PLATFORMS = {
     "x.com", "twitter.com", "linkedin.com", "wikipedia.org", "reddit.com", "quora.com", "justdial.com",
     "naukri.com", "indeed.com", "glassdoor.com", "glassdoor.co.in", "internshala.com", "foundit.in",
     "apna.co", "shine.com", "timesjobs.com", "ambitionbox.com", "mouthshut.com", "consumercomplaints.in",
+    "jobrapido.com", "jooble.org", "careerjet.co.in", "workindia.in", "hirist.tech", "instahyre.com", "monsterindia.com",
 }
 
 
@@ -107,6 +108,11 @@ def mode4_protect(
     from pipelines import CreditTracker  # local import avoids a cycle
 
     brand = query.strip()
+    if re.fullmatch(r"(?:https?://)?(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+/?", brand.lower()):
+        typed_domain = domain_of(brand)
+        official = dict(official or {})
+        official["domains"] = list(dict.fromkeys((official.get("domains") or []) + [typed_domain]))
+        brand = typed_domain.split(".")[0]
     if official:
         save_official(brand, official)  # setup is remembered for repeat scans and the public page
     else:
@@ -221,8 +227,10 @@ def mode4_protect(
         if off_domains and apply_dom and not _is_official_domain(apply_dom, off_domains) and not _is_platform(apply_dom):
             reasons.append(f"applications go to {apply_dom}, not your website or a known job site")
         if reasons:
+            red_flag = bool(FEE_RE.search(desc) or mail)
             add("job_post", j.get("title") or "Job post", f"Job post '{j.get('title')}' uses your name",
-                "; ".join(reasons).capitalize(), "high" if (FEE_RE.search(desc) or mail) else "medium",
+                "; ".join(reasons).capitalize() + ("" if red_flag else " (often a job aggregator: confirm it is authorised)"),
+                "high" if red_flag else "info",
                 j.get("apply_link"), [eid_for("google_jobs", j.get("apply_link") or j.get("share_link") or "", j.get("title"))])
 
     # 3. Look-alike websites (any result domain containing the brand that isn't yours)

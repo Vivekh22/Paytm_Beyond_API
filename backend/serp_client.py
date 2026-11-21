@@ -652,6 +652,10 @@ def extract_page(
         val = data.get(key)
         if isinstance(val, str) and val.strip():
             return val[:20000], warn
+    info = data.get("page_information") if isinstance(data.get("page_information"), dict) else {}
+    meta_text = " ".join(x for x in [info.get("title") or "", info.get("description") or ""] if x)
+    if meta_text:
+        return meta_text, "Page has no readable body text (likely JavaScript-only); checked its title and description only."
     pages = data.get("pages") or data.get("results")
     if isinstance(pages, list) and pages and isinstance(pages[0], dict):
         for key in ("markdown", "content", "text"):

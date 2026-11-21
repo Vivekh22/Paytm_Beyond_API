@@ -134,7 +134,7 @@ export function renderVerdictHero(report) {
   const label = String(verdict.label || '').toUpperCase();
   const score = Number(verdict.score ?? 0);
   const tone = verdictTone(label);
-  const modeName = mode === 1 ? 'Validate an idea' : mode === 2 ? 'Investigate a business' : 'Discover an opportunity';
+  const modeName = { 1: 'Validate an idea', 2: 'Investigate a business', 3: 'Discover an opportunity', 4: 'Protect a brand' }[mode] || 'Scan';
 
   let visual = '';
   if (mode === 1) {
@@ -158,7 +158,17 @@ export function renderVerdictHero(report) {
         <span class="${DISPLAY} text-[6rem] font-extrabold leading-[0.8] ${tone.text}" aria-hidden="true">${tone.arrow}</span>
         <span class="${DISPLAY} pb-1 text-4xl font-extrabold tracking-[-0.03em] lg:text-5xl">${esc(label)}</span>
       </div>
-      <span class="self-start rounded-full border border-stone-600 px-2.5 py-1 ${MONO} text-xs text-stone-200">signal score ${score}/100</span>`;
+      <span class="self-start rounded-full border border-stone-600 px-2.5 py-1 ${MONO} text-xs text-stone-200">signals ${score > 0 ? '+' : ''}${score} (range −3 to +3)</span>`;
+  } else if (mode === 4) {
+    const fs = report.findings || [];
+    const flagged = fs.filter(f => f.severity !== 'info').length;
+    visual = `
+      <p class="${MONO} text-[13px] font-semibold uppercase tracking-[0.08em] text-orange-300">Suspected impersonations</p>
+      <div class="flex items-end gap-4">
+        <span class="${DISPLAY} ${flagged ? 'bg-red-500 text-white' : 'bg-green-500 text-stone-950'} px-[0.1em] pb-[0.02em] pt-[0.08em] text-[6rem] font-extrabold leading-[0.8] tracking-[-0.06em] lg:text-[8rem]">${flagged}</span>
+        <span class="${DISPLAY} pb-1.5 text-xl font-bold leading-[1.1] lg:text-[26px]">flagged · ${formatNum(fs.length - flagged)} to confirm</span>
+      </div>
+      <span class="self-start rounded-full border border-stone-600 px-2.5 py-1 ${MONO} text-xs text-stone-200">${formatNum(report.new_count || 0)} new since last scan${report.allowed_count ? ` · ${formatNum(report.allowed_count)} marked allowed` : ''}</span>`;
   } else {
     const nOpp = (report.opportunities || []).length;
     const nApps = (report.competitors || []).length;
@@ -202,12 +212,68 @@ export function renderVerdictHero(report) {
         <div class="flex flex-col justify-center gap-5 bg-stone-950 p-6 text-white lg:p-9">${visual}</div>
         <div class="flex flex-col bg-white p-6 lg:p-9">
           <div class="flex items-baseline justify-between gap-3 pb-3">
-            <span class="${MONO} text-[13px] font-semibold uppercase tracking-[0.08em]">How the score adds up</span>
-            <span class="${MONO} text-xs text-stone-500">fixed formula</span>
+            <span class="${MONO} text-[13px] font-semibold uppercase tracking-[0.08em]">${mode === 4 ? 'What was checked' : 'How the score adds up'}</span>
+            <span class="${MONO} text-xs text-stone-500">${mode === 4 ? 'rule-based' : 'fixed formula'}</span>
           </div>
           ${rows || `<p class="border-t border-stone-300 py-4 text-[15px] text-stone-600">No breakdown returned for this scan.</p>`}
         </div>
       </div>
+    </div>`;
+}
+
+/* ---------------------------------------------------------------- findings */
+
+const FINDING_TYPES = {
+  helpline: 'Helpline number',
+  job_post: 'Job / internship post',
+  lookalike_site: 'Look-alike website',
+  fake_app: 'App using your name',
+  scam_report: 'Public scam report'
+};
+
+export function renderFindingsSection(report) {
+  const fs = report.findings || [];
+  const official = report.official || {};
+  const offLine = [
+    official.domains && official.domains.length ? `websites: ${official.domains.join(', ')}` : '',
+    official.phones && official.phones.length ? `numbers: ${official.phones.join(', ')}` : '',
+    official.app_ids && official.app_ids.length ? `apps: ${official.app_ids.join(', ')}` : ''
+  ].filter(Boolean).join(' · ') || 'none given';
+  const verifiedUrl = `${CONFIG.API_BASE}/verified/${encodeURIComponent(report.query || '')}`;
+
+  const cards = fs.map(f => {
+    const sev = f.severity === 'high' ? 'border-red-600 bg-red-50 text-red-800'
+      : f.severity === 'medium' ? 'border-orange-500 bg-orange-50 text-orange-800'
+      : 'border-stone-300 bg-stone-50 text-stone-700';
+    const sevLabel = f.severity === 'info' ? 'to confirm' : `${f.severity} · suspected`;
+    const ids = f.evidence_ids || [];
+    const n = resolveEvidence(ids, report.evidence || {}).length;
+    return `
+      <article class="flex flex-col gap-3 rounded-[14px] border border-stone-300 bg-white p-5" id="finding-${esc(f.id)}">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="rounded-full border px-2.5 py-0.5 ${MONO} text-xs font-semibold ${sev}">${esc(sevLabel)}</span>
+          <span class="${MONO} text-xs text-stone-600">${esc(FINDING_TYPES[f.type] || f.type)}</span>
+          ${f.is_new ? `<span class="rounded bg-stone-950 px-1.5 py-px ${MONO} text-[11px] font-semibold text-white">NEW</span>` : ''}
+        </div>
+        <h3 class="text-lg font-bold leading-snug">${esc(f.title)}</h3>
+        <p class="${MONO} text-[15px] font-semibold break-all">${esc(f.value)}</p>
+        <p class="text-[15px] text-stone-700">${esc(f.why)}</p>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-stone-200 pt-3 text-sm">
+          ${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener" class="font-semibold underline underline-offset-4 hover:text-orange-700">Open where it was found ↗</a>` : ''}
+          ${n ? `<button type="button" class="btn-factor-evidence ${MONO} text-xs font-semibold underline underline-offset-4 hover:text-orange-700" data-evidence-ids="${esc(JSON.stringify(ids))}" data-title="${esc(f.title)}">${n} receipt${n === 1 ? '' : 's'} ↗</button>` : ''}
+          <button type="button" class="btn-copy-report font-semibold underline underline-offset-4 hover:text-orange-700" data-report-text="${esc(f.report_text || '')}">Copy report text</button>
+          <button type="button" class="btn-allow-finding font-semibold text-stone-600 underline underline-offset-4 hover:text-stone-950" data-type="${esc(f.type)}" data-value="${esc(f.value)}">It's ours: mark as allowed</button>
+        </div>
+        ${(f.report_to || []).length ? `<details class="text-sm text-stone-700"><summary class="cursor-pointer font-semibold">Where to report</summary><ul class="mt-2 flex list-disc flex-col gap-1 pl-5">${f.report_to.map(r => `<li><strong>${esc(r.channel)}:</strong> ${esc(r.how)}</li>`).join('')}</ul></details>` : ''}
+      </article>`;
+  }).join('');
+
+  return `
+    <div class="flex flex-col gap-6">
+      ${sectionHead('Findings', `${formatNum(fs.length)} item${fs.length === 1 ? '' : 's'} using “${esc(report.query)}”`,
+        `Compared against your official records (${esc(offLine)}). Nothing here is confirmed fake: each item is “suspected” with its evidence.`,
+        `<a href="${esc(verifiedUrl)}" target="_blank" rel="noopener" class="inline-flex min-h-[44px] items-center rounded-[10px] border-[1.5px] border-stone-950 px-4 text-[15px] font-bold hover:bg-stone-950 hover:text-white">Public “official channels” page ↗</a>`)}
+      ${cards ? `<div class="grid gap-4 lg:grid-cols-2">${cards}</div>` : `<p class="rounded-[14px] border border-stone-300 bg-white p-5 text-[15px] text-stone-700">Nothing found using this name in this scan.</p>`}
     </div>`;
 }
 
