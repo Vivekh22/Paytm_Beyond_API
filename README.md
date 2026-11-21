@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔭 GapScope
+#  GapScope
 
 ### **Autonomous Market Intelligence Engine Where Every Claim Links to Its Receipts.**
 
@@ -23,33 +23,7 @@ Built for the **Beyond 9 to 5 Buildathon**
 
 ---
 
-## 💡 The Problem & GapScope's Solution
-
-<<<<<<< HEAD
-| The Traditional AI Trap | The GapScope Way |
-|---|---|
-| ❌ **Hallucinated Market Data:** LLMs invent user feedback, competitor metrics, and synthetic quotes. | ✅ **Zero-Hallucination Evidence Core:** Every review, forum thread, and article snippet is assigned an immutable ID (`ev_0001`...). AI clusters by ID only—never paraphrasing or inventing quotes. |
-| ❌ **Black-Box "Vibes" Scoring:** "7/10 market viability" generated from arbitrary prompt completions. | ✅ **Deterministic Python Math Engine:** Transparent mathematical formulas calculate Demand, Pain Intensity, Competition Gap, and Momentum (0–100 scale). |
-| ❌ **Static & Stale Snapshots:** Reports reflect outdated training data cutoff dates. | ✅ **Multi-Source Live Intelligence:** Real-time data synthesis across Google Trends, Play Store reviews, Reddit discussions, Google News, and You.com Web Index. |
-| ❌ **No Impersonation Defense:** Startups and brands are defenseless against fake apps, scam helplines, and lookalike domains. | ✅ **Integrated Brand Protect (Mode 4):** Autonomous scam, fake job listing, and lookalike portal detection with one-click takedown text and public verification pages. |
-=======
-<div align="center">
-
-### Research Workspace & Scan Hub
-<img src="assets/screenshots/landing-hero.png" alt="GapScope Landing Hero & Research Workspace" width="100%" />
-
-<br/><br/>
-
-| Market Intelligence Report & Viability Score | Live Evidence Wall & Customer Receipts |
-|:---:|:---:|
-| <img src="assets/screenshots/report-overview.png" alt="GapScope Market Intelligence Report" width="100%" /> | <img src="assets/screenshots/evidence-wall.png" alt="GapScope Evidence Wall" width="100%" /> |
-
-</div>
->>>>>>> 5ce1897d8585ee76b386f016b9a1667d4ea77893
-
----
-
-## 📸 Product Showcase
+## Product Showcase
 
 ### 1. Research Workspace & Scan Hub
 > Full-viewport interactive workspace supporting single-click demo presets, customizable search queries, and dynamic mode routing.
@@ -66,24 +40,24 @@ Built for the **Beyond 9 to 5 Buildathon**
 <table width="100%">
   <tr>
     <td width="50%" align="center" valign="top">
-      <h4>🎯 01 · Viability Score & Math Breakdown</h4>
+      <h4>01 · Viability Score & Math Breakdown</h4>
       <img src="assets/screenshots/section1-verdict.png" alt="Viability Score & Mathematical Verdict Breakdown" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
       <p align="left"><sub><b>Deterministic Verdict:</b> Concrete <b>BUILD</b> (≥65), <b>PIVOT</b> (40–64), or <b>KILL</b> (&lt;40) verdicts with mathematical factor attribution.</sub></p>
     </td>
     <td width="50%" align="center" valign="top">
-      <h4>📈 02 · 12-Month Demand Trend & Competitors</h4>
+      <h4>02 · 12-Month Demand Trend & Competitors</h4>
       <img src="assets/screenshots/section2-demand-trend.png" alt="Google Trends Demand Curve & Competitor Intelligence" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
       <p align="left"><sub><b>Market Momentum:</b> Real-time Google Trends search slope across India anchored against baseline benchmarks and competitor app ratings.</sub></p>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center" valign="top">
-      <h4>💬 03 · Verbatim Customer Friction Wall</h4>
+      <h4>03 · Verbatim Customer Friction Wall</h4>
       <img src="assets/screenshots/section3-evidence-clusters.png" alt="Anti-Hallucination Pain Clusters with Direct Citations" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
       <p align="left"><sub><b>Evidence with Receipts:</b> Unfiltered 1★ Play Store complaints, Reddit discussions, and You.com forum findings with direct outbound links.</sub></p>
     </td>
     <td width="50%" align="center" valign="top">
-      <h4>🚀 04 · Strategic Opportunities & Blueprints</h4>
+      <h4>04 · Strategic Opportunities & Blueprints</h4>
       <img src="assets/screenshots/section4-opportunities.png" alt="Actionable Concept Blueprints & Solutions" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
       <p align="left"><sub><b>Actionable Whitespace:</b> AI-synthesized product concepts pointing directly to the exact customer pain clusters they resolve.</sub></p>
     </td>
@@ -96,20 +70,20 @@ Built for the **Beyond 9 to 5 Buildathon**
 
 ```mermaid
 flowchart TD
-    subgraph Client["🖥️ Frontend Client (:8080)"]
+    subgraph Client[" Frontend Client (:8080)"]
         UI["User Interface\n(Modes 1, 2, 3, 4)"]
         SSE["SSE Stream Listener\n& Live Progress Tracker"]
         Drawer["Interactive Evidence Drawer\n& Verification Vault"]
     end
 
-    subgraph Backend["⚙️ Flask Engine (:5000)"]
+    subgraph Backend[" Flask Engine (:5000)"]
         Router["REST & SSE Gateway\n(/api/scan & /api/scan/id/stream)"]
         Pool["ThreadPoolExecutor\nParallel Dispatch Worker"]
         Cache[("SQLite WAL Cache\n72h TTL & SHA-256 Hashes")]
         Limiter["Sliding-Window Limiter\n(45 Calls/Hr Safety Guard)"]
     end
 
-    subgraph Providers["🌐 Live Intelligence Ingestion"]
+    subgraph Providers[" Live Intelligence Ingestion"]
         direction TB
         subgraph Track1["Track 01: SerpApi Engine"]
             GT["Google Trends (IN)"]
@@ -124,7 +98,7 @@ flowchart TD
         end
     end
 
-    subgraph Core["🧠 Intelligence Synthesis Engine"]
+    subgraph Core[" Intelligence Synthesis Engine"]
         Normalizer["Evidence Normalizer\n(Stable IDs: ev_0001...)"]
         Gemini["Google Gemini 2.5 Flash\n(Strict ID-Based Clustering)"]
         Math["Deterministic Python Scoring\n(Viability & Trajectory Formulas)"]
@@ -145,7 +119,7 @@ flowchart TD
 
 ---
 
-## ⚡ The Four Intelligence Modes
+## The Four Intelligence Modes
 
 ### Mode 01: Validate an Idea
 > *"I have an idea. Is there a genuine market opportunity?"*
@@ -178,7 +152,7 @@ flowchart TD
 
 ---
 
-## 🛠️ Tech Stack & Dependencies
+##  Tech Stack & Dependencies
 
 | Category | Technologies | Description |
 |---|---|---|
@@ -192,9 +166,9 @@ flowchart TD
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
-### 📋 Prerequisites
+### Prerequisites
 - Python 3.11 or higher
 - API Keys:
   - [Google Gemini API Key](https://aistudio.google.com/)
@@ -289,7 +263,7 @@ Set `DEMO_MODE=1` in `backend/.env` to run 100% offline using cached reports wit
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -303,7 +277,7 @@ Set `DEMO_MODE=1` in `backend/.env` to run 100% offline using cached reports wit
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 
 ```
 Paytm_Beyond_API/
@@ -349,7 +323,7 @@ Paytm_Beyond_API/
 
 ---
 
-## 🛡️ Guardrails & Engineering Moats
+## Guardrails & Engineering Moats
 
 1. **Anti-Hallucination Core:** Raw user feedback is mapped into sequential IDs (`ev_0001`...). Gemini is prompted to group exclusively by ID. Post-validation strips any references without direct proof.
 2. **Quota Protection:** An in-memory sliding-window limiter prevents account quota exhaustion (`SERPAPI_HOURLY_LIMIT=45`, `SERPAPI_SCAN_BUDGET=8`).
