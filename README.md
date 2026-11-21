@@ -25,7 +25,7 @@ Built for the **Beyond 9 to 5 Buildathon**
 
 ## Product Showcase
 
-### 1. Research Workspace & Scan Hub
+### Research Workspace & Scan Hub
 > Full-viewport interactive workspace supporting single-click demo presets, customizable search queries, and dynamic mode routing.
 
 <div align="center">
@@ -34,35 +34,6 @@ Built for the **Beyond 9 to 5 Buildathon**
 
 <br/>
 
-### 2. Live Intelligence Reports & Deep Insights
-> Interactive intelligence views featuring deterministic score gauges, 12-month Google Trends curves, verified customer receipts, and actionable startup blueprints.
-
-<table width="100%">
-  <tr>
-    <td width="50%" align="center" valign="top">
-      <h4>01 · Viability Score & Math Breakdown</h4>
-      <img src="assets/screenshots/section1-verdict.png" alt="Viability Score & Mathematical Verdict Breakdown" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-      <p align="left"><sub><b>Deterministic Verdict:</b> Concrete <b>BUILD</b> (≥65), <b>PIVOT</b> (40–64), or <b>KILL</b> (&lt;40) verdicts with mathematical factor attribution.</sub></p>
-    </td>
-    <td width="50%" align="center" valign="top">
-      <h4>02 · 12-Month Demand Trend & Competitors</h4>
-      <img src="assets/screenshots/section2-demand-trend.png" alt="Google Trends Demand Curve & Competitor Intelligence" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-      <p align="left"><sub><b>Market Momentum:</b> Real-time Google Trends search slope across India anchored against baseline benchmarks and competitor app ratings.</sub></p>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" align="center" valign="top">
-      <h4>03 · Verbatim Customer Friction Wall</h4>
-      <img src="assets/screenshots/section3-evidence-clusters.png" alt="Anti-Hallucination Pain Clusters with Direct Citations" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-      <p align="left"><sub><b>Evidence with Receipts:</b> Unfiltered 1★ Play Store complaints, Reddit discussions, and You.com forum findings with direct outbound links.</sub></p>
-    </td>
-    <td width="50%" align="center" valign="top">
-      <h4>04 · Strategic Opportunities & Blueprints</h4>
-      <img src="assets/screenshots/section4-opportunities.png" alt="Actionable Concept Blueprints & Solutions" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-      <p align="left"><sub><b>Actionable Whitespace:</b> AI-synthesized product concepts pointing directly to the exact customer pain clusters they resolve.</sub></p>
-    </td>
-  </tr>
-</table>
 
 ---
 
