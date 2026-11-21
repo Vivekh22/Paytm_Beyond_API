@@ -35,7 +35,7 @@ The user submits an idea, business, or category. GapScope fetches live multi-sou
 - [x] P0: SerpApi client wrappers with defensive parsing (`serp_client.py`)
 - [x] P0: You.com client integration for Track 02 (`youcom_client.py`)
 - [x] P0: Anti-hallucination evidence normalization (`evidence.py`)
-- [x] P0: Gemini 2.5 Flash clustering, opportunity generation, and post-validation (`llm.py`)
+- [x] P0: Gemini 2.5/3.8 Flash clustering, opportunity generation, and post-validation (`llm.py`)
 - [x] P0: Deterministic scoring formulas for Viability, Trajectory, and Discovery (`scoring.py`)
 - [x] P0: Mode 1 Pipeline with ThreadPoolExecutor parallelization (`pipelines.py`)
 - [x] P1: Mode 2 Pipeline (Competitor Investigation) and Mode 3 Pipeline (Category Discovery)
@@ -43,3 +43,4 @@ The user submits an idea, business, or category. GapScope fetches live multi-sou
 - [x] P0: Shared contract mock files (`mock/report_mode1.json`, `report_mode2.json`, `report_mode3.json`)
 - [x] P0: Prewarm script with `--dry-run` and demo preset cache filling (`prewarm.py`)
 - [x] P2: Setup documentation and curl examples (`README.md`)
+- [x] Pulled Frontend application (`frontend/index.html`, `frontend/report.html`, `frontend/js/`, `frontend/css/`) from remote origin.
