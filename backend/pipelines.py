@@ -109,7 +109,7 @@ def mode1_validate(
     you_web_2: List[Dict[str, Any]] = []
 
     def fetch_trends(kw):
-        pts, warn = trends_timeseries(kw, tracker=tracker, anchor=TRENDS_ANCHOR)
+        pts, warn = trends_timeseries(kw, tracker=tracker)
         return pts, warn
 
     def fetch_play(q):
@@ -156,14 +156,13 @@ def mode1_validate(
         if tracker.to_dict()["serpapi_live"] + 1 + 3 > SERPAPI_SCAN_BUDGET:
             warnings.append(f"Skipped Trends fallback: per-scan SerpApi budget ({SERPAPI_SCAN_BUDGET}) reached")
         elif fallback_kw and fallback_kw.lower() != broad.lower():
-            fb_pts, fb_warn = trends_timeseries(fallback_kw, tracker=tracker, anchor=TRENDS_ANCHOR)
+            fb_pts, fb_warn = trends_timeseries(fallback_kw, tracker=tracker)
             if fb_pts:
                 trend_points = fb_pts
                 warnings.append(f"Google Trends returned no data for '{broad}'; used '{fallback_kw}'")
                 broad = fallback_kw
 
-    # Split the anchor series out of the keyword points (kept only for scoring)
-    anchor_values = [p.pop("anchor") for p in trend_points if isinstance(p, dict) and "anchor" in p]
+    anchor_values = None
 
     # Top competitors
     top_apps = play_apps[:3]
