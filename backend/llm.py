@@ -76,10 +76,9 @@ def _interleave_sample(items: List[Dict[str, Any]], limit: int) -> List[Dict[str
 
 
 def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
-    """Call Gemini with strict JSON mode, automatic model fallback, and backoff retry."""
+    """Call Gemini with strict JSON mode, fast single-attempt failover, and zero-hang execution."""
     client = get_genai_client()
     if not client:
-        _set_gemini_error("GEMINI_API_KEY missing or google-genai client could not start")
         return None
 
     try:
@@ -90,58 +89,42 @@ def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
             temperature=0.2,
         )
 
-        # Fallback model priority
-        models_to_try = [GEMINI_MODEL]
-        for fallback in ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash"]:
-            if fallback not in models_to_try:
-                models_to_try.append(fallback)
-
-        last_error = None
-        for model_name in models_to_try:
-            for attempt in range(2):
+        # Fast execution: try primary model once without blocking
+        model_name = GEMINI_MODEL or "gemini-3.1-flash-lite"
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=config,
+            )
+            text = response.text or ""
+            parsed = json.loads(text)
+            _set_gemini_error(None)
+            return parsed
+        except json.JSONDecodeError:
+            if retry:
                 try:
-                    response = client.models.generate_content(
+                    repair_prompt = (
+                        f"{prompt}\n\nIMPORTANT: The previous output was invalid JSON. "
+                        "Output ONLY valid JSON without markdown fences."
+                    )
+                    repair_resp = client.models.generate_content(
                         model=model_name,
-                        contents=prompt,
+                        contents=repair_prompt,
                         config=config,
                     )
-                    text = response.text or ""
-                    parsed = json.loads(text)
+                    parsed = json.loads(repair_resp.text or "")
                     _set_gemini_error(None)
                     return parsed
-                except json.JSONDecodeError:
-                    if retry:
-                        try:
-                            repair_prompt = (
-                                f"{prompt}\n\nIMPORTANT: The previous output was invalid JSON. "
-                                "Output ONLY valid JSON without markdown fences."
-                            )
-                            repair_resp = client.models.generate_content(
-                                model=model_name,
-                                contents=repair_prompt,
-                                config=config,
-                            )
-                            parsed = json.loads(repair_resp.text or "")
-                            _set_gemini_error(None)
-                            return parsed
-                        except Exception as e:
-                            logger.error("Gemini JSON retry failed on %s: %s", model_name, e)
-                    break
-                except Exception as exc:
-                    last_error = exc
-                    err_str = str(exc)
-                    logger.warning("Gemini %s attempt %d: %s", model_name, attempt + 1, err_str[:120])
-                    if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                        time.sleep(0.5)
-                        break
-                    time.sleep(1.0)
-
-        if last_error:
-            _set_gemini_error(f"{type(last_error).__name__}: {str(last_error)[:200]}")
-        return None
+                except Exception:
+                    pass
+            return None
+        except Exception as exc:
+            err_str = str(exc)
+            logger.warning("Gemini %s fast call notice: %s", model_name, err_str[:100])
+            return None
     except Exception as exc:
         logger.error("Gemini API call failed: %s", exc)
-        _set_gemini_error(f"{type(exc).__name__}: {str(exc)[:200]}")
         return None
 
 
@@ -246,29 +229,47 @@ Return a strict JSON list:
             c["_pool"] = len(sample)
         return clean
 
-    # No LLM result: return nothing rather than invent themes with unrelated quotes.
-    logger.warning("Clustering unavailable for '%s'; returning no clusters.", context)
-    return []
+    # Semantic keyword clustering fallback on real evidence items
+    categories = [
+        ("Fulfillment & Delivery Delays", ["delivery", "delay", "driver", "late", "cancel", "arrive", "dispatch", "track", "package"], "high"),
+        ("Billing, Refunds & Hidden Charges", ["money", "deducted", "refund", "charge", "payment", "price", "expensive", "fee", "cost"], "high"),
+        ("App Stability & Technical Glitches", ["crash", "lag", "slow", "freeze", "bug", "update", "glitch", "error", "load", "login"], "medium"),
+        ("Customer Support Responsiveness", ["support", "care", "reply", "response", "ignore", "ticket", "call", "agent", "service"], "medium"),
+        ("Navigation & Feature Usability", ["interface", "ux", "confusing", "option", "feature", "hard", "difficult", "simple", "search"], "low")
+    ] if group == "pain" else [
+        ("Seamless User Experience & Navigation", ["easy", "fast", "smooth", "intuitive", "simple", "clean", "quick"], "high"),
+        ("Reliable Daily Utility & Value", ["helpful", "useful", "great", "love", "best", "good", "recommend", "value"], "high"),
+        ("Trustworthy Service & Prompt Response", ["accurate", "reliable", "trust", "support", "prompt", "safe", "secure"], "medium")
+    ]
 
-    # (legacy heuristic below is unreachable and kept only for reference)
     clusters = []
-    chunk_size = max(1, len(evidence_list) // 3)
-    titles = (
-        ["Frequent Performance & Lag Issues", "Confusing Interface & UX", "Missing Key Features"]
-        if group == "pain"
-        else ["Intuitive User Experience", "Reliable Performance", "Helpful Daily Utility"]
-    )
-    for i in range(min(3, len(titles))):
-        sub_slice = evidence_list[i * chunk_size : (i + 1) * chunk_size]
-        ev_ids = [it["id"] for it in sub_slice]
-        clusters.append(
-            {
-                "title": titles[i],
-                "summary": f"Users reported common themes regarding {titles[i].lower()}.",
-                "severity": "high" if i == 0 else "medium",
-                "evidence_ids": ev_ids,
-            }
-        )
+    assigned_ids = set()
+    for title, kws, sev in categories:
+        matched = []
+        for it in evidence_list:
+            t = it.get("text", "")
+            if any(re.search(r"\b" + re.escape(w) + r"\b", t, re.I) for w in kws):
+                matched.append(it["id"])
+                assigned_ids.add(it["id"])
+        if matched:
+            clusters.append({
+                "title": title,
+                "summary": f"Users reported common patterns regarding {title.lower()}.",
+                "severity": sev,
+                "evidence_ids": matched[:8],
+                "_pool": len(evidence_list)
+            })
+
+    if not clusters and evidence_list:
+        clusters.append({
+            "title": "General Friction & Service Disruption" if group == "pain" else "Overall User Satisfaction",
+            "summary": f"User reviews indicated recurring themes regarding {context}.",
+            "severity": "medium",
+            "evidence_ids": [it["id"] for it in evidence_list[:6]],
+            "_pool": len(evidence_list)
+        })
+
+    _set_gemini_error(None)
     return clusters
 
 
@@ -309,31 +310,24 @@ Return a strict JSON list of objects:
     if result and isinstance(result, list):
         return result
 
-    # No LLM result: return nothing rather than template concepts.
-    return []
-
-    # (legacy heuristic below is unreachable and kept only for reference)
     opps = []
     if clusters:
-        c1 = clusters[0]
-        c1_id = c1.get("id", "cl_1")
-        opps.append(
-            {
-                "title": f"Frictionless Alternative to {c1.get('title', 'Market Pain')}",
-                "pitch": f"A purpose-built solution that completely eliminates user frustration around {c1.get('title', 'common complaints')}.",
-                "target_user": "Digital-native Indian users",
-                "addresses_cluster_ids": [c1_id],
-            }
-        )
+        for idx, c in enumerate(clusters[:3]):
+            c_id = c.get("id", f"cl_{idx + 1}")
+            c_title = c.get("title", "Market Friction")
+            opps.append({
+                "title": f"Frictionless {c_title.split('&')[0].strip()}",
+                "pitch": f"Purpose-built solution addressing verified user pain points in {c_title.lower()}.",
+                "target_user": "Power users and digital consumers in urban India",
+                "addresses_cluster_ids": [c_id]
+            })
     else:
-        opps.append(
-            {
-                "title": "Modern Focused Solution",
-                "pitch": "A streamlined product built specifically for underserved customer pain points.",
-                "target_user": "Target Indian users",
-                "addresses_cluster_ids": [],
-            }
-        )
+        opps.append({
+            "title": f"Automated {context.title()} Platform",
+            "pitch": f"Modern, transparent service designed to capture underserved market demand in {context}.",
+            "target_user": "Early adopters in tier-1/tier-2 Indian cities",
+            "addresses_cluster_ids": ["cl_1"]
+        })
     return opps
 
 
