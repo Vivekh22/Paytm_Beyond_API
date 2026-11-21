@@ -155,6 +155,7 @@ def run_pipeline_task(session: ScanSession) -> None:
 
 
 @app.route("/api/scan", methods=["POST"])
+@app.route("/scan", methods=["POST"])
 def start_scan():
     """
     POST /api/scan
@@ -188,10 +189,12 @@ def start_scan():
 
 
 @app.route("/api/scan/<scan_id>/stream", methods=["GET"])
+@app.route("/scan/<scan_id>/stream", methods=["GET"])
 def stream_scan(scan_id: str):
     """
     GET /api/scan/<id>/stream
     Server-Sent Events delivering progress and terminal 'done' or 'error' events.
+    Supports in-memory threading locally and on-demand streaming on serverless.
     """
     with scans_lock:
         session = active_scans.get(scan_id)
@@ -200,7 +203,6 @@ def stream_scan(scan_id: str):
     if not session:
         saved = get_report(scan_id)
         if saved:
-
             def immediate_generator():
                 payload = json.dumps({"type": "done", "report": saved})
                 yield f"data: {payload}\n\n"
@@ -214,6 +216,61 @@ def stream_scan(scan_id: str):
                     "Connection": "keep-alive",
                 },
             )
+
+        # Serverless fallback: On-demand execution directly within the open SSE connection
+        mode = request.args.get("mode", type=int)
+        query = (request.args.get("query") or "").strip()
+        if mode and query:
+            def ondemand_generator():
+                q = queue.Queue()
+
+                def on_progress(step: str, message: str, pct: int) -> None:
+                    q.put({"type": "progress", "step": step, "message": message, "pct": pct})
+
+                def worker():
+                    try:
+                        if mode == 1:
+                            rep = mode1_validate(query, progress_callback=on_progress)
+                        elif mode == 2:
+                            rep = mode2_investigate(query, progress_callback=on_progress)
+                        elif mode == 3:
+                            rep = mode3_discover(query, progress_callback=on_progress)
+                        elif mode == 4:
+                            rep = mode4_protect(query, {}, progress_callback=on_progress)
+                        else:
+                            raise ValueError(f"Invalid mode: {mode}")
+
+                        rep["scan_id"] = scan_id
+                        save_report(scan_id, mode, query, rep)
+                        q.put({"type": "done", "report": rep})
+                    except Exception as exc:
+                        logger.exception("On-demand pipeline error for scan %s", scan_id)
+                        q.put({"type": "error", "message": str(exc)})
+
+                t = threading.Thread(target=worker, daemon=True)
+                t.start()
+
+                while True:
+                    try:
+                        evt = q.get(timeout=15.0)
+                        yield f"data: {json.dumps(evt)}\n\n"
+                        if evt.get("type") in ("done", "error"):
+                            break
+                    except queue.Empty:
+                        yield ": ping\n\n"
+                        if not t.is_alive():
+                            break
+
+            return Response(
+                ondemand_generator(),
+                mimetype="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "X-Accel-Buffering": "no",
+                    "Connection": "keep-alive",
+                },
+            )
+
         return jsonify({"error": f"Scan ID '{scan_id}' not found."}), 404
 
     def sse_event_stream():
@@ -247,6 +304,7 @@ def stream_scan(scan_id: str):
 
 
 @app.route("/api/report/<scan_id>", methods=["GET"])
+@app.route("/report/<scan_id>", methods=["GET"])
 def get_report_endpoint(scan_id: str):
     """
     GET /api/report/<id>
@@ -357,6 +415,7 @@ h1{{font-size:24px}}h2{{font-size:16px;margin-top:28px;color:#525252}}li{{margin
 
 
 @app.route("/api/examples", methods=["GET"])
+@app.route("/examples", methods=["GET"])
 def get_examples():
     """
     GET /api/examples
@@ -371,6 +430,7 @@ def get_examples():
 
 
 @app.route("/api/health", methods=["GET"])
+@app.route("/health", methods=["GET"])
 def get_health():
     """
     GET /api/health

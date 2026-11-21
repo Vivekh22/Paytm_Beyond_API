@@ -135,8 +135,8 @@ export function streamScan(scanId, onEvent, meta = {}) {
     };
   }
 
-  // Live SSE via EventSource
-  const url = `${CONFIG.API_BASE}/api/scan/${scanId}/stream`;
+  // Live SSE via EventSource (supports query params for serverless invocation)
+  const url = `${CONFIG.API_BASE}/api/scan/${scanId}/stream?mode=${mode}&query=${encodeURIComponent(meta.query || '')}`;
   const eventSource = new EventSource(url);
 
   eventSource.onmessage = (e) => {
