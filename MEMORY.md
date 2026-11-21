@@ -49,4 +49,5 @@ The user submits an idea, business, or category. GapScope fetches live multi-sou
 - [x] Fixed Vercel 404 routing by removing legacy `version: 2`, bundling runtime modules directly into `api/`, and enabling on-demand SSE streaming.
 - [x] Resolved Gemini 503/429 high demand & quota limits: default model updated to `gemini-3.1-flash-lite` with automatic fallback chain (`gemini-3.1-flash-lite` -> `gemini-3.5-flash-lite` -> `gemini-3.8-flash`) and backoff retry.
 - [x] Verified live deployment on Vercel (`https://qwer-beta-ten.vercel.app`): `/api/health` returns HTTP 200, `/api/scan` returns HTTP 202, and SSE streams live progress chunks.
+- [x] Fixed Google Trends timeseries squashing in Mode 1: removed anchor term comparison (`anchor=credit card`) so timeseries points reflect real 0-100 search volume dynamics instead of flatlining at 0.
 - [x] All code committed and synchronized across both `Vivekh22/Paytm_Beyond_API` and `AM-iSMAIL/qwer`.
