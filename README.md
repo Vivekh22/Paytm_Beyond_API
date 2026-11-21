@@ -66,15 +66,15 @@ Built for the **Beyond 9 to 5 Buildathon**
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart LR
-    A["👤 User Input\n(Validate / Investigate / Discover)"] --> B["⚡ Flask Backend\n(REST API & Cache)"]
-    B --> C["🌐 Live Data Sources\n• SerpApi (Reviews & Trends)\n• You.com (Web Search)"]
-    C --> D["🧠 Gemini 2.5 Flash\n(Evidence Clustering)"]
-    D --> E["📊 Python Scoring\n(Viability 0–100)"]
-    E --> F["📑 Evidence Report\n(Verifiable Receipts)"]
+    A["User Input\n(Validate / Investigate / Discover)"] --> B["Flask Backend\n(REST API & Cache)"]
+    B --> C["Live Data Sources\n• SerpApi (Reviews & Trends)\n• You.com (Web Search)"]
+    C --> D["Gemini 2.5 Flash\n(Evidence Clustering)"]
+    D --> E["Python Scoring\n(Viability 0–100)"]
+    E --> F["Evidence Report\n(Verifiable Receipts)"]
 ```
 
 ---
