@@ -21,18 +21,14 @@ An autonomous market-intelligence engine that investigates startup concepts, com
 
 <div align="center">
 
-### 1. Research Workspace & Three Core Modes
-<img src="assets/screenshots/landing-hero.png" alt="GapScope Landing & Mode Switcher" width="900" />
+### Research Workspace & Scan Hub
+<img src="assets/screenshots/landing-hero.png" alt="GapScope Landing Hero & Research Workspace" width="100%" />
 
 <br/><br/>
 
-### 2. Market Intelligence Report & Viability Score Gauge
-<img src="assets/screenshots/report-overview.png" alt="GapScope Market Intelligence Report" width="900" />
-
-<br/><br/>
-
-### 3. Evidence Wall — Customer Friction Receipts
-<img src="assets/screenshots/evidence-wall.png" alt="GapScope Evidence Wall" width="900" />
+| Market Intelligence Report & Viability Score | Live Evidence Wall & Customer Receipts |
+|:---:|:---:|
+| <img src="assets/screenshots/report-overview.png" alt="GapScope Market Intelligence Report" width="100%" /> | <img src="assets/screenshots/evidence-wall.png" alt="GapScope Evidence Wall" width="100%" /> |
 
 </div>
 
