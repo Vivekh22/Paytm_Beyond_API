@@ -1,6 +1,35 @@
+import re
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
-from config import VIABILITY_BUILD_THRESHOLD, VIABILITY_PIVOT_THRESHOLD
+from config import MOMENTUM_WINDOW_DAYS, VIABILITY_BUILD_THRESHOLD, VIABILITY_PIVOT_THRESHOLD
+
+
+def parse_loose_date(raw: Any) -> Optional[datetime]:
+    """Parse the date formats SerpApi / You.com return. Unparseable -> None (never guessed)."""
+    if not raw or not isinstance(raw, str):
+        return None
+    txt = raw.strip()
+    now = datetime.now(timezone.utc)
+    m = re.match(r"(\d+)\s+(minute|hour|day|week|month|year)s?\s+ago", txt, re.I)
+    if m:
+        n, unit = int(m.group(1)), m.group(2).lower()
+        days = {"minute": 0, "hour": 0, "day": 1, "week": 7, "month": 30, "year": 365}[unit] * n
+        return now - timedelta(days=days)
+    if txt.lower() in ("today", "yesterday"):
+        return now - timedelta(days=0 if txt.lower() == "today" else 1)
+    head = txt.split(",")[0].strip() if re.match(r"\d{1,2}/\d{1,2}/\d{4},", txt) else txt
+    for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d",
+                "%m/%d/%Y", "%B %d, %Y", "%b %d, %Y", "%d %B %Y", "%d %b %Y"):
+        try:
+            dt = datetime.strptime(head if fmt == "%m/%d/%Y" else txt[: len(txt)], fmt)
+            return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+    m = re.match(r"(\d{4}-\d{2}-\d{2})", txt)
+    if m:
+        return datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    return None
 
 
 def compute_trend_metrics(points: List[Dict[str, Any]]) -> Tuple[float, str, float, float]:
@@ -49,6 +78,8 @@ def compute_viability_score(
     competitors: List[Dict[str, Any]],
     evidence_map: Dict[str, Dict[str, Any]],
     total_reviews_scanned: int,
+    anchor_values: Optional[List[int]] = None,
+    anchor_name: str = "",
 ) -> Dict[str, Any]:
     """
     Compute deterministic Viability Score (0-100) for Mode 1.
@@ -60,12 +91,27 @@ def compute_viability_score(
       5. Evidence Confidence (Max 10)
     """
     # 1. Demand (Max 30)
+    # Trends values are relative (each request peaks at 100), so a series' own mean says
+    # little about volume. When an anchor term was fetched in the same request, demand is
+    # the keyword's mean relative to the anchor's mean (capped at 1x).
     mean_trends, direction, change_pct, slope_bonus = compute_trend_metrics(trend_points)
-    demand_base = mean_trends * 0.2
-    demand_score = min(30, max(0, round(demand_base + slope_bonus)))
-    demand_expl = (
-        f"Avg interest {mean_trends:.1f}/100, {direction} trajectory ({change_pct:+.1f}%)"
-    )
+    if not trend_points:
+        demand_score = 0
+        demand_expl = "No Google Trends data for this keyword in India"
+    elif anchor_values:
+        anchor_mean = sum(anchor_values) / max(len(anchor_values), 1)
+        ratio = mean_trends / max(anchor_mean, 1.0)
+        demand_score = min(30, max(0, round(min(ratio, 1.0) * 20.0 + slope_bonus)))
+        demand_expl = (
+            f"Searched {ratio:.2f}x as often as '{anchor_name}' in India; "
+            f"{direction} ({change_pct:+.1f}% last 3 months vs prior 9)"
+        )
+    else:
+        demand_score = min(30, max(0, round(mean_trends * 0.2 + slope_bonus)))
+        demand_expl = (
+            f"Relative interest {mean_trends:.1f}/100 (no anchor comparison available), "
+            f"{direction} ({change_pct:+.1f}%)"
+        )
 
     # 2. Pain Intensity (Max 30)
     # Share of scanned 1★ reviews that land in top 3 clusters
@@ -80,37 +126,67 @@ def compute_viability_score(
             if eid in evidence_map:
                 top_3_eids.add(eid)
 
-    denominator = max(total_reviews_scanned, len(top_3_eids), 1)
+    # Denominator = the items the model actually saw (frequency.total), not every review fetched.
+    pool = max([c.get("frequency", {}).get("total", 0) for c in pain_clusters] + [0])
+    denominator = max(pool or total_reviews_scanned, len(top_3_eids), 1)
     share = min(1.0, len(top_3_eids) / denominator)
     pain_score = min(30, max(0, round(share * 30.0)))
-    pain_expl = f"Top 3 pain themes account for {int(share * 100)}% of scanned critical reviews"
+    pain_expl = (
+        f"{len(top_3_eids)} of {denominator} analysed items fall into the top 3 recurring "
+        f"complaint themes ({int(share * 100)}%)"
+    )
 
     # 3. Competition Gap (Max 20)
     comp_evidence_ids = []
-    if competitors:
-        ratings = [c.get("rating", 0.0) for c in competitors if c.get("rating")]
-        avg_rating = sum(ratings) / len(ratings) if ratings else 4.0
+    ratings = []
+    for c in competitors or []:
+        try:
+            if c.get("rating"):
+                ratings.append(float(c["rating"]))
+        except (TypeError, ValueError):
+            pass
+    if ratings:
+        avg_rating = sum(ratings) / len(ratings)
         gap_raw = ((5.0 - avg_rating) / 2.0) * 20.0
         comp_gap_score = min(20, max(0, round(gap_raw)))
-        comp_expl = f"Average incumbent rating {avg_rating:.1f}★ indicates room for disruption"
+        comp_expl = f"Average rating of {len(ratings)} incumbent app(s): {avg_rating:.1f}★"
     else:
         comp_gap_score = 10
-        comp_expl = "No dominant mobile incumbents; open blue-ocean / web opportunity"
+        comp_expl = "No rated app competitors found; neutral score (not evidence of an open market)"
 
     # 4. Momentum (Max 10)
-    recent_news_and_web = [
-        eid
-        for eid, item in evidence_map.items()
-        if item.get("source") in ("google_news", "you_news", "you_web")
-    ]
+    # Only DATED news items inside the window count; undated items are ignored, not guessed.
+    cutoff = datetime.now(timezone.utc) - timedelta(days=MOMENTUM_WINDOW_DAYS)
+    recent_news_and_web = []
+    undated = 0
+    for eid, item in evidence_map.items():
+        if item.get("source") not in ("google_news", "you_news"):
+            continue
+        dt = parse_loose_date(item.get("date"))
+        if dt is None:
+            undated += 1
+        elif dt >= cutoff:
+            recent_news_and_web.append(eid)
     momentum_count = len(recent_news_and_web)
-    momentum_score = min(10, momentum_count)
-    momentum_expl = f"{momentum_count} external signals & news items found in recent coverage"
+    momentum_score = min(10, round(momentum_count * 10 / 8))
+    momentum_expl = (
+        f"{momentum_count} news items dated within the last {MOMENTUM_WINDOW_DAYS} days"
+        + (f" ({undated} undated items not counted)" if undated else "")
+    )
 
     # 5. Evidence Confidence (Max 10)
+    # Confidence = depth of first-hand reviews + breadth of independent source families.
+    families = {"play_store": "Play Store", "reddit": "Reddit", "google_news": "News",
+                "you_news": "News", "you_web": "Web"}
+    present = sorted({families[i.get("source")] for i in evidence_map.values() if i.get("source") in families})
+    play_count = sum(1 for i in evidence_map.values() if i.get("source") == "play_store")
+    review_pts = min(4, play_count // 30)
+    source_pts = min(6, round(len(present) * 1.5))
+    conf_score = review_pts + source_pts
     total_ev = len(evidence_map)
-    conf_score = round(min(total_ev / 100.0, 1.0) * 10.0)
-    conf_expl = f"{total_ev} cross-referenced evidence points verified across all sources"
+    conf_expl = (
+        f"{play_count} app reviews + {len(present)} source families ({', '.join(present) or 'none'})"
+    )
 
     # Total & Verdict
     total_score = min(
@@ -219,7 +295,7 @@ def compute_trajectory(
     )
 
     # Signal 2: Recent Reviews Trend
-    if newest_reviews:
+    if newest_reviews and all_time_rating:
         new_ratings = [r.get("rating", 0) for r in newest_reviews if r.get("rating")]
         new_avg = sum(new_ratings) / len(new_ratings) if new_ratings else all_time_rating
         diff = new_avg - all_time_rating

@@ -106,7 +106,7 @@ const dom = {
  */
 function showToast(message = 'Copied to clipboard') {
   if (!dom.toast) return;
-  dom.toastMessage.textContent = message;
+  dom.toast.textContent = message;
   dom.toast.classList.remove('hidden');
   setTimeout(() => {
     dom.toast.classList.add('hidden');

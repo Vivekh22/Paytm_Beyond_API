@@ -44,4 +44,4 @@ The user submits an idea, business, or category. GapScope fetches live multi-sou
 - [x] P0: Prewarm script with `--dry-run` and demo preset cache filling (`prewarm.py`)
 - [x] P2: Setup documentation and curl examples (`README.md`)
 - [x] Pulled Frontend application (`frontend/index.html`, `frontend/report.html`, `frontend/js/`, `frontend/css/`) from remote origin.
-- [x] Configured Vercel deployment (`vercel.json` outputting `frontend`, auto-environment detection in `config.js`).
+- [x] Local-only setup: no hosted deployment (`vercel.json` removed); frontend talks to the Flask backend on port 5000.

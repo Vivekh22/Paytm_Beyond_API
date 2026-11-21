@@ -43,3 +43,27 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 # Scoring Thresholds
 VIABILITY_BUILD_THRESHOLD = 65
 VIABILITY_PIVOT_THRESHOLD = 40  # 40-64 = PIVOT, < 40 = KILL
+
+# Google Trends is relative (each series peaks at 100). Demand is measured against
+# a fixed anchor term fetched in the SAME request so the two series share one scale.
+TRENDS_ANCHOR = os.getenv("TRENDS_ANCHOR", "credit card").strip()
+
+# How many evidence items the LLM sees when clustering (interleaved across apps/sources)
+LLM_SAMPLE_SIZE = int(os.getenv("LLM_SAMPLE_SIZE", "80"))
+
+# Momentum counts dated news items inside this window
+MOMENTUM_WINDOW_DAYS = int(os.getenv("MOMENTUM_WINDOW_DAYS", "90"))
+
+# Telegram alerts for Mode 4 (optional; alerts are skipped when unset)
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+
+# Optional extra sources (each costs SerpApi credits)
+ENABLE_APP_STORE = os.getenv("ENABLE_APP_STORE", "0").strip().lower() in ("1", "true", "yes")
+APP_STORE_COUNTRY = os.getenv("APP_STORE_COUNTRY", "in").strip()
+
+# SerpApi Extract API. Parameter names are configurable because they are unverified;
+# check them against serpapi.com docs on the day.
+EXTRACT_ENGINE = os.getenv("EXTRACT_ENGINE", "extract").strip()
+EXTRACT_URL_PARAM = os.getenv("EXTRACT_URL_PARAM", "url").strip()
+EXTRACT_MAX_SITES = int(os.getenv("EXTRACT_MAX_SITES", "2"))

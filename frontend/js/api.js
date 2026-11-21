@@ -1,30 +1,15 @@
 /**
  * GapScope API & Streaming Client
- * Supports live backend SSE streaming with intelligent category fallback.
+ * Supports both live SSE streaming and realistic mock simulations.
  */
 
 import { CONFIG } from './config.js';
-import { TRAVEL_REPORT, EDTECH_REPORT, CULTFIT_REPORT } from './category_mocks.js';
 
 /**
- * Fetch mock report data for a specific mode and query
+ * Fetch mock report data for a specific mode
  * @param {number|string} mode 1, 2, or 3
- * @param {string} query Search query or category name
  */
-export async function getMock(mode, query = '') {
-  const qLower = (query || '').toLowerCase().trim();
-
-  // Category and query-aware matching
-  if (qLower.includes('travel')) {
-    return JSON.parse(JSON.stringify(TRAVEL_REPORT));
-  }
-  if (qLower.includes('edtech') || qLower.includes('learning')) {
-    return JSON.parse(JSON.stringify(EDTECH_REPORT));
-  }
-  if (qLower.includes('cult')) {
-    return JSON.parse(JSON.stringify(CULTFIT_REPORT));
-  }
-
+export async function getMock(mode) {
   const modeNum = Number(mode) || 1;
   const mockPath = `mock/report_mode${modeNum}.json`;
   try {
@@ -33,9 +18,6 @@ export async function getMock(mode, query = '') {
       throw new Error(`Failed to load ${mockPath} (HTTP ${res.status})`);
     }
     const report = await res.json();
-    if (query) {
-      report.query = query;
-    }
     return report;
   } catch (err) {
     console.error(`[GapScope] Error fetching mock for mode ${mode}:`, err);
@@ -67,30 +49,28 @@ export async function getExamples() {
  * @param {string} query 
  */
 export async function startScan(mode, query) {
-  if (!CONFIG.USE_MOCK) {
-    try {
-      const res = await fetch(`${CONFIG.API_BASE}/api/scan`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: Number(mode), query: query.trim() })
-      });
-      if (res.ok) {
-        return await res.json();
-      }
-      console.warn(`[GapScope] /api/scan returned ${res.status}, using instant intelligence.`);
-    } catch (err) {
-      console.warn('[GapScope] Live scan fetch failed, using instant intelligence:', err);
-    }
+  if (CONFIG.USE_MOCK) {
+    // Generate a simulated scan id
+    const scanId = `mock_${mode}_${Math.random().toString(36).substring(2, 8)}`;
+    return { scan_id: scanId, mode, query };
   }
 
-  // Generate a simulated scan id
-  const slug = query.toLowerCase().replace(/[^a-z0-9]+/g, '_').substring(0, 16);
-  const scanId = `mock_${mode}_${slug}_${Math.random().toString(36).substring(2, 6)}`;
-  return { scan_id: scanId, mode, query };
+  const res = await fetch(`${CONFIG.API_BASE}/api/scan`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode: Number(mode), query: query.trim() })
+  });
+
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || errData.message || `Scan start failed (HTTP ${res.status})`);
+  }
+
+  return await res.json();
 }
 
 /**
- * Stream scan progress via EventSource (or simulated stream with live category fallback)
+ * Stream scan progress via EventSource (or simulated stream in mock mode)
  * @param {string} scanId 
  * @param {function} onEvent Callback receiving parsed SSE payload
  * @param {object} meta { mode, query }
@@ -98,24 +78,23 @@ export async function startScan(mode, query) {
  */
 export function streamScan(scanId, onEvent, meta = {}) {
   const mode = meta.mode || 1;
-  const query = meta.query || '';
 
-  if (CONFIG.USE_MOCK || scanId.startsWith('mock_')) {
+  if (CONFIG.USE_MOCK) {
     let cancelled = false;
     const timeouts = [];
 
     const mockSteps = [
-      { step: 'keywords', message: 'Extracting market search keywords via Gemini', pct: 15, source: 'Gemini' },
+      { step: 'keywords', message: 'Extracting market search keywords via Gemini 2.5 Flash', pct: 15, source: 'Gemini' },
       { step: 'trends', message: 'Querying Google Trends (geo=IN, 12 months) via SerpApi', pct: 32, source: 'SerpApi' },
-      { step: 'play_store', message: 'Scanning Google Play Store top apps & 1★ reviews', pct: 54, source: 'SerpApi' },
+      { step: 'play_store', message: 'Scanning Google Play Store top apps & 1★/5★ reviews', pct: 54, source: 'SerpApi' },
       { step: 'reddit_news', message: 'Searching Reddit discussions & Google News headlines', pct: 72, source: 'SerpApi' },
-      { step: 'youcom_web', message: 'Gathering competitor context via You.com Search API', pct: 88, source: 'You.com' },
-      { step: 'clustering', message: 'Verifying evidence IDs & computing deterministic formulas', pct: 98, source: 'Python' }
+      { step: 'youcom_web', message: 'Gathering competitor funding & market context via You.com Search API', pct: 88, source: 'You.com' },
+      { step: 'clustering', message: 'Verifying evidence IDs & computing deterministic scoring formula', pct: 98, source: 'Python' }
     ];
 
     // Schedule progressive feedback
     mockSteps.forEach((s, idx) => {
-      const delay = (idx + 1) * 350;
+      const delay = (idx + 1) * 380;
       const t = setTimeout(() => {
         if (cancelled) return;
         onEvent({
@@ -130,16 +109,20 @@ export function streamScan(scanId, onEvent, meta = {}) {
     });
 
     // Schedule completion
-    const finalDelay = (mockSteps.length + 1) * 350;
+    const finalDelay = (mockSteps.length + 1) * 380;
     const finalT = setTimeout(async () => {
       if (cancelled) return;
       try {
-        const report = await getMock(mode, query);
+        const report = await getMock(mode);
+        // Overwrite query in report if user provided one
+        if (meta.query) {
+          report.query = meta.query;
+        }
         report.scan_id = scanId;
         report.generated_at = new Date().toISOString();
         onEvent({ type: 'done', report });
       } catch (err) {
-        onEvent({ type: 'error', message: err.message || 'Failed to assemble report' });
+        onEvent({ type: 'error', message: err.message || 'Failed to assemble mock report' });
       }
     }, finalDelay);
     timeouts.push(finalT);
@@ -154,14 +137,7 @@ export function streamScan(scanId, onEvent, meta = {}) {
 
   // Live SSE via EventSource
   const url = `${CONFIG.API_BASE}/api/scan/${scanId}/stream`;
-  let eventSource;
-  try {
-    eventSource = new EventSource(url);
-  } catch (err) {
-    console.warn('[GapScope] EventSource init failed, falling back to category report:', err);
-    getMock(mode, query).then(r => onEvent({ type: 'done', report: r }));
-    return { abort: () => {} };
-  }
+  const eventSource = new EventSource(url);
 
   eventSource.onmessage = (e) => {
     try {
@@ -175,21 +151,15 @@ export function streamScan(scanId, onEvent, meta = {}) {
     }
   };
 
-  eventSource.onerror = async (e) => {
-    console.warn('[GapScope] Live scan stream unavailable or disconnected. Recovering with category intelligence:', e);
+  eventSource.onerror = (e) => {
+    console.error('[GapScope] EventSource encountered error:', e);
     eventSource.close();
-    try {
-      const fallbackReport = await getMock(mode, query);
-      fallbackReport.scan_id = scanId;
-      onEvent({ type: 'done', report: fallbackReport });
-    } catch (err) {
-      onEvent({ type: 'error', message: 'Scan connection timed out and fallback could not be loaded.' });
-    }
+    onEvent({ type: 'error', message: 'Connection to scan stream was lost or closed.' });
   };
 
   return {
     abort: () => {
-      if (eventSource) eventSource.close();
+      eventSource.close();
     }
   };
 }
@@ -199,16 +169,8 @@ export function streamScan(scanId, onEvent, meta = {}) {
  * @param {string} scanId 
  */
 export async function getReport(scanId) {
-  if (CONFIG.USE_MOCK || scanId.startsWith('mock_') || scanId.startsWith('disc_') || scanId.startsWith('inv_')) {
-    if (scanId.includes('travel')) {
-      return JSON.parse(JSON.stringify(TRAVEL_REPORT));
-    }
-    if (scanId.includes('edtech')) {
-      return JSON.parse(JSON.stringify(EDTECH_REPORT));
-    }
-    if (scanId.includes('cultfit')) {
-      return JSON.parse(JSON.stringify(CULTFIT_REPORT));
-    }
+  if (CONFIG.USE_MOCK || scanId.startsWith('mock_')) {
+    // Determine mode from scanId e.g. mock_2_xxx -> mode 2
     let mode = 1;
     const parts = scanId.split('_');
     if (parts.length >= 2 && [1, 2, 3].includes(Number(parts[1]))) {

@@ -1,4 +1,5 @@
 {
+  "sample": true,
   "scan_id": "m3_personal_finance",
   "mode": 3,
   "query": "Personal Finance",

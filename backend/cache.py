@@ -3,7 +3,7 @@ import json
 import sqlite3
 import threading
 import time
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from config import DB_PATH, DEMO_MODE, SERPAPI_HOURLY_LIMIT
 
@@ -69,6 +69,18 @@ def init_db() -> None:
                     created_at INTEGER
                 );
                 """
+            )
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS brand_official (brand TEXT PRIMARY KEY, official TEXT, "
+                "watch INTEGER DEFAULT 0, interval_hours INTEGER DEFAULT 24, last_run INTEGER DEFAULT 0)"
+            )
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS protect_allow (brand TEXT, type TEXT, value TEXT, created_at INTEGER, "
+                "PRIMARY KEY (brand, type, value))"
+            )
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS protect_seen (brand TEXT, type TEXT, value TEXT, first_seen INTEGER, "
+                "PRIMARY KEY (brand, type, value))"
             )
             conn.execute(
                 """
@@ -217,6 +229,116 @@ def get_report(scan_id: str) -> Optional[Dict[str, Any]]:
         conn.close()
 
 
+def find_latest_report(mode: int, query: str) -> Optional[Dict[str, Any]]:
+    """Latest saved report for (mode, query), case-insensitive. Used to replay presets in DEMO_MODE."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT report FROM reports WHERE mode = ? AND lower(query) = lower(?) "
+            "ORDER BY created_at DESC LIMIT 1",
+            (mode, query.strip()),
+        )
+        row = cursor.fetchone()
+        return json.loads(row[0]) if row else None
+    except Exception:
+        return None
+    finally:
+        conn.close()
+
+
+def _bkey(brand: str) -> str:
+    return " ".join((brand or "").lower().split())
+
+
+def save_official(brand: str, official: Dict[str, Any], watch: Optional[bool] = None,
+                  interval_hours: Optional[int] = None) -> None:
+    conn = get_db_connection()
+    try:
+        with conn:
+            row = conn.execute("SELECT watch, interval_hours FROM brand_official WHERE brand = ?", (_bkey(brand),)).fetchone()
+            w = int(watch) if watch is not None else (row[0] if row else 0)
+            ih = int(interval_hours) if interval_hours else (row[1] if row else 24)
+            conn.execute(
+                "INSERT OR REPLACE INTO brand_official (brand, official, watch, interval_hours, last_run) "
+                "VALUES (?, ?, ?, ?, COALESCE((SELECT last_run FROM brand_official WHERE brand = ?), 0))",
+                (_bkey(brand), json.dumps(official), w, ih, _bkey(brand)),
+            )
+    finally:
+        conn.close()
+
+
+def get_official(brand: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT official, watch, interval_hours, last_run FROM brand_official WHERE brand = ?",
+                           (_bkey(brand),)).fetchone()
+        if not row:
+            return None
+        return {"brand": _bkey(brand), "official": json.loads(row[0] or "{}"), "watch": bool(row[1]),
+                "interval_hours": row[2], "last_run": row[3]}
+    finally:
+        conn.close()
+
+
+def list_watched() -> List[Dict[str, Any]]:
+    conn = get_db_connection()
+    try:
+        rows = conn.execute("SELECT brand, official, interval_hours, last_run FROM brand_official WHERE watch = 1").fetchall()
+        return [{"brand": r[0], "official": json.loads(r[1] or "{}"), "interval_hours": r[2], "last_run": r[3]} for r in rows]
+    finally:
+        conn.close()
+
+
+def mark_watch_run(brand: str) -> None:
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("UPDATE brand_official SET last_run = ? WHERE brand = ?", (int(time.time()), _bkey(brand)))
+    finally:
+        conn.close()
+
+
+def allow_item(brand: str, ftype: str, value: str, allowed: bool = True) -> None:
+    """Mark a finding as allowed (e.g. a franchisee's number), or undo it. Removes a DB row, not a file."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            if allowed:
+                conn.execute("INSERT OR REPLACE INTO protect_allow (brand, type, value, created_at) VALUES (?, ?, ?, ?)",
+                             (_bkey(brand), ftype, str(value), int(time.time())))
+            else:
+                conn.execute("DELETE FROM protect_allow WHERE brand = ? AND type = ? AND value = ?",
+                             (_bkey(brand), ftype, str(value)))
+    finally:
+        conn.close()
+
+
+def list_allowed(brand: str) -> List[Dict[str, Any]]:
+    conn = get_db_connection()
+    try:
+        rows = conn.execute("SELECT type, value, created_at FROM protect_allow WHERE brand = ?", (_bkey(brand),)).fetchall()
+        return [{"type": r[0], "value": r[1], "created_at": r[2]} for r in rows]
+    finally:
+        conn.close()
+
+
+def mark_seen(brand: str, items: List[Tuple[str, str]]) -> set:
+    """Record findings; return the (type, value) pairs that were NOT seen before."""
+    conn = get_db_connection()
+    new = set()
+    try:
+        with conn:
+            for ftype, value in items:
+                cur = conn.execute("INSERT OR IGNORE INTO protect_seen (brand, type, value, first_seen) VALUES (?, ?, ?, ?)",
+                                   (_bkey(brand), ftype, str(value), int(time.time())))
+                if cur.rowcount:
+                    new.add((ftype, str(value)))
+    finally:
+        conn.close()
+    return new
+
+
 def get_cache_stats() -> Dict[str, Any]:
     """Retrieve runtime cache and rate limit statistics."""
     conn = get_db_connection()
@@ -236,7 +358,16 @@ def get_cache_stats() -> Dict[str, Any]:
         "serpapi_live_calls_this_hour": _rate_limiter.calls_this_hour(),
         "cache_entries": cache_entries,
         "demo_mode": DEMO_MODE,
+        "gemini_last_error": _gemini_error(),
     }
+
+
+def _gemini_error():
+    try:
+        import llm
+        return llm.LAST_GEMINI_ERROR
+    except Exception:
+        return None
 
 
 # Auto-initialize DB on import

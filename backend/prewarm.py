@@ -5,8 +5,10 @@ import sys
 from typing import Any, Dict, List
 
 from app import DEMO_PRESETS
+from cache import save_report
 from config import DEMO_MODE, SERPAPI_KEY, YDC_API_KEY
 from pipelines import mode1_validate, mode2_investigate, mode3_discover
+from protect import mode4_protect
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,15 +20,16 @@ logger = logging.getLogger("prewarm")
 def estimate_serpapi_calls() -> Dict[str, Any]:
     """
     Calculate dry-run estimate for SerpApi calls across all presets:
-    - Mode 1: Trends (1) + Play Search (1) + News (1) + Reddit (1) + Play Reviews (3) = 7 calls
+    - Mode 1: Trends (1) + Trends regions (1) + Play Search (1) + News (1) + Reddit (1) + Play Reviews (3) = 8 calls
     - Mode 2: Play Search (1) + 1★ Reviews (1) + 5★ Reviews (1) + Newest Reviews (1) + News (1) + Trends (1) + Reddit (1) = 7 calls
     - Mode 3: Play Search (1) + Play Reviews (5) + Reddit (1) + Trends (1) = 8 calls
+    - Mode 4: Google x2 + Maps + Jobs + Play Search + News + Extract (up to 2) = 8 calls
     """
     estimates = []
     total = 0
     for preset in DEMO_PRESETS:
         mode = preset["mode"]
-        calls = 7 if mode in (1, 2) else 8
+        calls = {1: 8, 2: 7, 3: 8, 4: 8}.get(mode, 8)
         estimates.append(
             {
                 "mode": mode,
@@ -81,8 +84,12 @@ def run_prewarm():
                 report = mode2_investigate(query, progress_callback=log_progress)
             elif mode == 3:
                 report = mode3_discover(query, progress_callback=log_progress)
+            elif mode == 4:
+                report = mode4_protect(query, preset.get("official"), progress_callback=log_progress, record_seen=False)
             else:
                 continue
+
+            save_report(report["scan_id"], mode, query, report)
 
             credits = report.get("credits", {})
             for k in total_credits:

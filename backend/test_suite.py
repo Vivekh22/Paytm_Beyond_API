@@ -288,7 +288,7 @@ class TestFlaskEndpoints(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         data = resp.get_json()
         self.assertIsInstance(data, list)
-        self.assertEqual(len(data), 9)
+        self.assertEqual(len(data), 11)
 
     def test_mock_endpoints(self):
         for mode in (1, 2, 3):
@@ -299,8 +299,8 @@ class TestFlaskEndpoints(unittest.TestCase):
 
     def test_prewarm_dry_run_estimation(self):
         est = estimate_serpapi_calls()
-        self.assertEqual(len(est["presets"]), 9)
-        self.assertEqual(est["total_estimated_serpapi_calls"], 66)
+        self.assertEqual(len(est["presets"]), 11)
+        self.assertEqual(est["total_estimated_serpapi_calls"], 85)  # 3x8 + 3x7 + 3x8 + 2x8
 
     def test_scan_and_stream_endpoints(self):
         resp = self.client.post("/api/scan", json={"mode": 1, "query": "Test Scanner"})

@@ -162,6 +162,70 @@ class EvidenceCollector:
                 }
             )
 
+    def add_store_reviews(
+        self,
+        reviews: List[Dict[str, Any]],
+        source: str,
+        entity: str,
+        url: str,
+    ) -> None:
+        """Ingest Maps or App Store reviews ({user, rating, snippet, date, likes})."""
+        for r in sorted(reviews, key=lambda x: int(x.get("likes", 0) or 0), reverse=True):
+            norm_text = self._normalize_text(r.get("snippet", ""))
+            if len(norm_text) < 20:
+                continue
+            sig = self._make_signature(norm_text)
+            if sig in self._seen_signatures:
+                continue
+            self._seen_signatures.add(sig)
+            self._raw_candidates.append(
+                {
+                    "source": source,
+                    "text": norm_text,
+                    "title": None,
+                    "author": r.get("user"),
+                    "rating": r.get("rating") or None,
+                    "date": r.get("date") or None,
+                    "url": url,
+                    "entity": entity,
+                    "likes": int(r.get("likes", 0) or 0),
+                    "_priority": 95 + int(r.get("likes", 0) or 0),
+                }
+            )
+
+    def add_generic(
+        self,
+        items: List[Dict[str, Any]],
+        source: str,
+        entity: str,
+        priority: int = 60,
+    ) -> None:
+        """Ingest results that have title / snippet / link (Google Search, Maps, Jobs)."""
+        for it in items:
+            title = it.get("title", "") or ""
+            snippet = it.get("snippet", "") or ""
+            norm_text = self._normalize_text(f"{title}. {snippet}" if snippet and title not in snippet else (snippet or title))
+            if len(norm_text) < 20:
+                continue
+            sig = self._make_signature(norm_text + (it.get("link") or ""))
+            if sig in self._seen_signatures:
+                continue
+            self._seen_signatures.add(sig)
+            self._raw_candidates.append(
+                {
+                    "source": source,
+                    "text": norm_text,
+                    "title": title or None,
+                    "author": None,
+                    "rating": None,
+                    "date": it.get("date") or None,
+                    "url": it.get("link") or "",
+                    "entity": entity,
+                    "likes": 0,
+                    "_priority": priority,
+                }
+            )
+
     def build(self) -> Tuple[Dict[str, Dict[str, Any]], List[Dict[str, Any]]]:
         """
         Finalize evidence map and list with sequentially stable IDs.

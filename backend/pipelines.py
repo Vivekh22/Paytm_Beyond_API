@@ -5,7 +5,9 @@ import threading
 import uuid
 from typing import Any, Callable, Dict, List, Optional
 
+from config import ENABLE_APP_STORE, SERPAPI_SCAN_BUDGET, TRENDS_ANCHOR
 from evidence import EvidenceCollector
+import llm as _llm
 from llm import (
     classify_news,
     cluster_evidence,
@@ -14,6 +16,7 @@ from llm import (
     post_validate_and_enrich_clusters,
     post_validate_and_enrich_opportunities,
 )
+from timeline import build_timeline
 from scoring import (
     compute_discovery_verdict,
     compute_trajectory,
@@ -26,6 +29,11 @@ from serp_client import (
     play_search,
     reddit as serp_reddit,
     trends_timeseries,
+    trends_regions,
+    maps_search,
+    maps_reviews,
+    appstore_search,
+    appstore_reviews,
 )
 from youcom_client import you_search
 
@@ -101,7 +109,7 @@ def mode1_validate(
     you_web_2: List[Dict[str, Any]] = []
 
     def fetch_trends(kw):
-        pts, warn = trends_timeseries(kw, tracker=tracker)
+        pts, warn = trends_timeseries(kw, tracker=tracker, anchor=TRENDS_ANCHOR)
         return pts, warn
 
     def fetch_play(q):
@@ -127,6 +135,7 @@ def mode1_validate(
         future_reddit = executor.submit(fetch_reddit, specific)
         future_you1 = executor.submit(fetch_you, f"{broad} startups India competitors funding")
         future_you2 = executor.submit(fetch_you, f"{specific} problems complaints")
+        future_regions = executor.submit(trends_regions, broad, tracker)
 
         trend_points, t_warn = future_trends.result()
         play_apps, p_warn = future_play.result()
@@ -134,20 +143,27 @@ def mode1_validate(
         reddit_items, r_warn = future_reddit.result()
         you_web_1, y1_warn = future_you1.result()
         you_web_2, y2_warn = future_you2.result()
+        regions, rg_warn = future_regions.result()
 
-    for w in [t_warn, p_warn, n_warn, r_warn, y1_warn, y2_warn]:
+    for w in [t_warn, p_warn, n_warn, r_warn, y1_warn, y2_warn, rg_warn]:
         if w and w not in warnings:
             warnings.append(w)
 
     # Trends fallback if empty
     if not trend_points:
         fallback_kw = broad.split()[0] if " " in broad else category
-        if fallback_kw and fallback_kw.lower() != broad.lower():
-            fb_pts, fb_warn = trends_timeseries(fallback_kw, tracker=tracker)
+        # keep 3 calls in reserve for the competitor review fetches
+        if tracker.to_dict()["serpapi_live"] + 1 + 3 > SERPAPI_SCAN_BUDGET:
+            warnings.append(f"Skipped Trends fallback: per-scan SerpApi budget ({SERPAPI_SCAN_BUDGET}) reached")
+        elif fallback_kw and fallback_kw.lower() != broad.lower():
+            fb_pts, fb_warn = trends_timeseries(fallback_kw, tracker=tracker, anchor=TRENDS_ANCHOR)
             if fb_pts:
                 trend_points = fb_pts
                 warnings.append(f"Google Trends returned no data for '{broad}'; used '{fallback_kw}'")
                 broad = fallback_kw
+
+    # Split the anchor series out of the keyword points (kept only for scoring)
+    anchor_values = [p.pop("anchor") for p in trend_points if isinstance(p, dict) and "anchor" in p]
 
     # Top competitors
     top_apps = play_apps[:3]
@@ -186,13 +202,35 @@ def mode1_validate(
                     }
                 )
     else:
-        warnings.append("No direct Play Store apps matched; defaulting to Web & Reddit evidence.")
+        warnings.append("No matching Play Store apps; using Google Maps places and their reviews.")
+        places, m_warn = maps_search(specific, tracker=tracker)
+        if m_warn and m_warn not in warnings:
+            warnings.append(m_warn)
+        for place in [pl for pl in places if pl.get("data_id")][:2]:
+            revs, mr_warn = maps_reviews(place["data_id"], tracker=tracker)
+            if mr_warn and mr_warn not in warnings:
+                warnings.append(mr_warn)
+            total_reviews_scanned += len(revs)
+            collector.add_store_reviews(revs, source="google_maps", entity=place["title"], url=place["link"])
+            competitor_list.append(
+                {
+                    "name": place["title"],
+                    "product_id": place.get("place_id", ""),
+                    "rating": place.get("rating"),
+                    "installs": f"{place.get('reviews')} Maps reviews" if place.get("reviews") else "N/A",
+                    "icon": "",
+                    "url": place["link"],
+                    "source": "google_maps",
+                    "reviews_scanned": len(revs),
+                }
+            )
+    if not competitor_list:
         for item in you_web_1[:3]:
             competitor_list.append(
                 {
                     "name": item.get("title", "Web Competitor"),
                     "product_id": "",
-                    "rating": 4.0,
+                    "rating": None,
                     "installs": "N/A",
                     "icon": "",
                     "url": item.get("url", ""),
@@ -225,13 +263,19 @@ def mode1_validate(
         competitors=competitor_list,
         evidence_map=evidence_map,
         total_reviews_scanned=total_reviews_scanned,
+        anchor_values=anchor_values,
+        anchor_name=TRENDS_ANCHOR,
     )
 
     mean_val, direction, change_pct, _ = compute_trend_metrics(trend_points)
+    for comp in competitor_list:
+        if comp.get("source") == "play_store":
+            comp["investigate"] = {"mode": 2, "query": comp["name"]}
 
     report = {
         "scan_id": scan_id,
         "mode": 1,
+        "regions": regions[:10],
         "query": query,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "keywords": {
@@ -252,9 +296,16 @@ def mode1_validate(
         "clusters": clusters,
         "opportunities": opportunities,
         "news": [],
+        "timeline": None,
+        "findings": [],
         "evidence": evidence_map,
         "warnings": warnings,
     }
+
+    if not report["trend"]["points"]:
+        report["trend"] = None  # contract: null when Trends has no data
+    if not report["clusters"] and _llm.LAST_GEMINI_ERROR:
+        report["warnings"].append(f"Gemini unavailable, so no themes were generated: {_llm.LAST_GEMINI_ERROR}")
 
     _emit(progress_callback, "done", "Market intelligence report generated", 100)
     return report
@@ -280,7 +331,7 @@ def mode2_investigate(
     product_id = best_app["product_id"] if best_app else ""
     app_name = best_app["title"] if best_app else query
     app_url = best_app["link"] if best_app else ""
-    all_time_rating = best_app["rating"] if best_app else 4.0
+    all_time_rating = best_app["rating"] if best_app else None
 
     _emit(progress_callback, "parallel_search", f"Fetching reviews, media, news & trends for {app_name}", 40)
 
@@ -316,12 +367,25 @@ def mode2_investigate(
         if w and w not in warnings:
             warnings.append(w)
 
-    total_scanned = len(revs_1star) + len(revs_5star) + len(revs_newest)
+    ios_reviews: List[Dict[str, Any]] = []
+    ios_app = None
+    if ENABLE_APP_STORE:
+        ios_apps, w_ios = appstore_search(query, tracker=tracker)
+        ios_app = ios_apps[0] if ios_apps else None
+        if ios_app:
+            ios_reviews, w_ios2 = appstore_reviews(ios_app["product_id"], tracker=tracker)
+            w_ios = w_ios or w_ios2
+        if w_ios and w_ios not in warnings:
+            warnings.append(w_ios)
+
+    total_scanned = len(revs_1star) + len(revs_5star) + len(revs_newest) + len(ios_reviews)
 
     collector = EvidenceCollector(max_items=150)
     collector.add_play_reviews(revs_1star, app_name=app_name, app_url=app_url)
     collector.add_play_reviews(revs_5star, app_name=app_name, app_url=app_url)
     collector.add_play_reviews(revs_newest, app_name=app_name, app_url=app_url)
+    if ios_app:
+        collector.add_store_reviews(ios_reviews, source="app_store", entity=f"{ios_app['title']} (iOS)", url=ios_app["link"])
     collector.add_reddit_posts(reddit_items, entity=f"{app_name} Reddit")
     collector.add_news_items(news_items, entity=f"{app_name} News")
     collector.add_youcom_results(you_items_1 + you_items_2, entity=f"{app_name} Web")
@@ -358,7 +422,7 @@ def mode2_investigate(
         for eid, it in evidence_map.items()
         if it["source"] in ("google_news", "you_news")
     ]
-    news_classified = classify_news(news_eids)
+    news_classified = [n for n in classify_news(news_eids) if n.get("evidence_id") in evidence_map]
 
     _emit(progress_callback, "trajectory", "Calculating trajectory index & rating drift", 85)
     verdict = compute_trajectory(
@@ -389,6 +453,7 @@ def mode2_investigate(
     report = {
         "scan_id": scan_id,
         "mode": 2,
+        "regions": [],
         "query": query,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "keywords": {
@@ -409,9 +474,16 @@ def mode2_investigate(
         "clusters": combined_clusters,
         "opportunities": opportunities,
         "news": news_classified,
+        "timeline": build_timeline(trend_points, revs_newest, revs_1star, evidence_map, news_classified),
+        "findings": [],
         "evidence": evidence_map,
         "warnings": warnings,
     }
+
+    if not report["trend"]["points"]:
+        report["trend"] = None  # contract: null when Trends has no data
+    if not report["clusters"] and _llm.LAST_GEMINI_ERROR:
+        report["warnings"].append(f"Gemini unavailable, so no themes were generated: {_llm.LAST_GEMINI_ERROR}")
 
     _emit(progress_callback, "done", "Competitor intelligence report generated", 100)
     return report
@@ -500,6 +572,21 @@ def mode3_discover(
     for idx, c in enumerate(clusters, start=1):
         c["id"] = f"cl_{idx}"
 
+    # Underserved need = the same complaint in 2+ apps while category demand is rising or flat
+    _m, cat_direction, cat_change, _b = compute_trend_metrics(trend_points)
+    for c in clusters:
+        n_apps = len(c.get("apps_affected", []))
+        if not trend_points:
+            c["underserved"] = None
+            c["underserved_reason"] = f"Seen in {n_apps} app(s); no Google Trends data to check demand"
+        elif n_apps >= 2 and cat_direction in ("rising", "flat"):
+            c["underserved"] = True
+            c["underserved_reason"] = (f"Seen in {n_apps} of {len(competitor_list)} apps while '{query}' demand is "
+                                       f"{cat_direction} ({cat_change:+.1f}%)")
+        else:
+            c["underserved"] = False
+            c["underserved_reason"] = (f"Seen in {n_apps} app(s); demand {cat_direction} ({cat_change:+.1f}%)")
+
     _emit(progress_callback, "opportunities", "Synthesizing 3 category-wide whitespace concepts", 85)
     raw_opps = generate_opportunities(clusters[:3], context=f"{query} category whitespace")
     opportunities = post_validate_and_enrich_opportunities(raw_opps, clusters, evidence_map)[:3]
@@ -512,6 +599,7 @@ def mode3_discover(
     report = {
         "scan_id": scan_id,
         "mode": 3,
+        "regions": [],
         "query": query,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "keywords": {
@@ -532,9 +620,16 @@ def mode3_discover(
         "clusters": clusters,
         "opportunities": opportunities,
         "news": [],
+        "timeline": None,
+        "findings": [],
         "evidence": evidence_map,
         "warnings": warnings,
     }
+
+    if not report["trend"]["points"]:
+        report["trend"] = None  # contract: null when Trends has no data
+    if not report["clusters"] and _llm.LAST_GEMINI_ERROR:
+        report["warnings"].append(f"Gemini unavailable, so no themes were generated: {_llm.LAST_GEMINI_ERROR}")
 
     _emit(progress_callback, "done", "Category discovery report complete", 100)
     return report

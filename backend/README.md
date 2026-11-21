@@ -132,3 +132,55 @@ curl http://localhost:5000/api/report/a1b2c3d4
    - **Mode 1 Viability Score (0-100)**: Demand (30), Pain Intensity (30), Competition Gap (20), Momentum (10), Confidence (10). Thresholds: `BUILD >= 65`, `PIVOT 40-64`, `KILL < 40`.
    - **Mode 2 Trajectory**: Multi-signal voting across Google Trends slope, recent review rating drift, and news sentiment (`GROWING`, `STAGNATING`, `DECLINING`).
    - **Mode 3 Discovery**: Cross-app pain frequency ranking uncovering systemic whitespace.
+
+## Demo-safety changes (21 Nov)
+
+- **Gemini calls are cached** in `cache.db` (provider `gemini`, keyed by model + prompt hash). Same input → same keywords → same SerpApi cache keys, so `DEMO_MODE=1` works offline.
+- **Preset replay:** `prewarm.py` now saves each preset report. With `DEMO_MODE=1`, scanning a preset query replays its saved report (short progress stream, no network).
+- **Demand uses an anchor:** Trends is fetched as `"<keyword>,<TRENDS_ANCHOR>"` in one call (default anchor `credit card`, set in `.env`). Demand = keyword mean ÷ anchor mean.
+- **Scoring tightened:** pain uses the items the model actually saw; momentum counts only news dated in the last `MOMENTUM_WINDOW_DAYS` (90); confidence = review depth + number of source families; no invented 4.0★ ratings when data is missing.
+- **No invented content:** if Gemini is unavailable, clustering and opportunities return empty lists instead of template themes.
+- **apps_affected** comes only from Play Store reviews. Cluster labels read "N of M items analysed".
+- **SSE** replays earlier events on reconnect and pings every 15 s.
+- **Contract:** `trend` is `null` when there is no Trends data; mock files carry `"sample": true`.
+- **Check reports:** `python check_contract.py` (mocks + every saved report). Run after prewarm.
+- Trends fallback retry is skipped once the per-scan SerpApi budget is used.
+
+## New: Mode 2 timeline and Mode 4 Protect
+
+**Mode 2 `timeline`** (null in other modes): month-by-month rows
+`{month, search_interest, avg_rating, reviews_count, complaints, news_positive, news_negative, evidence_ids}`
+and rule-based `turning_points` `{month, kind, description, evidence_ids}` where kind is
+`search_rise|search_drop|rating_rise|rating_drop|complaint_spike|positive_news|negative_news`.
+Ratings use only the newest reviews (the 1★/5★ sets are filtered and would bias averages).
+Turning points show what changed and when, not proof of cause.
+
+**Mode 4 Protect** (`POST /api/scan` with `{"mode": 4, "query": "<brand>", "official": {"domains": [], "phones": [], "app_ids": []}}`):
+6 SerpApi calls (Google x2, Maps, Jobs, Play, News). Report has `findings[]`:
+`{id, type, severity: high|medium|info, status: "suspected", title, value, why, url, evidence_ids, report_to[], report_text}`,
+types `helpline|job_post|lookalike_site|fake_app|scam_report`. Without official records, items are `info` ("to confirm"), never flagged.
+New evidence sources: `google_search`, `google_maps`, `google_jobs`.
+Presets "Blue Dart" and "IRCTC" use their websites only: add official phones and app IDs in `DEMO_PRESETS` (app.py) before prewarming.
+
+**Telegram alerts:** set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in `.env`; a Mode 4 scan with high/medium findings sends a message.
+
+Tests: `python test_new_features.py` (timeline + Protect, all mocked).
+
+## More features (21 Nov, afternoon)
+
+| Feature | Where | Notes |
+|---|---|---|
+| Top Indian regions | Mode 1 `regions: [{name, value}]` | 1 extra Trends call (`GEO_MAP_0`); Mode 1 is now 8 calls |
+| Offline businesses | Mode 1 | No Play Store match → Google Maps places + their newest reviews (source `google_maps`) |
+| "Open as investigation" | Mode 1 `competitors[].investigate` | `{mode: 2, query}` for the frontend button |
+| Underserved needs | Mode 3 `clusters[].underserved`, `underserved_reason` | True when a complaint appears in 2+ apps and demand is rising or flat |
+| App Store reviews (optional) | Mode 2 | `ENABLE_APP_STORE=1`; +2 calls; source `app_store` |
+| Compare | `GET /api/compare?a=<scan_id>&b=<scan_id>` | Two finished Mode 2 reports side by side |
+| Saved official records | `POST/GET /api/protect/official` | Remembered for scans, the scheduler and the public page |
+| Mark as allowed | `POST/DELETE/GET /api/protect/allow` | Allowed items are hidden from later scans (`allowed_count`) |
+| New-only alerts | `findings[].is_new`, `new_count` | Telegram sends only new high/medium items; prewarm doesn't mark items as seen |
+| Scheduled scans | `POST /api/protect/watch` + `python monitor.py` | `--once` for Windows Task Scheduler |
+| Extract check | Mode 4 look-alike sites | Reads up to 2 pages; flags password/OTP/card/payment fields. Param names in `.env` (`EXTRACT_*`) are unverified: check the SerpApi docs |
+| Public page | `GET /verified/<brand>` | Lists official websites, numbers and apps |
+
+Tests: `python test_more_features.py`.

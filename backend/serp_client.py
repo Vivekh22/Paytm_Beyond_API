@@ -4,6 +4,9 @@ import requests
 
 from cache import cached_call
 from config import (
+    APP_STORE_COUNTRY,
+    EXTRACT_ENGINE,
+    EXTRACT_URL_PARAM,
     SERPAPI_BASE_URL,
     SERPAPI_DEFAULT_GEO,
     SERPAPI_DEFAULT_GL,
@@ -24,7 +27,7 @@ def _serp_request(params: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def trends_timeseries(
-    keyword: str, tracker: Optional[Any] = None
+    keyword: str, tracker: Optional[Any] = None, anchor: Optional[str] = None
 ) -> Tuple[List[Dict[str, Any]], Optional[str]]:
     """
     Fetch Google Trends timeseries data for India over the past 12 months.
@@ -35,7 +38,7 @@ def trends_timeseries(
 
     params = {
         "engine": "google_trends",
-        "q": keyword,
+        "q": f"{keyword},{anchor}" if anchor else keyword,
         "geo": SERPAPI_DEFAULT_GEO,
         "data_type": "TIMESERIES",
         "date": "today 12-m",
@@ -70,7 +73,16 @@ def trends_timeseries(
                     val = int(first)
                 except ValueError:
                     val = 0
-        points.append({"date": d, "value": val})
+        point: Dict[str, Any] = {"date": d, "value": val}
+        if item.get("timestamp"):
+            point["ts"] = item.get("timestamp")
+        # With an anchor, SerpApi returns one value per comma-separated term, in order.
+        if anchor and isinstance(values, list) and len(values) > 1 and isinstance(values[1], dict):
+            try:
+                point["anchor"] = int(values[1].get("extracted_value", values[1].get("value", 0)) or 0)
+            except (ValueError, TypeError):
+                point["anchor"] = 0
+        points.append(point)
 
     return points, warn
 
@@ -174,6 +186,7 @@ def play_search(
             "installs": installs,
             "thumbnail": thumbnail,
             "link": link,
+            "developer": it.get("author") or it.get("developer") or it.get("author_name") or "",
         }
 
     # 1. app_highlight
@@ -437,3 +450,211 @@ def autocomplete(
                 results.append(s)
 
     return results, warn
+
+
+def google_search(
+    query: str, tracker: Optional[Any] = None, engine_tag: str = "google_search"
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Google organic results (India). Returns: ([{title, snippet, link}], warning)"""
+    if not query:
+        return [], "Empty Google query."
+    params = {"engine": "google", "q": query, "gl": SERPAPI_DEFAULT_GL, "hl": SERPAPI_DEFAULT_HL, "num": 10}
+    data, _, warn = cached_call(provider="serpapi", engine=engine_tag, params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return [], warn
+    out = []
+    for item in data.get("organic_results", []) or []:
+        if isinstance(item, dict):
+            out.append({"title": item.get("title") or "", "snippet": item.get("snippet") or "",
+                        "link": item.get("link") or ""})
+    # Local pack results often carry phone numbers too
+    local = data.get("local_results")
+    places = local.get("places", []) if isinstance(local, dict) else (local if isinstance(local, list) else [])
+    for pl in places or []:
+        if isinstance(pl, dict):
+            out.append({"title": pl.get("title") or "", "snippet": f"{pl.get('title', '')} {pl.get('phone', '')} {pl.get('address', '')}",
+                        "link": pl.get("links", {}).get("website", "") if isinstance(pl.get("links"), dict) else ""})
+    return out, warn
+
+
+def maps_search(
+    query: str, tracker: Optional[Any] = None
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Google Maps local results (India). Returns: ([{title, phone, address, website, link}], warning)"""
+    if not query:
+        return [], "Empty Maps query."
+    params = {"engine": "google_maps", "q": query, "type": "search", "hl": SERPAPI_DEFAULT_HL,
+              "ll": "@20.5937,78.9629,5z"}
+    data, _, warn = cached_call(provider="serpapi", engine="google_maps", params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return [], warn
+    out = []
+    results = data.get("local_results") or ([data["place_results"]] if isinstance(data.get("place_results"), dict) else [])
+    for r in results or []:
+        if not isinstance(r, dict):
+            continue
+        link = r.get("website") or ""
+        if not link and r.get("place_id"):
+            link = f"https://www.google.com/maps/place/?q=place_id:{r.get('place_id')}"
+        out.append({"title": r.get("title") or "", "phone": r.get("phone") or "", "address": r.get("address") or "",
+                    "website": r.get("website") or "", "link": link, "data_id": r.get("data_id") or "",
+                    "place_id": r.get("place_id") or "", "rating": r.get("rating"), "reviews": r.get("reviews")})
+    return out, warn
+
+
+def jobs_search(
+    query: str, tracker: Optional[Any] = None
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Google Jobs results (India). Returns: ([{title, company_name, via, description, apply_link, share_link}], warning)"""
+    if not query:
+        return [], "Empty Jobs query."
+    params = {"engine": "google_jobs", "q": query, "gl": SERPAPI_DEFAULT_GL, "hl": SERPAPI_DEFAULT_HL,
+              "location": "India"}
+    data, _, warn = cached_call(provider="serpapi", engine="google_jobs", params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return [], warn
+    out = []
+    for j in data.get("jobs_results", []) or []:
+        if not isinstance(j, dict):
+            continue
+        apply = j.get("apply_options") or []
+        apply_link = apply[0].get("link", "") if apply and isinstance(apply[0], dict) else ""
+        out.append({"title": j.get("title") or "", "company_name": j.get("company_name") or "",
+                    "via": j.get("via") or "", "description": (j.get("description") or "")[:2000],
+                    "apply_link": apply_link, "share_link": j.get("share_link") or ""})
+    return out, warn
+
+
+def trends_regions(
+    keyword: str, tracker: Optional[Any] = None
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Interest by Indian state over 12 months. Returns: ([{name, value}], warning), highest first."""
+    if not keyword:
+        return [], "No keyword for Trends regions."
+    params = {"engine": "google_trends", "q": keyword, "geo": SERPAPI_DEFAULT_GEO,
+              "data_type": "GEO_MAP_0", "date": "today 12-m"}
+    data, _, warn = cached_call(provider="serpapi", engine="google_trends_regions", params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return [], warn
+    rows = data.get("interest_by_region") or data.get("compared_breakdown_by_region") or []
+    out = []
+    for r in rows if isinstance(rows, list) else []:
+        if not isinstance(r, dict):
+            continue
+        val = r.get("extracted_value", r.get("value"))
+        if isinstance(r.get("values"), list) and r["values"]:
+            val = r["values"][0].get("extracted_value", r["values"][0].get("value"))
+        try:
+            val = int(val)
+        except (TypeError, ValueError):
+            continue
+        if val > 0:
+            out.append({"name": r.get("location") or r.get("geo") or "", "value": val})
+    out.sort(key=lambda x: x["value"], reverse=True)
+    return out, warn
+
+
+def maps_reviews(
+    data_id: str, tracker: Optional[Any] = None
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Newest Google Maps reviews for a place. Returns: ([{user, rating, snippet, date, likes}], warning)"""
+    if not data_id:
+        return [], "No Maps data_id for reviews."
+    params = {"engine": "google_maps_reviews", "data_id": data_id, "hl": SERPAPI_DEFAULT_HL, "sort_by": "newestFirst"}
+    data, _, warn = cached_call(provider="serpapi", engine="google_maps_reviews", params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return [], warn
+    out = []
+    for r in data.get("reviews", []) or []:
+        if not isinstance(r, dict):
+            continue
+        user = r.get("user") if isinstance(r.get("user"), dict) else {}
+        try:
+            rating = int(float(r.get("rating") or 0))
+        except (TypeError, ValueError):
+            rating = 0
+        out.append({"user": user.get("name") or "Maps user", "rating": rating,
+                    "snippet": r.get("snippet") or (r.get("extracted_snippet") or {}).get("original", "") if isinstance(r.get("extracted_snippet"), dict) else (r.get("snippet") or ""),
+                    "date": r.get("iso_date") or r.get("date") or "", "likes": int(r.get("likes") or 0)})
+    return out, warn
+
+
+def appstore_search(
+    term: str, tracker: Optional[Any] = None
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Apple App Store search. Returns: ([{title, product_id, rating, link}], warning)"""
+    if not term:
+        return [], "Empty App Store query."
+    params = {"engine": "apple_app_store", "term": term, "country": APP_STORE_COUNTRY, "num": 5}
+    data, _, warn = cached_call(provider="serpapi", engine="apple_app_store", params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return [], warn
+    out = []
+    for a in data.get("organic_results", []) or []:
+        if not isinstance(a, dict) or not a.get("id"):
+            continue
+        rating = a.get("rating")
+        if isinstance(rating, list) and rating:
+            rating = rating[0].get("rating") if isinstance(rating[0], dict) else None
+        try:
+            rating = float(rating) if rating is not None else None
+        except (TypeError, ValueError):
+            rating = None
+        out.append({"title": a.get("title") or "", "product_id": str(a.get("id")), "rating": rating,
+                    "link": a.get("link") or ""})
+    return out, warn
+
+
+def appstore_reviews(
+    product_id: str, tracker: Optional[Any] = None
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Most recent App Store reviews. Returns: ([{user, rating, snippet, date}], warning)"""
+    if not product_id:
+        return [], "No App Store product id."
+    params = {"engine": "apple_reviews", "product_id": product_id, "country": APP_STORE_COUNTRY, "sort": "mostrecent"}
+    data, _, warn = cached_call(provider="serpapi", engine="apple_reviews", params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return [], warn
+    out = []
+    for r in data.get("reviews", []) or []:
+        if not isinstance(r, dict):
+            continue
+        author = r.get("author") if isinstance(r.get("author"), dict) else {}
+        try:
+            rating = int(r.get("rating") or 0)
+        except (TypeError, ValueError):
+            rating = 0
+        text = " ".join(x for x in [r.get("title") or "", r.get("text") or ""] if x)
+        out.append({"user": author.get("name") or "App Store user", "rating": rating, "snippet": text,
+                    "date": r.get("review_date") or r.get("date") or ""})
+    return out, warn
+
+
+def extract_page(
+    url: str, tracker: Optional[Any] = None
+) -> Tuple[str, Optional[str]]:
+    """Read a web page's text through SerpApi Extract. Returns: (text, warning). Param names come from config."""
+    if not url:
+        return "", "No URL to extract."
+    params = {"engine": EXTRACT_ENGINE, EXTRACT_URL_PARAM: url}
+    data, _, warn = cached_call(provider="serpapi", engine="extract", params=params,
+                                fetch_fn=lambda: _serp_request(params), tracker=tracker)
+    if not data or not isinstance(data, dict):
+        return "", warn
+    for key in ("markdown", "content", "text", "html"):
+        val = data.get(key)
+        if isinstance(val, str) and val.strip():
+            return val[:20000], warn
+    pages = data.get("pages") or data.get("results")
+    if isinstance(pages, list) and pages and isinstance(pages[0], dict):
+        for key in ("markdown", "content", "text"):
+            if isinstance(pages[0].get(key), str):
+                return pages[0][key][:20000], warn
+    return "", warn or "Extract returned no readable text (check EXTRACT_* settings)."

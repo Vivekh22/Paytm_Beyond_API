@@ -1,14 +1,24 @@
+import hashlib
 import json
 import logging
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-from config import GEMINI_API_KEY, GEMINI_MODEL
+from cache import cached_call
+from config import GEMINI_API_KEY, GEMINI_MODEL, LLM_SAMPLE_SIZE
 
 logger = logging.getLogger(__name__)
 
 # Lazy initialized client
 _genai_client = None
+
+# Last Gemini failure (shown in report warnings and /api/health so failures aren't silent)
+LAST_GEMINI_ERROR: Optional[str] = None
+
+
+def _set_gemini_error(msg: Optional[str]) -> None:
+    global LAST_GEMINI_ERROR
+    LAST_GEMINI_ERROR = msg
 
 
 def get_genai_client():
@@ -24,9 +34,51 @@ def get_genai_client():
 
 
 def _call_gemini_json(prompt: str, retry: bool = True) -> Optional[Any]:
+    """
+    Cached Gemini call. Gemini output varies run to run; without caching, a different
+    keyword extraction would produce different SerpApi cache keys and break DEMO_MODE.
+    Keyed by model + sha256(prompt). Failed/None results are never cached.
+    """
+    params = {
+        "model": GEMINI_MODEL,
+        "prompt_sha": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+    }
+    data, _was_cached, warn = cached_call(
+        provider="gemini",
+        engine="generate_json",
+        params=params,
+        fetch_fn=lambda: _call_gemini_json_live(prompt, retry),
+    )
+    if warn:
+        logger.warning("Gemini call not served: %s", warn)
+    return data
+
+
+def _interleave_sample(items: List[Dict[str, Any]], limit: int) -> List[Dict[str, Any]]:
+    """Round-robin items across entities so no single app/source dominates the LLM sample."""
+    buckets: Dict[str, List[Dict[str, Any]]] = {}
+    order: List[str] = []
+    for it in items:
+        key = f"{it.get('source')}|{it.get('entity')}"
+        if key not in buckets:
+            buckets[key] = []
+            order.append(key)
+        buckets[key].append(it)
+    sample: List[Dict[str, Any]] = []
+    idx = 0
+    while len(sample) < limit and any(buckets[k] for k in order):
+        k = order[idx % len(order)]
+        if buckets[k]:
+            sample.append(buckets[k].pop(0))
+        idx += 1
+    return sample
+
+
+def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
     """Call Gemini with strict JSON mode, retrying once on JSON parse failure."""
     client = get_genai_client()
     if not client:
+        _set_gemini_error("GEMINI_API_KEY missing or google-genai client could not start")
         return None
 
     try:
@@ -42,7 +94,9 @@ def _call_gemini_json(prompt: str, retry: bool = True) -> Optional[Any]:
             config=config,
         )
         text = response.text or ""
-        return json.loads(text)
+        parsed = json.loads(text)
+        _set_gemini_error(None)
+        return parsed
     except json.JSONDecodeError:
         if retry:
             try:
@@ -61,6 +115,7 @@ def _call_gemini_json(prompt: str, retry: bool = True) -> Optional[Any]:
         return None
     except Exception as exc:
         logger.error("Gemini API call failed: %s", exc)
+        _set_gemini_error(f"{type(exc).__name__}: {str(exc)[:200]}")
         return None
 
 
@@ -118,7 +173,8 @@ def cluster_evidence(
 
     # Format items for prompt: [ev_0007] (play_store, 1★) text...
     formatted_items = []
-    for item in evidence_list[:80]:  # feed up to top 80 items
+    sample = _interleave_sample(evidence_list, LLM_SAMPLE_SIZE)
+    for item in sample:
         ev_id = item["id"]
         source = item["source"]
         rating = f"{item['rating']}★" if item.get("rating") else "N/A"
@@ -140,6 +196,7 @@ STRICT RULES:
 1. Reference evidence ONLY by their exact bracketed ID (e.g. "ev_0007").
 2. NEVER write or paraphrase quotes in the output.
 3. If a cluster has no supporting IDs, set ai_suggested=true.
+5. Put EVERY item that clearly fits a theme into that cluster's evidence_ids (an item belongs to at most one cluster). Leave out items that fit no theme.
 4. Each cluster must have:
    - "title": Short punchy title (3-7 words)
    - "summary": 1-2 sentence description of the common problem or theme
@@ -158,9 +215,16 @@ Return a strict JSON list:
 """
     result = _call_gemini_json(prompt)
     if result and isinstance(result, list):
-        return result
+        clean = [c for c in result if isinstance(c, dict)]
+        for c in clean:
+            c["_pool"] = len(sample)
+        return clean
 
-    # Heuristic fallback if LLM unavailable
+    # No LLM result: return nothing rather than invent themes with unrelated quotes.
+    logger.warning("Clustering unavailable for '%s'; returning no clusters.", context)
+    return []
+
+    # (legacy heuristic below is unreachable and kept only for reference)
     clusters = []
     chunk_size = max(1, len(evidence_list) // 3)
     titles = (
@@ -219,7 +283,10 @@ Return a strict JSON list of objects:
     if result and isinstance(result, list):
         return result
 
-    # Heuristic fallback
+    # No LLM result: return nothing rather than template concepts.
+    return []
+
+    # (legacy heuristic below is unreachable and kept only for reference)
     opps = []
     if clusters:
         c1 = clusters[0]
@@ -329,13 +396,16 @@ def post_validate_and_enrich_clusters(
         affected_entities = []
         seen_entities = set()
         for eid in valid_ids:
+            if evidence_map[eid].get("source") != "play_store":
+                continue  # only real apps count as "apps affected"
             ent = evidence_map[eid].get("entity")
-            if ent and ent not in seen_entities and ent != "News" and ent != "Reddit Discussion":
+            if ent and ent not in seen_entities:
                 seen_entities.add(ent)
                 affected_entities.append(ent)
 
         count = len(valid_ids)
-        total = max(total_reviews_scanned, count, 1)
+        pool = raw.get("_pool")
+        total = max(int(pool) if pool else total_reviews_scanned, count, 1)
 
         validated_clusters.append(
             {
@@ -347,7 +417,7 @@ def post_validate_and_enrich_clusters(
                 "frequency": {
                     "count": count,
                     "total": total,
-                    "label": f"{count} of {total} reviews",
+                    "label": f"{count} of {total} items analysed",
                 },
                 "apps_affected": affected_entities,
                 "evidence_ids": valid_ids,
