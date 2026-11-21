@@ -7,7 +7,7 @@ import threading
 import uuid
 from typing import Dict, Optional
 
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 from cache import get_cache_stats, get_report, save_report
@@ -19,6 +19,8 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -240,6 +242,24 @@ def get_mock_report(mode: int):
         data = json.load(f)
 
     return jsonify(data)
+
+
+@app.route("/")
+def serve_index():
+    """Serve frontend index.html."""
+    if frontend_dir.exists():
+        return send_from_directory(frontend_dir, "index.html")
+    return jsonify({"status": "GapScope Backend Active"})
+
+
+@app.route("/<path:filename>")
+def serve_static(filename: str):
+    """Serve frontend static assets."""
+    if filename.startswith("api/"):
+        return jsonify({"error": "Endpoint not found"}), 404
+    if frontend_dir.exists() and (frontend_dir / filename).exists():
+        return send_from_directory(frontend_dir, filename)
+    return jsonify({"error": f"File '{filename}' not found."}), 404
 
 
 if __name__ == "__main__":

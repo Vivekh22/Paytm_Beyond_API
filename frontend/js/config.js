@@ -4,10 +4,12 @@
  */
 
 export const CONFIG = {
-  // Live Backend URL
-  API_BASE: (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  // Live Backend URL (auto-detects port 5000 for direct origin or defaults to http://localhost:5000)
+  API_BASE: (typeof window !== 'undefined' && window.location.port === '5000')
+    ? ''
+    : (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
     ? 'http://localhost:5000'
-    : 'http://localhost:5000',
+    : '',
 
   // Mock-first flag: true on production preview/Vercel, false on local with running backend
   USE_MOCK: !(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'),
