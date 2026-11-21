@@ -44,4 +44,8 @@ The user submits an idea, business, or category. GapScope fetches live multi-sou
 - [x] P0: Prewarm script with `--dry-run` and demo preset cache filling (`prewarm.py`)
 - [x] P2: Setup documentation and curl examples (`README.md`)
 - [x] Pulled Frontend application (`frontend/index.html`, `frontend/report.html`, `frontend/js/`, `frontend/css/`) from remote origin.
-- [x] Local-only setup: no hosted deployment (`vercel.json` removed); frontend talks to the Flask backend on port 5000.
+- [x] Integrated Mode 4 Protect (`protect.py`, `monitor.py`, `notify.py`, `timeline.py`, `compare.py`).
+- [x] Configured serverless runtime: `api/index.py`, `requirements.txt`, and `vercel.json` rewrites.
+- [x] Dynamic `/api` routing in `frontend/js/config.js` (same-origin `/api` on HTTPS/Vercel, port 5000 on local HTTP).
+- [x] Pushed all clean code to `origin/main` (commit `0e79099`).
+- [x] Redeploy instructions & dashboard opened for Vercel project `ismail-91bb/qwer`.

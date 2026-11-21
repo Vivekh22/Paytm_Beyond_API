@@ -25,12 +25,27 @@ Built for the **Beyond 9 to 5 Buildathon**
 
 ## 💡 The Problem & GapScope's Solution
 
+<<<<<<< HEAD
 | The Traditional AI Trap | The GapScope Way |
 |---|---|
 | ❌ **Hallucinated Market Data:** LLMs invent user feedback, competitor metrics, and synthetic quotes. | ✅ **Zero-Hallucination Evidence Core:** Every review, forum thread, and article snippet is assigned an immutable ID (`ev_0001`...). AI clusters by ID only—never paraphrasing or inventing quotes. |
 | ❌ **Black-Box "Vibes" Scoring:** "7/10 market viability" generated from arbitrary prompt completions. | ✅ **Deterministic Python Math Engine:** Transparent mathematical formulas calculate Demand, Pain Intensity, Competition Gap, and Momentum (0–100 scale). |
 | ❌ **Static & Stale Snapshots:** Reports reflect outdated training data cutoff dates. | ✅ **Multi-Source Live Intelligence:** Real-time data synthesis across Google Trends, Play Store reviews, Reddit discussions, Google News, and You.com Web Index. |
 | ❌ **No Impersonation Defense:** Startups and brands are defenseless against fake apps, scam helplines, and lookalike domains. | ✅ **Integrated Brand Protect (Mode 4):** Autonomous scam, fake job listing, and lookalike portal detection with one-click takedown text and public verification pages. |
+=======
+<div align="center">
+
+### Research Workspace & Scan Hub
+<img src="assets/screenshots/landing-hero.png" alt="GapScope Landing Hero & Research Workspace" width="100%" />
+
+<br/><br/>
+
+| Market Intelligence Report & Viability Score | Live Evidence Wall & Customer Receipts |
+|:---:|:---:|
+| <img src="assets/screenshots/report-overview.png" alt="GapScope Market Intelligence Report" width="100%" /> | <img src="assets/screenshots/evidence-wall.png" alt="GapScope Evidence Wall" width="100%" /> |
+
+</div>
+>>>>>>> 5ce1897d8585ee76b386f016b9a1667d4ea77893
 
 ---
 
