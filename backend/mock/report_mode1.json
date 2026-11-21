@@ -1,0 +1,297 @@
+{
+  "scan_id": "m1_upi_student",
+  "mode": 1,
+  "query": "UPI expense tracker for college students",
+  "generated_at": "2026-11-21T10:00:00Z",
+  "keywords": {
+    "broad": "expense tracker",
+    "specific": [
+      "UPI expense tracker",
+      "student budget app India"
+    ],
+    "category": "Finance"
+  },
+  "credits": {
+    "serpapi_live": 3,
+    "serpapi_cached": 5,
+    "youcom_live": 1,
+    "youcom_cached": 1
+  },
+  "verdict": {
+    "kind": "viability",
+    "label": "BUILD",
+    "score": 72,
+    "headline": "High UPI transaction failure tracking pain and rising student search demand confirm strong viability",
+    "breakdown": [
+      {
+        "factor": "Demand",
+        "score": 22,
+        "max": 30,
+        "explanation": "Avg interest 61.4/100, rising trajectory (+18.5%)",
+        "evidence_ids": []
+      },
+      {
+        "factor": "Pain intensity",
+        "score": 24,
+        "max": 30,
+        "explanation": "Top 3 pain themes account for 81% of scanned critical reviews",
+        "evidence_ids": [
+          "ev_0001",
+          "ev_0002",
+          "ev_0003"
+        ]
+      },
+      {
+        "factor": "Competition gap",
+        "score": 12,
+        "max": 20,
+        "explanation": "Average incumbent rating 3.8★ indicates room for disruption",
+        "evidence_ids": [
+          "ev_0004",
+          "ev_0005"
+        ]
+      },
+      {
+        "factor": "Momentum",
+        "score": 8,
+        "max": 10,
+        "explanation": "8 external signals & news items found in recent coverage",
+        "evidence_ids": [
+          "ev_0006",
+          "ev_0007"
+        ]
+      },
+      {
+        "factor": "Evidence confidence",
+        "score": 6,
+        "max": 10,
+        "explanation": "7 cross-referenced evidence points verified across all sources",
+        "evidence_ids": []
+      }
+    ]
+  },
+  "trend": {
+    "keyword": "expense tracker",
+    "geo": "IN",
+    "points": [
+      { "date": "2025-12", "value": 45 },
+      { "date": "2026-01", "value": 52 },
+      { "date": "2026-02", "value": 48 },
+      { "date": "2026-03", "value": 50 },
+      { "date": "2026-04", "value": 55 },
+      { "date": "2026-05", "value": 58 },
+      { "date": "2026-06", "value": 60 },
+      { "date": "2026-07", "value": 62 },
+      { "date": "2026-08", "value": 65 },
+      { "date": "2026-09", "value": 70 },
+      { "date": "2026-10", "value": 74 },
+      { "date": "2026-11", "value": 78 }
+    ],
+    "change_pct": 18.5,
+    "direction": "rising"
+  },
+  "competitors": [
+    {
+      "name": "Walnut: Expense & Money Tracker",
+      "product_id": "com.daamitt.walnut.app",
+      "rating": 3.9,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/walnut-icon",
+      "url": "https://play.google.com/store/apps/details?id=com.daamitt.walnut.app",
+      "source": "play_store",
+      "reviews_scanned": 100
+    },
+    {
+      "name": "Money View: Budget & Expense",
+      "product_id": "com.whizdm.moneyview",
+      "rating": 3.7,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/moneyview-icon",
+      "url": "https://play.google.com/store/apps/details?id=com.whizdm.moneyview",
+      "source": "play_store",
+      "reviews_scanned": 100
+    }
+  ],
+  "clusters": [
+    {
+      "id": "cl_1",
+      "group": "pain",
+      "title": "UPI Auto-Categorization & SMS Parsing Breakage",
+      "summary": "Users report that multi-account UPI transactions and bank SMS updates are constantly mislabeled or ignored completely.",
+      "severity": "high",
+      "frequency": {
+        "count": 42,
+        "total": 200,
+        "label": "42 of 200 reviews"
+      },
+      "apps_affected": [
+        "Walnut: Expense & Money Tracker",
+        "Money View: Budget & Expense"
+      ],
+      "evidence_ids": [
+        "ev_0001",
+        "ev_0002"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_2",
+      "group": "pain",
+      "title": "Aggressive Loan Offers and Intrusive Ads",
+      "summary": "Budget trackers are turning into predatory lending storefronts, destroying core tracking usability for college students.",
+      "severity": "high",
+      "frequency": {
+        "count": 35,
+        "total": 200,
+        "label": "35 of 200 reviews"
+      },
+      "apps_affected": [
+        "Money View: Budget & Expense"
+      ],
+      "evidence_ids": [
+        "ev_0003",
+        "ev_0004"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_3",
+      "group": "pain",
+      "title": "Splitwise Clone Lag and Lack of Group Sync",
+      "summary": "Students wanting hostel shared billing find current sync mechanisms buggy and slow.",
+      "severity": "medium",
+      "frequency": {
+        "count": 18,
+        "total": 200,
+        "label": "18 of 200 reviews"
+      },
+      "apps_affected": [
+        "Walnut: Expense & Money Tracker"
+      ],
+      "evidence_ids": [
+        "ev_0005"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "op_1",
+      "title": "Privacy-First Zero-Ad Student UPI Tracker",
+      "pitch": "On-device UPI notification parser with instant hostel shared expense splitting and zero loan spam.",
+      "target_user": "College students and young graduates in metro cities",
+      "addresses_cluster_ids": [
+        "cl_1",
+        "cl_2"
+      ],
+      "evidence_ids": [
+        "ev_0001",
+        "ev_0002",
+        "ev_0003",
+        "ev_0004"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_2",
+      "title": "Real-time Campus Roommate Bill Sync",
+      "pitch": "Instant group budgeting integrating QR pay receipts without manual bill entry.",
+      "target_user": "Roommates and college clubs managing split budgets",
+      "addresses_cluster_ids": [
+        "cl_3"
+      ],
+      "evidence_ids": [
+        "ev_0005"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "news": [],
+  "evidence": {
+    "ev_0001": {
+      "id": "ev_0001",
+      "source": "play_store",
+      "text": "Ever since the new update, UPI payments to local vendors fail to categorize. It logs everything under 'Others' and editing manually takes forever.",
+      "title": null,
+      "author": "Aarav Sharma",
+      "rating": 1,
+      "date": "2026-10-14",
+      "url": "https://play.google.com/store/apps/details?id=com.daamitt.walnut.app",
+      "entity": "Walnut: Expense & Money Tracker",
+      "likes": 28
+    },
+    "ev_0002": {
+      "id": "ev_0002",
+      "source": "play_store",
+      "text": "App misses half of HDFC UPI debit notifications. If I pay through GPay or Paytm, it does not catch the SMS properly anymore.",
+      "title": null,
+      "author": "Kavita R.",
+      "rating": 1,
+      "date": "2026-10-20",
+      "url": "https://play.google.com/store/apps/details?id=com.whizdm.moneyview",
+      "entity": "Money View: Budget & Expense",
+      "likes": 19
+    },
+    "ev_0003": {
+      "id": "ev_0003",
+      "source": "play_store",
+      "text": "This was once a great budget app. Now it is full of instant personal loan popups and spam callers. Completely uninstalled.",
+      "title": null,
+      "author": "Rohan Deshmukh",
+      "rating": 1,
+      "date": "2026-09-30",
+      "url": "https://play.google.com/store/apps/details?id=com.whizdm.moneyview",
+      "entity": "Money View: Budget & Expense",
+      "likes": 34
+    },
+    "ev_0004": {
+      "id": "ev_0004",
+      "source": "reddit",
+      "text": "Why do all Indian money tracker apps force loan advertisements? As a college student I just want a simple UPI expense tracker that doesn't sell my credit profile.",
+      "title": "Best expense tracker for UPI in 2026?",
+      "author": null,
+      "rating": null,
+      "date": null,
+      "url": "https://reddit.com/r/india/comments/upi_tracker",
+      "entity": "Reddit Discussion",
+      "likes": 0
+    },
+    "ev_0005": {
+      "id": "ev_0005",
+      "source": "play_store",
+      "text": "Group split expense syncing with flatmates fails constantly. Shows different pending balances on my friend's phone.",
+      "title": null,
+      "author": "Vikas G.",
+      "rating": 1,
+      "date": "2026-08-11",
+      "url": "https://play.google.com/store/apps/details?id=com.daamitt.walnut.app",
+      "entity": "Walnut: Expense & Money Tracker",
+      "likes": 14
+    },
+    "ev_0006": {
+      "id": "ev_0006",
+      "source": "google_news",
+      "text": "UPI transactions in India cross 18 billion monthly volume as Gen Z students abandon physical cash entirely for daily micro-spends.",
+      "title": "NPCI reports record UPI volume among university cohorts",
+      "author": "Economic Times",
+      "rating": null,
+      "date": "2026-10-05",
+      "url": "https://economictimes.indiatimes.com/tech/upi-genz",
+      "entity": "Google News",
+      "likes": 0
+    },
+    "ev_0007": {
+      "id": "ev_0007",
+      "source": "you_web",
+      "text": "Student financial management startups in Bengaluru secure seed capital to address privacy concerns around SMS reading finance apps.",
+      "title": "Indian Fintech 2026 Landscape Report",
+      "author": null,
+      "rating": null,
+      "date": "2 weeks ago",
+      "url": "https://inc42.com/fintech-student-privacy",
+      "entity": "You.com Search",
+      "likes": 0
+    }
+  },
+  "warnings": []
+}

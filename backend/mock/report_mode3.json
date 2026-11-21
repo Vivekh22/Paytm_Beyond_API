@@ -1,0 +1,283 @@
+{
+  "scan_id": "m3_personal_finance",
+  "mode": 3,
+  "query": "Personal Finance",
+  "generated_at": "2026-11-21T10:10:00Z",
+  "keywords": {
+    "broad": "Personal Finance",
+    "specific": [
+      "Personal Finance apps India",
+      "best money management app India"
+    ],
+    "category": "Personal Finance"
+  },
+  "credits": {
+    "serpapi_live": 5,
+    "serpapi_cached": 3,
+    "youcom_live": 2,
+    "youcom_cached": 0
+  },
+  "verdict": {
+    "kind": "discovery",
+    "label": null,
+    "score": null,
+    "headline": "Identified 3 cross-competitor systemic gaps across 3 market leaders",
+    "breakdown": [
+      {
+        "factor": "Cross-App Systemic Gaps",
+        "score": 30,
+        "max": 30,
+        "explanation": "3 complaint clusters span multiple leading competitors",
+        "evidence_ids": [
+          "ev_0001",
+          "ev_0002",
+          "ev_0003"
+        ]
+      },
+      {
+        "factor": "Incumbent Saturation",
+        "score": 15,
+        "max": 20,
+        "explanation": "Evaluated top 3 benchmark apps in the category",
+        "evidence_ids": []
+      }
+    ]
+  },
+  "trend": {
+    "keyword": "Personal Finance",
+    "geo": "IN",
+    "points": [
+      { "date": "2025-12", "value": 70 },
+      { "date": "2026-01", "value": 75 },
+      { "date": "2026-02", "value": 72 },
+      { "date": "2026-03", "value": 78 },
+      { "date": "2026-04", "value": 80 },
+      { "date": "2026-05", "value": 82 },
+      { "date": "2026-06", "value": 85 },
+      { "date": "2026-07", "value": 84 },
+      { "date": "2026-08", "value": 88 },
+      { "date": "2026-09", "value": 90 },
+      { "date": "2026-10", "value": 92 },
+      { "date": "2026-11", "value": 95 }
+    ],
+    "change_pct": 14.8,
+    "direction": "rising"
+  },
+  "competitors": [
+    {
+      "name": "CRED: Pay Bills & Track",
+      "product_id": "com.dreamplug.androidapp",
+      "rating": 4.6,
+      "installs": "50M+",
+      "icon": "https://play-lh.googleusercontent.com/cred-icon",
+      "url": "https://play.google.com/store/apps/details?id=com.dreamplug.androidapp",
+      "source": "play_store",
+      "reviews_scanned": 100
+    },
+    {
+      "name": "Jupiter: Digital Banking & Money",
+      "product_id": "money.jupiter",
+      "rating": 4.2,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/jupiter-icon",
+      "url": "https://play.google.com/store/apps/details?id=money.jupiter",
+      "source": "play_store",
+      "reviews_scanned": 100
+    },
+    {
+      "name": "INDmoney: Stocks, Mutual Funds & Net Worth",
+      "product_id": "in.indwealth",
+      "rating": 4.1,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/indmoney-icon",
+      "url": "https://play.google.com/store/apps/details?id=in.indwealth",
+      "source": "play_store",
+      "reviews_scanned": 100
+    }
+  ],
+  "clusters": [
+    {
+      "id": "cl_1",
+      "group": "pain",
+      "title": "Account Aggregator Consent Sync Timeouts & Failures",
+      "summary": "Users across all three apps face broken bank connections where fetching updated balances requires repeated OTP re-authentication that often fails.",
+      "severity": "high",
+      "frequency": {
+        "count": 54,
+        "total": 300,
+        "label": "54 of 300 reviews"
+      },
+      "apps_affected": [
+        "CRED: Pay Bills & Track",
+        "Jupiter: Digital Banking & Money",
+        "INDmoney: Stocks, Mutual Funds & Net Worth"
+      ],
+      "evidence_ids": [
+        "ev_0001",
+        "ev_0002",
+        "ev_0003"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_2",
+      "group": "pain",
+      "title": "Cluttered Super-App Feature Bloat",
+      "summary": "Every finance app is expanding into e-commerce, gaming coins, vehicle insurance, and peer lending, burying core portfolio insights.",
+      "severity": "high",
+      "frequency": {
+        "count": 43,
+        "total": 300,
+        "label": "43 of 300 reviews"
+      },
+      "apps_affected": [
+        "CRED: Pay Bills & Track",
+        "INDmoney: Stocks, Mutual Funds & Net Worth"
+      ],
+      "evidence_ids": [
+        "ev_0004",
+        "ev_0005"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_3",
+      "group": "pain",
+      "title": "Tax & Capital Gains Reporting Inaccuracies",
+      "summary": "Investors find year-end capital gains and dividend tax computations out of sync with official IT department AIS data.",
+      "severity": "medium",
+      "frequency": {
+        "count": 29,
+        "total": 300,
+        "label": "29 of 300 reviews"
+      },
+      "apps_affected": [
+        "INDmoney: Stocks, Mutual Funds & Net Worth"
+      ],
+      "evidence_ids": [
+        "ev_0006"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "op_1",
+      "title": "Resilient Auto-Sync Net Worth Dashboard",
+      "pitch": "A minimal, ultra-clean net worth tracker using cached fallback sync so bank timeouts never break user portfolio views.",
+      "target_user": "Salaried tech professionals with multiple bank and demat accounts",
+      "addresses_cluster_ids": [
+        "cl_1"
+      ],
+      "evidence_ids": [
+        "ev_0001",
+        "ev_0002",
+        "ev_0003"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_2",
+      "title": "Unbloated Single-Purpose Investment Tracker",
+      "pitch": "Zero ads, zero credit card pitch, zero reward spins: just fast, pristine net-worth and asset allocation tracking.",
+      "target_user": "High-intent retail investors tired of gamified fintech",
+      "addresses_cluster_ids": [
+        "cl_2"
+      ],
+      "evidence_ids": [
+        "ev_0004",
+        "ev_0005"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_3",
+      "title": "Direct-to-ITR Automated Tax Reconciliation",
+      "pitch": "Automated cross-reconciliation of Zerodha/Groww mutual funds directly against AIS/26AS tax statements.",
+      "target_user": "Indian retail equity and mutual fund investors filing ITR-2/3",
+      "addresses_cluster_ids": [
+        "cl_3"
+      ],
+      "evidence_ids": [
+        "ev_0006"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "news": [],
+  "evidence": {
+    "ev_0001": {
+      "id": "ev_0001",
+      "source": "play_store",
+      "text": "Bank account sync via Account Aggregator fails 9 times out of 10. SBI and ICICI accounts show 'refreshing' for days without balance update.",
+      "title": null,
+      "author": "Ankit Verma",
+      "rating": 1,
+      "date": "2026-10-25",
+      "url": "https://play.google.com/store/apps/details?id=com.dreamplug.androidapp",
+      "entity": "CRED: Pay Bills & Track",
+      "likes": 47
+    },
+    "ev_0002": {
+      "id": "ev_0002",
+      "source": "play_store",
+      "text": "Every Monday morning the app asks me to re-verify OTP for fetching linked bank statements. Completely defeats the point of automated budgeting.",
+      "title": null,
+      "author": "Suresh Nair",
+      "rating": 1,
+      "date": "2026-10-19",
+      "url": "https://play.google.com/store/apps/details?id=money.jupiter",
+      "entity": "Jupiter: Digital Banking & Money",
+      "likes": 31
+    },
+    "ev_0003": {
+      "id": "ev_0003",
+      "source": "play_store",
+      "text": "Bank statement linking keeps disconnecting. Net worth jumps erratically because some accounts don't sync properly.",
+      "title": null,
+      "author": "Meera Joshi",
+      "rating": 1,
+      "date": "2026-09-28",
+      "url": "https://play.google.com/store/apps/details?id=in.indwealth",
+      "entity": "INDmoney: Stocks, Mutual Funds & Net Worth",
+      "likes": 25
+    },
+    "ev_0004": {
+      "id": "ev_0004",
+      "source": "play_store",
+      "text": "App has become unbearable. I open it to check credit card statement and I get bombarded with casino wheel spins, luxury shopping deals, and loans.",
+      "title": null,
+      "author": "Tarun Saxena",
+      "rating": 1,
+      "date": "2026-10-12",
+      "url": "https://play.google.com/store/apps/details?id=com.dreamplug.androidapp",
+      "entity": "CRED: Pay Bills & Track",
+      "likes": 62
+    },
+    "ev_0005": {
+      "id": "ev_0005",
+      "source": "play_store",
+      "text": "Way too cluttered now. It used to be clean tracking of US stocks and Indian mutual funds. Now there are 10 tabs of loans, fixed deposits, and credit cards.",
+      "title": null,
+      "author": "Varun T.",
+      "rating": 1,
+      "date": "2026-10-04",
+      "url": "https://play.google.com/store/apps/details?id=in.indwealth",
+      "entity": "INDmoney: Stocks, Mutual Funds & Net Worth",
+      "likes": 39
+    },
+    "ev_0006": {
+      "id": "ev_0006",
+      "source": "reddit",
+      "text": "Capital gains report generated by fintech apps did not match my broker STT sheet. Ended up getting a notice from tax portal for mismatch.",
+      "title": "Don't blindly trust tracking apps for ITR filing",
+      "author": null,
+      "rating": null,
+      "date": null,
+      "url": "https://reddit.com/r/IndiaInvestments/comments/itr_mismatch",
+      "entity": "Reddit Discussion",
+      "likes": 0
+    }
+  },
+  "warnings": []
+}

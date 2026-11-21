@@ -1,0 +1,250 @@
+{
+  "scan_id": "m2_dunzo_investigate",
+  "mode": 2,
+  "query": "Dunzo",
+  "generated_at": "2026-11-21T10:05:00Z",
+  "keywords": {
+    "broad": "Dunzo",
+    "specific": [
+      "Dunzo reviews",
+      "Dunzo complaints"
+    ],
+    "category": "Competitor Investigation"
+  },
+  "credits": {
+    "serpapi_live": 4,
+    "serpapi_cached": 4,
+    "youcom_live": 2,
+    "youcom_cached": 0
+  },
+  "verdict": {
+    "kind": "trajectory",
+    "label": "DECLINING",
+    "score": -3,
+    "headline": "Operational strain and deteriorating user satisfaction signaling severe decline",
+    "breakdown": [
+      {
+        "factor": "Search Interest Trajectory",
+        "score": -1,
+        "max": 1,
+        "explanation": "Search interest falling (-28.4% vs prior period)",
+        "evidence_ids": []
+      },
+      {
+        "factor": "Review Sentiment Drift",
+        "score": -1,
+        "max": 1,
+        "explanation": "Recent reviews (1.82★) degrading vs all-time (3.90★)",
+        "evidence_ids": [
+          "ev_0001",
+          "ev_0002"
+        ]
+      },
+      {
+        "factor": "Media Sentiment",
+        "score": -1,
+        "max": 1,
+        "explanation": "Negative media headwinds detected (4 negative vs 0 positive)",
+        "evidence_ids": [
+          "ev_0005",
+          "ev_0006"
+        ]
+      }
+    ]
+  },
+  "trend": {
+    "keyword": "Dunzo",
+    "geo": "IN",
+    "points": [
+      { "date": "2025-12", "value": 68 },
+      { "date": "2026-01", "value": 62 },
+      { "date": "2026-02", "value": 55 },
+      { "date": "2026-03", "value": 50 },
+      { "date": "2026-04", "value": 45 },
+      { "date": "2026-05", "value": 41 },
+      { "date": "2026-06", "value": 38 },
+      { "date": "2026-07", "value": 35 },
+      { "date": "2026-08", "value": 32 },
+      { "date": "2026-09", "value": 29 },
+      { "date": "2026-10", "value": 25 },
+      { "date": "2026-11", "value": 22 }
+    ],
+    "change_pct": -28.4,
+    "direction": "falling"
+  },
+  "competitors": [
+    {
+      "name": "Dunzo: 24x7 Delivery App",
+      "product_id": "com.dunzo.user",
+      "rating": 3.9,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/dunzo-icon",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "source": "play_store",
+      "reviews_scanned": 150
+    }
+  ],
+  "clusters": [
+    {
+      "id": "cl_1",
+      "group": "pain",
+      "title": "Delivery Partner Unavailability & Canceled Orders",
+      "summary": "Users report that orders stay pending for over an hour before being automatically cancelled without support explanation.",
+      "severity": "high",
+      "frequency": {
+        "count": 48,
+        "total": 100,
+        "label": "48 of 100 reviews"
+      },
+      "apps_affected": [
+        "Dunzo: 24x7 Delivery App"
+      ],
+      "evidence_ids": [
+        "ev_0001",
+        "ev_0002"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_2",
+      "group": "pain",
+      "title": "Wallet Refund Withholding & Non-responsive Support",
+      "summary": "Cancelled order amounts are credited to in-app wallet rather than original payment methods with no customer support bot resolution.",
+      "severity": "high",
+      "frequency": {
+        "count": 27,
+        "total": 100,
+        "label": "27 of 100 reviews"
+      },
+      "apps_affected": [
+        "Dunzo: 24x7 Delivery App"
+      ],
+      "evidence_ids": [
+        "ev_0003"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_3",
+      "group": "strength",
+      "title": "Errand & Item Pick-and-Drop Flexibility",
+      "summary": "Long-term users still appreciate the peer-to-peer parcel courier feature when local riders are available.",
+      "severity": "low",
+      "frequency": {
+        "count": 20,
+        "total": 50,
+        "label": "20 of 50 reviews"
+      },
+      "apps_affected": [
+        "Dunzo: 24x7 Delivery App"
+      ],
+      "evidence_ids": [
+        "ev_0004"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "op_1",
+      "title": "Decentralized Peer Courier with Escrow Instant Refunds",
+      "pitch": "A hyper-local B2C parcel courier guaranteeing immediate bank refunds if driver pickup isn't confirmed in 8 minutes.",
+      "target_user": "Urban office workers and home businesses sending documents/parcels",
+      "addresses_cluster_ids": [
+        "cl_1",
+        "cl_2"
+      ],
+      "evidence_ids": [
+        "ev_0001",
+        "ev_0002",
+        "ev_0003"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "news": [
+    {
+      "evidence_id": "ev_0005",
+      "sentiment": "negative"
+    },
+    {
+      "evidence_id": "ev_0006",
+      "sentiment": "negative"
+    }
+  ],
+  "evidence": {
+    "ev_0001": {
+      "id": "ev_0001",
+      "source": "play_store",
+      "text": "Placed an order for medicines at 8 PM. App kept saying assigning partner for 70 minutes then abruptly cancelled. Terrible service now.",
+      "title": null,
+      "author": "Pooja Hegde",
+      "rating": 1,
+      "date": "2026-10-18",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo: 24x7 Delivery App",
+      "likes": 41
+    },
+    "ev_0002": {
+      "id": "ev_0002",
+      "source": "play_store",
+      "text": "No drivers anywhere in Indiranagar. Dunzo used to be the gold standard, now it is completely unusable.",
+      "title": null,
+      "author": "Naveen K.",
+      "rating": 1,
+      "date": "2026-10-22",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo: 24x7 Delivery App",
+      "likes": 29
+    },
+    "ev_0003": {
+      "id": "ev_0003",
+      "source": "play_store",
+      "text": "They deducted 450 rupees from UPI. Order was rejected but money sent to Dunzo cash instead of my bank account. Support chat is just an automated loop.",
+      "title": null,
+      "author": "Sameer Khan",
+      "rating": 1,
+      "date": "2026-09-15",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo: 24x7 Delivery App",
+      "likes": 37
+    },
+    "ev_0004": {
+      "id": "ev_0004",
+      "source": "play_store",
+      "text": "Still love the parcel service when it works. Sending forgotten keys or tiffin across town is irreplaceable.",
+      "title": null,
+      "author": "Deepak M.",
+      "rating": 5,
+      "date": "2026-07-12",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo: 24x7 Delivery App",
+      "likes": 12
+    },
+    "ev_0005": {
+      "id": "ev_0005",
+      "source": "google_news",
+      "text": "Dunzo faces operational restructuring and delayed vendor liabilities amid intense quick commerce competition from Blinkit and Zepto.",
+      "title": "Quick commerce shifts landscape as legacy delivery apps restructure",
+      "author": "Livemint",
+      "rating": null,
+      "date": "2026-09-02",
+      "url": "https://livemint.com/companies/dunzo-restructuring-2026",
+      "entity": "Dunzo News",
+      "likes": 0
+    },
+    "ev_0006": {
+      "id": "ev_0006",
+      "source": "you_news",
+      "text": "Hyperlocal delivery platform struggles with rider retention in Tier 1 metros leading to increased order cancellation rates.",
+      "title": "Logistics Deep Dive India 2026",
+      "author": null,
+      "rating": null,
+      "date": "1 month ago",
+      "url": "https://entrackr.com/delivery-retention-challenges",
+      "entity": "Dunzo Web",
+      "likes": 0
+    }
+  },
+  "warnings": []
+}
