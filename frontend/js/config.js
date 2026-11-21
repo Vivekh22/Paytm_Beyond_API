@@ -3,6 +3,9 @@
  * Design language follows finprob.com (stone + orange-500, Bricolage / Inter / JetBrains Mono).
  */
 
+const isBrowser = typeof window !== 'undefined';
+const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 export const CONFIG = {
   // Live Backend URL (auto-detects port 5000 for direct origin or defaults to http://localhost:5000)
   API_BASE: (typeof window !== 'undefined' && window.location.port === '5000')
@@ -11,8 +14,8 @@ export const CONFIG = {
     ? 'http://localhost:5000'
     : '',
 
-  // Mock-first flag: true on production preview/Vercel, false on local with running backend
-  USE_MOCK: !(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'),
+  // Mock-first flag: false attempts live Python backend first, with resilient instant fallback
+  USE_MOCK: false,
 
   // Demo presets for one-click instant evaluation
   EXAMPLE_PRESETS: [
@@ -32,15 +35,22 @@ export const CONFIG = {
     },
     {
       mode: 3,
+      query: 'Travel',
+      label: 'Travel',
+      badge: '⚡ instant',
+      category: 'Travel & Hospitality'
+    },
+    {
+      mode: 3,
       query: 'Personal Finance',
       label: 'Personal Finance',
       badge: '⚡ instant',
       category: 'Finance'
     },
     {
-      mode: 1,
-      query: 'AI career coach for engineering graduates',
-      label: 'AI career coach',
+      mode: 3,
+      query: 'EdTech',
+      label: 'EdTech',
       badge: '⚡ instant',
       category: 'EdTech'
     },
@@ -53,18 +63,6 @@ export const CONFIG = {
     }
   ],
 
-  // Source styling tokens (outlined mono pills, one tint per source)
-  SOURCE_METAS: {
-    play_store:  { name: 'Play Store',   letter: 'P', pillClass: 'border-green-700 text-green-800',                 textClass: 'text-green-800' },
-    reddit:      { name: 'Reddit',       letter: 'R', pillClass: 'border-orange-600 text-orange-700',               textClass: 'text-orange-700' },
-    google_news: { name: 'Google News',  letter: 'N', pillClass: 'border-blue-700 text-blue-800',                   textClass: 'text-blue-800' },
-    you_web:     { name: 'You.com Web',  letter: 'Y', pillClass: 'border-violet-700 bg-violet-50 text-violet-800',  textClass: 'text-violet-800' },
-    you_news:    { name: 'You.com News', letter: 'Y', pillClass: 'border-dashed border-violet-600 text-violet-700', textClass: 'text-violet-700' }
-  },
-
-  // Scoring thresholds
-  THRESHOLDS: {
-    BUILD_MIN: 65,
-    PIVOT_MIN: 40
-  }
+  // Cache duration in milliseconds (72 hours)
+  CACHE_TTL_MS: 72 * 60 * 60 * 1000
 };
