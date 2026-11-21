@@ -1,0 +1,472 @@
+{
+  "scan_id": "mock_mode1_upi_tracker",
+  "mode": 1,
+  "query": "UPI expense tracker for college students",
+  "generated_at": "2026-11-21T10:00:00Z",
+  "_comment": "Realistic sample data for Mode 1 Hackathon demonstration",
+  "keywords": {
+    "broad": "expense tracker",
+    "specific": [
+      "UPI expense tracker",
+      "student budget app India"
+    ],
+    "category": "Finance"
+  },
+  "credits": {
+    "serpapi_live": 3,
+    "serpapi_cached": 5,
+    "youcom_live": 1,
+    "youcom_cached": 1
+  },
+  "verdict": {
+    "kind": "viability",
+    "label": "PIVOT",
+    "score": 58,
+    "headline": "Real pain, crowded market — differentiate on privacy and SMS-free sync",
+    "breakdown": [
+      {
+        "factor": "Search Demand",
+        "score": 18,
+        "max": 30,
+        "explanation": "Average Google Trends interest 52/100 across India college hubs, up +14.2% YoY.",
+        "evidence_ids": [
+          "ev_0001",
+          "ev_0002"
+        ]
+      },
+      {
+        "factor": "Pain Intensity",
+        "score": 22,
+        "max": 30,
+        "explanation": "38% of negative reviews cite broken auto-categorisation of UPI IDs like swiggy@icici or Paytm QR.",
+        "evidence_ids": [
+          "ev_0007",
+          "ev_0008",
+          "ev_0009",
+          "ev_0010"
+        ]
+      },
+      {
+        "factor": "Competition Gap",
+        "score": 8,
+        "max": 20,
+        "explanation": "Heavy incumbent presence (Axio/Walnut, Fold, Monefy), but their newest reviews average only 2.9★.",
+        "evidence_ids": [
+          "ev_0003",
+          "ev_0004"
+        ]
+      },
+      {
+        "factor": "Market Momentum",
+        "score": 6,
+        "max": 10,
+        "explanation": "RBI Account Aggregator discussions on r/IndiaInvestments and r/developersIndia are accelerating.",
+        "evidence_ids": [
+          "ev_0005",
+          "ev_0006",
+          "ev_0014"
+        ]
+      },
+      {
+        "factor": "Evidence Confidence",
+        "score": 4,
+        "max": 10,
+        "explanation": "16 verified sources across Play Store, Reddit, You.com, and Google News.",
+        "evidence_ids": []
+      }
+    ]
+  },
+  "trend": {
+    "keyword": "expense tracker",
+    "geo": "IN",
+    "points": [
+      { "date": "2025-12", "value": 41 },
+      { "date": "2026-01", "value": 54 },
+      { "date": "2026-02", "value": 48 },
+      { "date": "2026-03", "value": 46 },
+      { "date": "2026-04", "value": 50 },
+      { "date": "2026-05", "value": 52 },
+      { "date": "2026-06", "value": 49 },
+      { "date": "2026-07", "value": 58 },
+      { "date": "2026-08", "value": 55 },
+      { "date": "2026-09", "value": 61 },
+      { "date": "2026-10", "value": 64 },
+      { "date": "2026-11", "value": 68 }
+    ],
+    "change_pct": 14.2,
+    "direction": "rising"
+  },
+  "competitors": [
+    {
+      "name": "Axio (formerly Walnut)",
+      "product_id": "com.daamitt.walnut.app",
+      "rating": 4.1,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/4g_f22j-3y8d1r=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.daamitt.walnut.app",
+      "source": "play_store",
+      "reviews_scanned": 120
+    },
+    {
+      "name": "Fold Money",
+      "product_id": "money.fold.android",
+      "rating": 4.4,
+      "installs": "100K+",
+      "icon": "https://play-lh.googleusercontent.com/fold_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=money.fold.android",
+      "source": "play_store",
+      "reviews_scanned": 80
+    },
+    {
+      "name": "Money View Expense Manager",
+      "product_id": "com.whizdm.moneyview",
+      "rating": 3.9,
+      "installs": "50M+",
+      "icon": "https://play-lh.googleusercontent.com/mv_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.whizdm.moneyview",
+      "source": "play_store",
+      "reviews_scanned": 100
+    },
+    {
+      "name": "Jupiter Money",
+      "product_id": "money.jupiter",
+      "rating": 4.3,
+      "installs": "5M+",
+      "icon": "https://play-lh.googleusercontent.com/jup_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=money.jupiter",
+      "source": "you_web",
+      "reviews_scanned": 60
+    }
+  ],
+  "clusters": [
+    {
+      "id": "cl_1",
+      "group": "pain",
+      "title": "UPI merchant tag misclassification and messy splits",
+      "summary": "Users report that peer-to-peer UPI transfers like chai split or canteen bills get tagged as random business expenses, requiring continuous manual corrections.",
+      "severity": "high",
+      "frequency": {
+        "count": 46,
+        "total": 120,
+        "label": "46 of 120 reviews"
+      },
+      "apps_affected": [
+        "Axio (Walnut)",
+        "Money View"
+      ],
+      "evidence_ids": [
+        "ev_0007",
+        "ev_0008",
+        "ev_0015"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_2",
+      "group": "pain",
+      "title": "SMS permissions blocked on Android 14/15 & privacy anxiety",
+      "summary": "With Google tightening SMS read permissions and students uncomfortable granting bank SMS access, auto-fetch frequently breaks without warning.",
+      "severity": "high",
+      "frequency": {
+        "count": 31,
+        "total": 120,
+        "label": "31 of 120 reviews"
+      },
+      "apps_affected": [
+        "Axio (Walnut)",
+        "Fold Money"
+      ],
+      "evidence_ids": [
+        "ev_0009",
+        "ev_0010"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_3",
+      "group": "pain",
+      "title": "Unwanted loan upsells and aggressive push notifications",
+      "summary": "Apps that started as simple budgeting tools have morphed into personal loan distributors, bombarding students with pre-approved credit lines.",
+      "severity": "medium",
+      "frequency": {
+        "count": 24,
+        "total": 120,
+        "label": "24 of 120 reviews"
+      },
+      "apps_affected": [
+        "Money View",
+        "Axio (Walnut)"
+      ],
+      "evidence_ids": [
+        "ev_0011",
+        "ev_0012"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_4",
+      "group": "pain",
+      "title": "Gamified peer streaks and canteen micro-budgeting",
+      "summary": "Students want social accountability like daily ₹150 canteen budgets with roommate streak challenges rather than dry double-entry bookkeeping.",
+      "severity": "low",
+      "frequency": {
+        "count": 0,
+        "total": 120,
+        "label": "0 of 120 reviews"
+      },
+      "apps_affected": [],
+      "evidence_ids": [],
+      "ai_suggested": true
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "op_1",
+      "title": "Account-Aggregator Native Privacy Tracker",
+      "pitch": "Zero SMS permission required. Pulls bank & UPI data directly via RBI licensed Account Aggregators (Setu/Finvu), solving privacy trust issues for college students.",
+      "target_user": "Tier 1 & 2 college students holding student savings accounts",
+      "addresses_cluster_ids": [
+        "cl_2"
+      ],
+      "evidence_ids": [
+        "ev_0009"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_2",
+      "title": "Hostel Split-Bill & UPI Smart Classifier",
+      "pitch": "An AI classifier trained specifically on Indian VPA handles (e.g. food@paytm, roomies@oksbi) that automates hostel flat splits without Splitwise fee friction.",
+      "target_user": "Engineering and MBA students sharing flat expenses",
+      "addresses_cluster_ids": [
+        "cl_1"
+      ],
+      "evidence_ids": [
+        "ev_0007"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_3",
+      "title": "Clean, Ad-Free 'Anti-Loan' Budgeting",
+      "pitch": "Guaranteed zero loan ads or NBFC push notifications. Transparent freemium model with college student discount (₹199/year).",
+      "target_user": "Students fed up with fintech apps pushing high-interest credit lines",
+      "addresses_cluster_ids": [
+        "cl_3"
+      ],
+      "evidence_ids": [
+        "ev_0011"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "news": [
+    {
+      "evidence_id": "ev_0013",
+      "sentiment": "neutral"
+    },
+    {
+      "evidence_id": "ev_0014",
+      "sentiment": "positive"
+    },
+    {
+      "evidence_id": "ev_0016",
+      "sentiment": "negative"
+    }
+  ],
+  "evidence": {
+    "ev_0001": {
+      "id": "ev_0001",
+      "source": "google_news",
+      "text": "UPI transactions in India cross 16 billion monthly benchmark in late 2026, driven primarily by micro-merchants and student pocket allowance transfers.",
+      "title": "UPI reaches record monthly transaction volume across tier-2 youth hubs",
+      "author": "ET Tech Desk",
+      "rating": null,
+      "date": "2026-11-04",
+      "url": "https://economictimes.indiatimes.com/tech/upi-records-2026",
+      "entity": "Economic Times",
+      "likes": null
+    },
+    "ev_0002": {
+      "id": "ev_0002",
+      "source": "you_web",
+      "text": "Market research reveals Gen-Z college students make 6 to 9 UPI transactions daily for sub-₹50 items like cutting chai, photocopies, and hostel tuck shop items.",
+      "title": "The Micro-Payment Economy of Indian Campuses",
+      "author": "Inc42 Research",
+      "rating": null,
+      "date": "2026-09-15",
+      "url": "https://inc42.com/features/gen-z-upi-spending-trends-2026",
+      "entity": "Inc42",
+      "likes": null
+    },
+    "ev_0003": {
+      "id": "ev_0003",
+      "source": "you_web",
+      "text": "Fold Money raises seed extension to expand bank account aggregator tracking as Google restricts SMS permission for financial trackers in India.",
+      "title": "Fold bags funding to build open finance alternative to SMS trackers",
+      "author": "YourStory",
+      "rating": null,
+      "date": "2026-07-22",
+      "url": "https://yourstory.com/2026/07/fold-money-funding-account-aggregator",
+      "entity": "YourStory",
+      "likes": null
+    },
+    "ev_0004": {
+      "id": "ev_0004",
+      "source": "reddit",
+      "text": "Are there any expense trackers in India that actually understand UPI VPA handles? Every time I pay ₹20 for dosa at local stall it shows up as an unknown transfer to XYZ Enterprises.",
+      "title": "Expense tracker that doesn't mess up UPI handles?",
+      "author": "u/karan_bangalore",
+      "rating": null,
+      "date": "2026-10-18",
+      "url": "https://reddit.com/r/IndiaInvestments/comments/upi_trackers_pain",
+      "entity": "r/IndiaInvestments",
+      "likes": 84
+    },
+    "ev_0005": {
+      "id": "ev_0005",
+      "source": "reddit",
+      "text": "I stopped using Walnut/Axio after 4 years. The app keeps demanding SMS access even after Android revoked it, and half the time it categorizes my college mess split as salary credit lol.",
+      "title": "RIP Walnut: The decline of automated budgeting in India",
+      "author": "u/rahul_dev_99",
+      "rating": null,
+      "date": "2026-10-25",
+      "url": "https://reddit.com/r/developersIndia/comments/walnut_sms_issues",
+      "entity": "r/developersIndia",
+      "likes": 142
+    },
+    "ev_0006": {
+      "id": "ev_0006",
+      "source": "you_news",
+      "text": "Reserve Bank of India expands Account Aggregator framework to include digital credit and real-time merchant categories.",
+      "title": "RBI updates AA framework to streamline consumer expense management",
+      "author": "Mint FinTech",
+      "rating": null,
+      "date": "2026-08-11",
+      "url": "https://livemint.com/technology/rbi-account-aggregator-update",
+      "entity": "Mint",
+      "likes": null
+    },
+    "ev_0007": {
+      "id": "ev_0007",
+      "source": "play_store",
+      "text": "Total waste of time for UPI payments. It categorizes transfers to my roommates as 'Investment' and grocery as 'Travel'. I spend more time editing tags than tracking.",
+      "title": null,
+      "author": "Aditya Sharma",
+      "rating": 1,
+      "date": "2026-10-12",
+      "url": "https://play.google.com/store/apps/details?id=com.daamitt.walnut.app",
+      "entity": "Axio (Walnut)",
+      "likes": 29
+    },
+    "ev_0008": {
+      "id": "ev_0008",
+      "source": "play_store",
+      "text": "Doesn't recognize Google Pay and PhonePe QR receipts properly anymore. When UPI bank server is slow and debit SMS comes 10 minutes later, app creates duplicate entries.",
+      "title": null,
+      "author": "Pooja V.",
+      "rating": 1,
+      "date": "2026-10-03",
+      "url": "https://play.google.com/store/apps/details?id=com.daamitt.walnut.app",
+      "entity": "Axio (Walnut)",
+      "likes": 18
+    },
+    "ev_0009": {
+      "id": "ev_0009",
+      "source": "play_store",
+      "text": "Updated to Android 15 on my Pixel and the app stopped syncing. Asking for full SMS read permissions feels very sketchy in 2026 when bank OTPs arrive on the same inbox.",
+      "title": null,
+      "author": "Karthik R.",
+      "rating": 1,
+      "date": "2026-11-01",
+      "url": "https://play.google.com/store/apps/details?id=money.fold.android",
+      "entity": "Fold Money",
+      "likes": 42
+    },
+    "ev_0010": {
+      "id": "ev_0010",
+      "source": "play_store",
+      "text": "Constant sync failures. I don't want to grant all-time SMS permissions just to log my canteen coffee. Need a privacy-friendly alternative.",
+      "title": null,
+      "author": "Sneha Mukherji",
+      "rating": 1,
+      "date": "2026-09-28",
+      "url": "https://play.google.com/store/apps/details?id=com.whizdm.moneyview",
+      "entity": "Money View",
+      "likes": 15
+    },
+    "ev_0011": {
+      "id": "ev_0011",
+      "source": "play_store",
+      "text": "Used to be a simple expense tracker. Now it's just a loan marketing app spamming me with pre-approved personal loans every 2 hours. Uninstalled.",
+      "title": null,
+      "author": "Vikas Tiwari",
+      "rating": 1,
+      "date": "2026-10-20",
+      "url": "https://play.google.com/store/apps/details?id=com.whizdm.moneyview",
+      "entity": "Money View",
+      "likes": 67
+    },
+    "ev_0012": {
+      "id": "ev_0012",
+      "source": "play_store",
+      "text": "Why do you need my contacts and location just to show me how much I spent this month? And stop asking me to take instant loans with 36% APR!",
+      "title": null,
+      "author": "Meera Nambiar",
+      "rating": 1,
+      "date": "2026-10-15",
+      "url": "https://play.google.com/store/apps/details?id=com.daamitt.walnut.app",
+      "entity": "Axio (Walnut)",
+      "likes": 34
+    },
+    "ev_0013": {
+      "id": "ev_0013",
+      "source": "google_news",
+      "text": "Google Play Store strengthens policy on financial apps accessing sensitive SMS and call logs in India.",
+      "title": "Google updates app permission rules for financial trackers in India",
+      "author": "Business Standard",
+      "rating": null,
+      "date": "2026-06-18",
+      "url": "https://business-standard.com/technology/google-sms-policy-update-2026",
+      "entity": "Business Standard",
+      "likes": null
+    },
+    "ev_0014": {
+      "id": "ev_0014",
+      "source": "you_news",
+      "text": "Fintech founders in Bengaluru experiment with on-device LLMs to categorize UPI statements without transmitting raw transaction logs to cloud servers.",
+      "title": "Local AI and Account Aggregators: The new wave of Indian fintech",
+      "author": "TechCircle",
+      "rating": null,
+      "date": "2026-10-29",
+      "url": "https://techcircle.in/2026/10/local-ai-fintech-startups-india",
+      "entity": "TechCircle",
+      "likes": null
+    },
+    "ev_0015": {
+      "id": "ev_0015",
+      "source": "reddit",
+      "text": "Hostel room splits in Splitwise are becoming unusable because of the 10-second payment countdown paywall. If an app can just link my UPI and auto-reconcile room bills I will gladly pay ₹50 a month.",
+      "title": "Splitwise alternatives for college flats in India?",
+      "author": "u/manipal_coder",
+      "rating": null,
+      "date": "2026-09-02",
+      "url": "https://reddit.com/r/india/comments/splitwise_alternative_college",
+      "entity": "r/india",
+      "likes": 195
+    },
+    "ev_0016": {
+      "id": "ev_0016",
+      "source": "google_news",
+      "text": "Data privacy audit by cyber watchdog warns of aggressive tracking SDKs embedded inside popular Android utility and expense apps in India.",
+      "title": "Cyberwatch report flags privacy risks in consumer personal finance apps",
+      "author": "Medianama",
+      "rating": null,
+      "date": "2026-08-30",
+      "url": "https://medianama.com/2026/08/privacy-audit-finance-apps",
+      "entity": "Medianama",
+      "likes": null
+    }
+  },
+  "warnings": []
+}

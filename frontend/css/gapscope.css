@@ -1,0 +1,62 @@
+/* GapScope shared styles (finprob.com design language) */
+html { scroll-behavior: smooth; }
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #0c0a09;
+}
+[id] { scroll-margin-top: 88px; }
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* Keyboard focus ring, always visible */
+:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Highlighted phrase inside a quote (finprob <mark>) */
+mark, mark.finprob-highlight {
+  background-color: #fed7aa; /* orange-200 */
+  color: #0c0a09;
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+mark.mark-strong {
+  background-color: #f97316; /* orange-500 */
+  padding: 0 0.12em;
+  border-radius: 0;
+}
+
+/* Jump-to-cluster highlight */
+@keyframes clusterHighlight {
+  0%   { background-color: #ffedd5; box-shadow: 0 0 0 3px #f97316; }
+  100% { background-color: #ffffff; box-shadow: 0 0 0 0 transparent; }
+}
+.cluster-highlighted { animation: clusterHighlight 1.8s ease-out forwards; }
+
+/* Drawer */
+.drawer-backdrop { background-color: rgba(12, 10, 9, 0.55); backdrop-filter: blur(3px); }
+@keyframes drawerInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes drawerInUp    { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.drawer-panel { animation: drawerInUp 0.22s ease-out; }
+@media (min-width: 640px) { .drawer-panel { animation: drawerInRight 0.22s ease-out; } }
+
+/* Spinner */
+@keyframes gsSpin { to { transform: rotate(360deg); } }
+.gs-spin { animation: gsSpin 0.8s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .drawer-panel, .cluster-highlighted, .gs-spin { animation: none; }
+}
+
+/* Print: only the report */
+@media print {
+  body { background: #fff !important; }
+  .no-print, header, footer.site-footer, #evidenceDrawer, #toast { display: none !important; }
+  #reportContainer { display: block !important; }
+  .card-print { break-inside: avoid; box-shadow: none !important; }
+  a[href^="http"]::after { content: ""; }
+}

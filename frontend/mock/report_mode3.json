@@ -1,0 +1,466 @@
+{
+  "scan_id": "mock_mode3_personal_finance",
+  "mode": 3,
+  "query": "Personal Finance",
+  "generated_at": "2026-11-21T11:00:00Z",
+  "_comment": "Realistic sample data for Mode 3 Hackathon demonstration",
+  "keywords": {
+    "broad": "personal finance apps",
+    "specific": [
+      "best personal finance app India",
+      "fintech investment tracking"
+    ],
+    "category": "Personal Finance"
+  },
+  "credits": {
+    "serpapi_live": 4,
+    "serpapi_cached": 6,
+    "youcom_live": 2,
+    "youcom_cached": 1
+  },
+  "verdict": {
+    "kind": "discovery",
+    "label": null,
+    "score": 78,
+    "headline": "3 high-conviction startup opportunities across 5 leading fintech apps (450+ complaints analysed)",
+    "breakdown": [
+      {
+        "factor": "Cross-App Grievance Frequency",
+        "score": 26,
+        "max": 30,
+        "explanation": "Top pain points repeat across 4 out of 5 tracked apps, showing universal industry dissatisfaction.",
+        "evidence_ids": [
+          "ev_3001",
+          "ev_3002",
+          "ev_3003"
+        ]
+      },
+      {
+        "factor": "Macro Search Momentum",
+        "score": 24,
+        "max": 30,
+        "explanation": "Search volume for 'clean investment tracker' and 'AA net worth app' rose +24.5% across India.",
+        "evidence_ids": [
+          "ev_3004",
+          "ev_3005"
+        ]
+      },
+      {
+        "factor": "Incumbent Vulnerability",
+        "score": 18,
+        "max": 20,
+        "explanation": "Legacy players (CRED, INDmoney, Groww) have pivot fatigue towards NBFC lending and insurance brokering.",
+        "evidence_ids": [
+          "ev_3006",
+          "ev_3007"
+        ]
+      },
+      {
+        "factor": "Regulatory Tailwinds",
+        "score": 10,
+        "max": 20,
+        "explanation": "SEBI & RBI transparency guidelines curb hidden convenience fees, favoring pure fee-based advisory.",
+        "evidence_ids": [
+          "ev_3008"
+        ]
+      }
+    ]
+  },
+  "trend": {
+    "keyword": "personal finance apps",
+    "geo": "IN",
+    "points": [
+      { "date": "2025-12", "value": 52 },
+      { "date": "2026-01", "value": 58 },
+      { "date": "2026-02", "value": 55 },
+      { "date": "2026-03", "value": 60 },
+      { "date": "2026-04", "value": 64 },
+      { "date": "2026-05", "value": 62 },
+      { "date": "2026-06", "value": 67 },
+      { "date": "2026-07", "value": 71 },
+      { "date": "2026-08", "value": 69 },
+      { "date": "2026-09", "value": 74 },
+      { "date": "2026-10", "value": 79 },
+      { "date": "2026-11", "value": 84 }
+    ],
+    "change_pct": 24.5,
+    "direction": "rising"
+  },
+  "competitors": [
+    {
+      "name": "CRED",
+      "product_id": "com.dreamplug.androidapp",
+      "rating": 4.6,
+      "installs": "50M+",
+      "icon": "https://play-lh.googleusercontent.com/cred_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.dreamplug.androidapp",
+      "source": "play_store",
+      "reviews_scanned": 150
+    },
+    {
+      "name": "Groww: Stocks & Mutual Funds",
+      "product_id": "com.nextbillion.groww",
+      "rating": 4.3,
+      "installs": "50M+",
+      "icon": "https://play-lh.googleusercontent.com/groww_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.nextbillion.groww",
+      "source": "play_store",
+      "reviews_scanned": 150
+    },
+    {
+      "name": "INDmoney: Track Investments & US Stocks",
+      "product_id": "com.indwealth",
+      "rating": 4.2,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/ind_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.indwealth",
+      "source": "play_store",
+      "reviews_scanned": 120
+    },
+    {
+      "name": "Zerodha Coin",
+      "product_id": "com.zerodha.coin",
+      "rating": 4.1,
+      "installs": "5M+",
+      "icon": "https://play-lh.googleusercontent.com/coin_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.zerodha.coin",
+      "source": "play_store",
+      "reviews_scanned": 90
+    },
+    {
+      "name": "Jupiter: Digital Banking & Money",
+      "product_id": "money.jupiter",
+      "rating": 4.2,
+      "installs": "5M+",
+      "icon": "https://play-lh.googleusercontent.com/jup_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=money.jupiter",
+      "source": "you_web",
+      "reviews_scanned": 80
+    }
+  ],
+  "clusters": [
+    {
+      "id": "cl_301",
+      "group": "pain",
+      "title": "Hidden convenience fees, UPI surcharges, and disguised platform levies",
+      "summary": "Users voice intense backlash against apps introducing surprise ₹3-₹12 platform fees on electricity bills, credit card payments, and FASTag recharges.",
+      "severity": "high",
+      "frequency": {
+        "count": 68,
+        "total": 150,
+        "label": "68 of 150 reviews"
+      },
+      "apps_affected": [
+        "CRED",
+        "Groww",
+        "INDmoney",
+        "Jupiter"
+      ],
+      "evidence_ids": [
+        "ev_3009",
+        "ev_3010",
+        "ev_3011"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_302",
+      "group": "pain",
+      "title": "Account Aggregator session expiries and broken net worth sync",
+      "summary": "EPFO, mutual fund CAS, and bank account balances disconnect every few weeks, forcing tedious OTP re-logins and displaying out-of-date portfolio totals.",
+      "severity": "high",
+      "frequency": {
+        "count": 47,
+        "total": 150,
+        "label": "47 of 150 reviews"
+      },
+      "apps_affected": [
+        "INDmoney",
+        "Groww",
+        "Jupiter"
+      ],
+      "evidence_ids": [
+        "ev_3012",
+        "ev_3013"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_303",
+      "group": "pain",
+      "title": "Aggressive predatory credit line and personal loan spam",
+      "summary": "Apps intended for wealth creation have degraded into high-interest credit marketplaces, pushing pre-approved loans and credit cards via persistent popups.",
+      "severity": "medium",
+      "frequency": {
+        "count": 42,
+        "total": 150,
+        "label": "42 of 150 reviews"
+      },
+      "apps_affected": [
+        "CRED",
+        "INDmoney",
+        "Jupiter"
+      ],
+      "evidence_ids": [
+        "ev_3014",
+        "ev_3015"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_304",
+      "group": "pain",
+      "title": "Automated Old vs New Tax Regime optimization engine",
+      "summary": "Demand for automated capital gains tax harvesting tailored specifically to the Union Budget 2026 LTCG/STCG changes for retail Indian investors.",
+      "severity": "low",
+      "frequency": {
+        "count": 0,
+        "total": 150,
+        "label": "0 of 150 reviews"
+      },
+      "apps_affected": [],
+      "evidence_ids": [],
+      "ai_suggested": true
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "op_301",
+      "title": "The Zero-Fee, Zero-Loan Wealth Dashboard",
+      "pitch": "A clean subscription-based (₹999/yr) net worth command center that pledges zero platform fees on payments and absolute zero credit/loan push notifications.",
+      "target_user": "Salaried IT & corporate professionals earning ₹15L–₹50L in metro India",
+      "addresses_cluster_ids": [
+        "cl_301",
+        "cl_303"
+      ],
+      "evidence_ids": [
+        "ev_3009",
+        "ev_3014"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_302",
+      "title": "Always-On Account Aggregator Portfolio Radar",
+      "pitch": "Leverages permanent AA consent with auto-renewing refresh tokens. Tracks bank savings, EPFO, NPS, stocks, and mutual funds without painful monthly OTP reconnects.",
+      "target_user": "Active retail investors tracking multi-broker portfolios across Zerodha, Groww and ICICI Direct",
+      "addresses_cluster_ids": [
+        "cl_302"
+      ],
+      "evidence_ids": [
+        "ev_3012"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_303",
+      "title": "Automated Indian Capital Gains Tax Harvester",
+      "pitch": "Syncs with broker APIs to automatically trigger tax-loss and tax-gain harvesting before March 31, saving users up to ₹1,25,000 in annual LTCG tax liabilities.",
+      "target_user": "High earners with equity and mutual fund exposure affected by new tax brackets",
+      "addresses_cluster_ids": [
+        "cl_304"
+      ],
+      "evidence_ids": [
+        "ev_3008"
+      ],
+      "ai_suggested": true
+    }
+  ],
+  "news": [
+    {
+      "evidence_id": "ev_3004",
+      "sentiment": "positive"
+    },
+    {
+      "evidence_id": "ev_3007",
+      "sentiment": "neutral"
+    },
+    {
+      "evidence_id": "ev_3008",
+      "sentiment": "positive"
+    }
+  ],
+  "evidence": {
+    "ev_3001": {
+      "id": "ev_3001",
+      "source": "reddit",
+      "text": "Every single fintech app in India is turning into a loan shark. CRED used to be about credit card rewards, now it's CRED Cash. INDmoney used to be family office tracking, now it's credit lines.",
+      "title": "Why does every Indian fintech app eventually become a moneylender?",
+      "author": "u/delhi_investor_guy",
+      "rating": null,
+      "date": "2026-10-14",
+      "url": "https://reddit.com/r/IndiaInvestments/comments/fintech_loan_spams",
+      "entity": "r/IndiaInvestments",
+      "likes": 284
+    },
+    "ev_3002": {
+      "id": "ev_3002",
+      "source": "you_web",
+      "text": "The monetization dilemma of Indian wealthtech: Why platform fees and unsecured credit lines are driving power users back to plain spreadsheets.",
+      "title": "The Great Indian Fintech Backlash: Why users feel betrayed",
+      "author": "Finception",
+      "rating": null,
+      "date": "2026-09-18",
+      "url": "https://finception.in/fintech-monetization-playbook-2026",
+      "entity": "Finception",
+      "likes": null
+    },
+    "ev_3003": {
+      "id": "ev_3003",
+      "source": "google_news",
+      "text": "Reserve Bank of India advises payment apps and fintech aggregators against adding undisclosed convenience fees at checkout without upfront itemization.",
+      "title": "RBI scrutinizes stealth platform charges on bill payments",
+      "author": "Livemint",
+      "rating": null,
+      "date": "2026-10-09",
+      "url": "https://livemint.com/industry/banking/rbi-stealth-convenience-charges",
+      "entity": "Livemint",
+      "likes": null
+    },
+    "ev_3004": {
+      "id": "ev_3004",
+      "source": "you_news",
+      "text": "Account Aggregator active user count in India doubles to 110 million in 2026 as public sector banks join the interoperable open finance network.",
+      "title": "Open finance in India reaches milestone with AA ecosystem adoption",
+      "author": "Economic Times",
+      "rating": null,
+      "date": "2026-11-01",
+      "url": "https://economictimes.indiatimes.com/tech/aa-ecosystem-2026",
+      "entity": "Economic Times",
+      "likes": null
+    },
+    "ev_3005": {
+      "id": "ev_3005",
+      "source": "reddit",
+      "text": "I would honestly pay a ₹1,000 annual subscription for an app that just aggregates my Zerodha Kite, Groww mutual funds, and HDFC bank balance without selling my phone number to Bajaj Finserv.",
+      "title": "Willing to pay for an ad-free privacy-respecting net worth dashboard",
+      "author": "u/bangalore_cto",
+      "rating": null,
+      "date": "2026-10-27",
+      "url": "https://reddit.com/r/developersIndia/comments/paid_finance_dashboard",
+      "entity": "r/developersIndia",
+      "likes": 412
+    },
+    "ev_3006": {
+      "id": "ev_3006",
+      "source": "you_web",
+      "text": "Fintech report highlights that user trust drops by 32% whenever an investment app begins push-marketing instant credit to users looking at equity returns.",
+      "title": "Consumer Trust Dynamics in Indian Wealth Management",
+      "author": "Bain & Company India",
+      "rating": null,
+      "date": "2026-07-14",
+      "url": "https://bain.com/insights/india-wealth-fintech-2026",
+      "entity": "Bain & Co",
+      "likes": null
+    },
+    "ev_3007": {
+      "id": "ev_3007",
+      "source": "google_news",
+      "text": "SEBI releases consultation paper proposing enhanced disclosure standards for financial influencers and tech platforms recommending mutual funds.",
+      "title": "SEBI tightens transparency norms for online investment aggregators",
+      "author": "Business Standard",
+      "rating": null,
+      "date": "2026-08-22",
+      "url": "https://business-standard.com/markets/sebi-transparency-paper-2026",
+      "entity": "Business Standard",
+      "likes": null
+    },
+    "ev_3008": {
+      "id": "ev_3008",
+      "source": "you_news",
+      "text": "Taxation updates for FY 2026-27 introduce higher scrutiny on short-term capital gains, triggering high demand for automated portfolio rebalancing tools.",
+      "title": "How budget tax rules are shaping retail investment habits in India",
+      "author": "ClearTax Insights",
+      "rating": null,
+      "date": "2026-09-01",
+      "url": "https://cleartax.in/s/capital-gains-rebalancing-2026",
+      "entity": "ClearTax",
+      "likes": null
+    },
+    "ev_3009": {
+      "id": "ev_3009",
+      "source": "play_store",
+      "text": "CRED used to be premium. Now they charge ₹11 'convenience fee' on a ₹2,000 electricity bill payment, plus ₹5 processing fee on credit cards. Uninstalled. Back to bank netbanking.",
+      "title": null,
+      "author": "Rohit Verma",
+      "rating": 1,
+      "date": "2026-11-10",
+      "url": "https://play.google.com/store/apps/details?id=com.dreamplug.androidapp",
+      "entity": "CRED",
+      "likes": 94
+    },
+    "ev_3010": {
+      "id": "ev_3010",
+      "source": "play_store",
+      "text": "Why is Groww charging platform fees on direct mutual fund SIPs? You advertise zero commission direct plans and then quietly add processing charges at the final step.",
+      "title": null,
+      "author": "Siddharth Jain",
+      "rating": 1,
+      "date": "2026-10-31",
+      "url": "https://play.google.com/store/apps/details?id=com.nextbillion.groww",
+      "entity": "Groww",
+      "likes": 63
+    },
+    "ev_3011": {
+      "id": "ev_3011",
+      "source": "play_store",
+      "text": "Every transaction on INDmoney now comes with some hidden surcharge. And the reward coins they give are totally worthless coupons for brands nobody cares about.",
+      "title": null,
+      "author": "Kavita S.",
+      "rating": 1,
+      "date": "2026-10-18",
+      "url": "https://play.google.com/store/apps/details?id=com.indwealth",
+      "entity": "INDmoney",
+      "likes": 37
+    },
+    "ev_3012": {
+      "id": "ev_3012",
+      "source": "play_store",
+      "text": "My bank balance and stock portfolio sync stopped working 3 weeks ago. Re-entering OTP every few days defeats the entire purpose of an automated net worth tracker.",
+      "title": null,
+      "author": "Deepak Menon",
+      "rating": 1,
+      "date": "2026-11-05",
+      "url": "https://play.google.com/store/apps/details?id=com.indwealth",
+      "entity": "INDmoney",
+      "likes": 48
+    },
+    "ev_3013": {
+      "id": "ev_3013",
+      "source": "play_store",
+      "text": "EPFO sync has been showing 'Server busy' for two months straight. If you can't maintain bank integration APIs, don't advertise complete net worth tracking.",
+      "title": null,
+      "author": "Naveen G.",
+      "rating": 1,
+      "date": "2026-09-24",
+      "url": "https://play.google.com/store/apps/details?id=money.jupiter",
+      "entity": "Jupiter Money",
+      "likes": 29
+    },
+    "ev_3014": {
+      "id": "ev_3014",
+      "source": "play_store",
+      "text": "I open the app to check my SIP returns and full-screen popup screams 'Congratulation! ₹5,00,000 instant loan pre-approved'. Stop this nuisance loan spam!",
+      "title": null,
+      "author": "Harish Patel",
+      "rating": 1,
+      "date": "2026-10-21",
+      "url": "https://play.google.com/store/apps/details?id=com.dreamplug.androidapp",
+      "entity": "CRED",
+      "likes": 112
+    },
+    "ev_3015": {
+      "id": "ev_3015",
+      "source": "play_store",
+      "text": "Too many notifications pushing personal loans, peer-to-peer 12% lending, and credit cards. It feels like a telemarketing call center in app format.",
+      "title": null,
+      "author": "Archana Joshi",
+      "rating": 1,
+      "date": "2026-10-11",
+      "url": "https://play.google.com/store/apps/details?id=com.indwealth",
+      "entity": "INDmoney",
+      "likes": 56
+    }
+  },
+  "warnings": []
+}

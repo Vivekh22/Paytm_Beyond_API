@@ -1,0 +1,419 @@
+{
+  "scan_id": "mock_mode2_dunzo_audit",
+  "mode": 2,
+  "query": "Dunzo",
+  "generated_at": "2026-11-21T10:30:00Z",
+  "_comment": "Realistic sample data for Mode 2 Hackathon demonstration",
+  "keywords": {
+    "broad": "Dunzo delivery",
+    "specific": [
+      "Dunzo",
+      "Dunzo Daily quick commerce",
+      "Dunzo complaints"
+    ],
+    "category": "Quick-commerce"
+  },
+  "credits": {
+    "serpapi_live": 4,
+    "serpapi_cached": 4,
+    "youcom_live": 1,
+    "youcom_cached": 1
+  },
+  "verdict": {
+    "kind": "trajectory",
+    "label": "DECLINING",
+    "score": 24,
+    "headline": "Mounting liabilities, dark store shutdowns, and delivery partner churn signal contraction",
+    "breakdown": [
+      {
+        "factor": "Search Demand Trajectory",
+        "score": -1,
+        "max": 1,
+        "explanation": "Google Trends query interest crashed -58.4% over the last 12 months in core Bengaluru market.",
+        "evidence_ids": [
+          "ev_2001",
+          "ev_2002"
+        ]
+      },
+      {
+        "factor": "Recent Review Delta (Newest vs All-Time)",
+        "score": -1,
+        "max": 1,
+        "explanation": "Recent 100 reviews average 1.6★ compared to 4.2★ historical rating, driven by canceled orders.",
+        "evidence_ids": [
+          "ev_2007",
+          "ev_2008",
+          "ev_2009"
+        ]
+      },
+      {
+        "factor": "News & Web Sentiment Ratio",
+        "score": -1,
+        "max": 1,
+        "explanation": "86% negative media sentiment regarding pending employee PF dues, vendor litigations, and board restructuring.",
+        "evidence_ids": [
+          "ev_2003",
+          "ev_2004",
+          "ev_2005"
+        ]
+      },
+      {
+        "factor": "Competitor Displacement",
+        "score": 0,
+        "max": 1,
+        "explanation": "Zepto and Blinkit have absorbed over 80% of former Dunzo Daily quick commerce market share.",
+        "evidence_ids": [
+          "ev_2006"
+        ]
+      }
+    ]
+  },
+  "trend": {
+    "keyword": "Dunzo",
+    "geo": "IN",
+    "points": [
+      { "date": "2025-12", "value": 78 },
+      { "date": "2026-01", "value": 68 },
+      { "date": "2026-02", "value": 54 },
+      { "date": "2026-03", "value": 46 },
+      { "date": "2026-04", "value": 38 },
+      { "date": "2026-05", "value": 31 },
+      { "date": "2026-06", "value": 26 },
+      { "date": "2026-07", "value": 22 },
+      { "date": "2026-08", "value": 19 },
+      { "date": "2026-09", "value": 16 },
+      { "date": "2026-10", "value": 14 },
+      { "date": "2026-11", "value": 12 }
+    ],
+    "change_pct": -58.4,
+    "direction": "falling"
+  },
+  "competitors": [
+    {
+      "name": "Blinkit (Zomato)",
+      "product_id": "com.grofers.customerapp",
+      "rating": 4.6,
+      "installs": "50M+",
+      "icon": "https://play-lh.googleusercontent.com/blinkit_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.grofers.customerapp",
+      "source": "play_store",
+      "reviews_scanned": 150
+    },
+    {
+      "name": "Zepto",
+      "product_id": "com.zeptoconsumerapp",
+      "rating": 4.5,
+      "installs": "50M+",
+      "icon": "https://play-lh.googleusercontent.com/zepto_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.zeptoconsumerapp",
+      "source": "play_store",
+      "reviews_scanned": 150
+    },
+    {
+      "name": "Swiggy Instamart",
+      "product_id": "in.swiggy.android",
+      "rating": 4.4,
+      "installs": "100M+",
+      "icon": "https://play-lh.googleusercontent.com/swiggy_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=in.swiggy.android",
+      "source": "play_store",
+      "reviews_scanned": 120
+    },
+    {
+      "name": "Porter (B2B Courier)",
+      "product_id": "com.theporter.android.customerapp",
+      "rating": 4.5,
+      "installs": "10M+",
+      "icon": "https://play-lh.googleusercontent.com/porter_icon=s64",
+      "url": "https://play.google.com/store/apps/details?id=com.theporter.android.customerapp",
+      "source": "you_web",
+      "reviews_scanned": 80
+    }
+  ],
+  "clusters": [
+    {
+      "id": "cl_201",
+      "group": "pain",
+      "title": "Persistent order cancellations and ghost deliveries",
+      "summary": "Users in Bengaluru and Pune report orders placed through Dunzo Daily remain in 'Finding Partner' for 45 minutes before auto-cancelling or being wrongly marked delivered.",
+      "severity": "high",
+      "frequency": {
+        "count": 52,
+        "total": 100,
+        "label": "52 of 100 recent reviews"
+      },
+      "apps_affected": [
+        "Dunzo"
+      ],
+      "evidence_ids": [
+        "ev_2007",
+        "ev_2008",
+        "ev_2015"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_202",
+      "group": "pain",
+      "title": "Refunds trapped in Dunzo Cash with zero human support",
+      "summary": "When orders fail, money is deposited as non-transferable Dunzo Cash rather than being refunded to original UPI/source account, with customer support completely dead.",
+      "severity": "high",
+      "frequency": {
+        "count": 39,
+        "total": 100,
+        "label": "39 of 100 recent reviews"
+      },
+      "apps_affected": [
+        "Dunzo"
+      ],
+      "evidence_ids": [
+        "ev_2009",
+        "ev_2010"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "cl_203",
+      "group": "pain",
+      "title": "Speculative AI dispatch algorithm breakdown during monsoons",
+      "summary": "Hypothesis that rain-surge algorithms cause cascade cancellations due to lack of localized driver incentive safeguards.",
+      "severity": "low",
+      "frequency": {
+        "count": 0,
+        "total": 100,
+        "label": "0 of 100 reviews"
+      },
+      "apps_affected": [],
+      "evidence_ids": [],
+      "ai_suggested": true
+    },
+    {
+      "id": "cl_204",
+      "group": "strength",
+      "title": "Affection for city-wide peer-to-peer package pickup (Dunzo B2B)",
+      "summary": "Long-time users still express immense love for Dunzo's original concierge package delivery (sending forgotten keys, tiffin, charger across Bengaluru).",
+      "severity": "low",
+      "frequency": {
+        "count": 18,
+        "total": 100,
+        "label": "18 of 100 reviews"
+      },
+      "apps_affected": [
+        "Dunzo"
+      ],
+      "evidence_ids": [
+        "ev_2011",
+        "ev_2012"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "op_201",
+      "title": "Pure-Play Intercity Concierge Pickup (No Dark Store Burn)",
+      "pitch": "Reclaim Dunzo's original product-market fit: on-demand point-to-point courier and document delivery without burning billions on 10-minute grocery dark stores.",
+      "target_user": "Urban professionals in Bengaluru, Mumbai & Delhi who need intra-city item transit",
+      "addresses_cluster_ids": [
+        "cl_204"
+      ],
+      "evidence_ids": [
+        "ev_2011"
+      ],
+      "ai_suggested": false
+    },
+    {
+      "id": "op_202",
+      "title": "Instant UPI Refund Guarantee for Logistics",
+      "pitch": "A hyper-reliable courier network with NPCI instant auto-refund reverse API, directly answering Dunzo's trust collapse around trapped wallet balances.",
+      "target_user": "Consumers burned by trapped wallet credits on legacy delivery apps",
+      "addresses_cluster_ids": [
+        "cl_202"
+      ],
+      "evidence_ids": [
+        "ev_2009"
+      ],
+      "ai_suggested": false
+    }
+  ],
+  "news": [
+    {
+      "evidence_id": "ev_2003",
+      "sentiment": "negative"
+    },
+    {
+      "evidence_id": "ev_2004",
+      "sentiment": "negative"
+    },
+    {
+      "evidence_id": "ev_2005",
+      "sentiment": "negative"
+    },
+    {
+      "evidence_id": "ev_2006",
+      "sentiment": "neutral"
+    }
+  ],
+  "evidence": {
+    "ev_2001": {
+      "id": "ev_2001",
+      "source": "you_news",
+      "text": "Dunzo's monthly active users plummet below 1.2 million in 2026 as quick commerce rivals Zepto and Blinkit capture dominant 85% share in South India.",
+      "title": "Dunzo market share slides dramatically in Bengaluru",
+      "author": "Entrackr",
+      "rating": null,
+      "date": "2026-10-15",
+      "url": "https://entrackr.com/2026/10/dunzo-market-share-q3",
+      "entity": "Entrackr",
+      "likes": null
+    },
+    "ev_2002": {
+      "id": "ev_2002",
+      "source": "google_news",
+      "text": "Google Trends shows search queries for 'Dunzo grocery' down 62% in Karnataka as users migrate to Blinkit and Zepto for instant deliveries.",
+      "title": "Search interest for Dunzo declines to all-time low",
+      "author": "Tech in Asia",
+      "rating": null,
+      "date": "2026-09-20",
+      "url": "https://techinasia.com/dunzo-search-interest-trend",
+      "entity": "Tech in Asia",
+      "likes": null
+    },
+    "ev_2003": {
+      "id": "ev_2003",
+      "source": "google_news",
+      "text": "Dunzo faces fresh legal notices from vendors and logistics partners over delayed payments totaling ₹45 crore across warehouse leases.",
+      "title": "Vendor notices pile up as Dunzo attempts debt restructuring",
+      "author": "Economic Times",
+      "rating": null,
+      "date": "2026-11-08",
+      "url": "https://economictimes.indiatimes.com/tech/startups/dunzo-vendors-debt-notices",
+      "entity": "Economic Times",
+      "likes": null
+    },
+    "ev_2004": {
+      "id": "ev_2004",
+      "source": "you_news",
+      "text": "Reliance Retail and board investors negotiate restructuring plan for Dunzo's B2B delivery arm as consumer-facing dark stores shut down permanently.",
+      "title": "Reliance in talks to salvage Dunzo B2B logistics infrastructure",
+      "author": "Mint",
+      "rating": null,
+      "date": "2026-10-28",
+      "url": "https://livemint.com/companies/news/reliance-dunzo-restructuring-talks",
+      "entity": "Mint",
+      "likes": null
+    },
+    "ev_2005": {
+      "id": "ev_2005",
+      "source": "you_web",
+      "text": "Ex-employees of Dunzo stage online protests regarding delayed provident fund deposits and gratuity settlements following corporate restructuring.",
+      "title": "Dunzo former staff petition labor ministry over unpaid dues",
+      "author": "Inc42",
+      "rating": null,
+      "date": "2026-08-19",
+      "url": "https://inc42.com/buzz/dunzo-employees-pf-dues-delay",
+      "entity": "Inc42",
+      "likes": null
+    },
+    "ev_2006": {
+      "id": "ev_2006",
+      "source": "you_web",
+      "text": "Quick commerce in India shifts toward larger dark stores carrying 20,000 SKUs, making Dunzo's asset-light partner grocery model economically obsolete.",
+      "title": "Why the asset-light quick commerce model failed in India",
+      "author": "The Ken",
+      "rating": null,
+      "date": "2026-09-05",
+      "url": "https://the-ken.com/story/death-of-asset-light-quick-commerce",
+      "entity": "The Ken",
+      "likes": null
+    },
+    "ev_2007": {
+      "id": "ev_2007",
+      "source": "play_store",
+      "text": "Ordered urgent medicines in Indiranagar. App took payment of ₹450, showed 'Rider assigned' for 50 minutes, then silently cancelled without even notifying me. Completely unreliable.",
+      "title": null,
+      "author": "Ananya Hegde",
+      "rating": 1,
+      "date": "2026-11-02",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo",
+      "likes": 51
+    },
+    "ev_2008": {
+      "id": "ev_2008",
+      "source": "play_store",
+      "text": "The app is a ghost town now. 9 out of 10 stores in Koramangala show 'Temporarily Closed'. Why keep the app live on Play Store if you can't fulfill deliveries?",
+      "title": null,
+      "author": "Abhishek Roy",
+      "rating": 1,
+      "date": "2026-10-22",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo",
+      "likes": 39
+    },
+    "ev_2009": {
+      "id": "ev_2009",
+      "source": "play_store",
+      "text": "They cancelled my order and credited ₹800 into Dunzo Cash instead of my bank account. And now nothing is deliverable, so that money is basically stolen!",
+      "title": null,
+      "author": "Pradeep Rao",
+      "rating": 1,
+      "date": "2026-10-14",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo",
+      "likes": 88
+    },
+    "ev_2010": {
+      "id": "ev_2010",
+      "source": "reddit",
+      "text": "Anyone know how to get money back from Dunzo Cash wallet? Have ₹1,400 stuck there for 3 months and the help chat only repeats an automated bot loop.",
+      "title": "Stuck money in Dunzo Cash — any legal or consumer forum recourse?",
+      "author": "u/bangalore_techie_01",
+      "rating": null,
+      "date": "2026-09-12",
+      "url": "https://reddit.com/r/bangalore/comments/dunzo_cash_refund_stuck",
+      "entity": "r/bangalore",
+      "likes": 210
+    },
+    "ev_2011": {
+      "id": "ev_2011",
+      "source": "play_store",
+      "text": "I really miss the 2020 Dunzo that could pick up my house keys from Whitefield and drop them to HSR. Even today when courier works, it saves lives. Please fix your app guys.",
+      "title": null,
+      "author": "Tanvi Deshmukh",
+      "rating": 5,
+      "date": "2026-09-08",
+      "url": "https://play.google.com/store/apps/details?id=com.dunzo.user",
+      "entity": "Dunzo",
+      "likes": 16
+    },
+    "ev_2012": {
+      "id": "ev_2012",
+      "source": "reddit",
+      "text": "Before quick commerce grocery madness, Dunzo was basically Bengaluru's personal genie. Sending homemade tiffin to sibling or getting printouts from xerox shop. Nobody replaced that niche cleanly.",
+      "title": "Nothing ever matched prime Dunzo courier service",
+      "author": "u/old_blr_resident",
+      "rating": null,
+      "date": "2026-08-25",
+      "url": "https://reddit.com/r/bangalore/comments/dunzo_prime_nostalgia",
+      "entity": "r/bangalore",
+      "likes": 340
+    },
+    "ev_2015": {
+      "id": "ev_2015",
+      "source": "reddit",
+      "text": "Spoke to a delivery partner who used to drive for Dunzo. He said they owe him 2 weeks of incentive payouts from August so he switched to Zepto and Swiggy full time.",
+      "title": "Rider ground reality behind Dunzo's Bangalore shutdown",
+      "author": "u/delivery_insights_in",
+      "rating": null,
+      "date": "2026-09-30",
+      "url": "https://reddit.com/r/india/comments/dunzo_delivery_ground_reality",
+      "entity": "r/india",
+      "likes": 115
+    }
+  },
+  "warnings": [
+    "High delivery partner churn detected in primary market (Bengaluru)",
+    "Severe customer sentiment gap: Recent reviews average -2.6★ below historical peak"
+  ]
+}

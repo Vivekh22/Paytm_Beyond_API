@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find gaps worth building, with the posts to prove it | GapScope</title>
+  <meta name="description" content="GapScope reads live Play Store reviews, Reddit, Google Trends, Google News and the open web, and returns a decision where every claim links to its source.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <link rel="stylesheet" href="css/gapscope.css">
+</head>
+<body class="bg-white text-stone-950 antialiased overflow-x-hidden">
+<div class="min-h-screen flex flex-col overflow-x-clip">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="sticky top-0 z-40 border-b border-stone-200 bg-white/95 backdrop-blur no-print">
+    <div class="mx-auto flex min-h-[72px] max-w-[1200px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
+      <a class="flex min-h-[44px] items-center gap-2 group" href="index.html" aria-label="GapScope home">
+        <span class="group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="#0c0a09"/><circle cx="12.5" cy="12.5" r="5.5" stroke="#f97316" stroke-width="2.6"/><path d="M16.8 16.8l4.6 4.6" stroke="#f97316" stroke-width="2.6" stroke-linecap="round"/></svg>
+        </span>
+        <span class="font-display text-[21px] font-extrabold tracking-[-0.02em]">GapScope</span>
+      </a>
+
+      <nav aria-label="Sections" class="hidden items-center gap-8 text-[15px] font-medium md:flex">
+        <a href="#how" class="inline-flex min-h-[44px] items-center hover:text-orange-700">How it works</a>
+        <a href="#modes" class="inline-flex min-h-[44px] items-center hover:text-orange-700">Three modes</a>
+        <a href="#scoring" class="inline-flex min-h-[44px] items-center hover:text-orange-700">Scoring</a>
+        <a href="#faq" class="inline-flex min-h-[44px] items-center hover:text-orange-700">Questions</a>
+      </nav>
+
+      <div class="hidden items-center gap-3 md:flex">
+        <div id="creditMeter" class="inline-flex min-h-[36px] items-center gap-2 rounded-full border border-stone-300 px-3 font-mono text-xs text-stone-700" title="API calls for this scan: total and served from cache">
+          <span class="h-1.5 w-1.5 rounded-full bg-orange-500" aria-hidden="true"></span>
+          <span id="creditMeterText" class="tabular-nums">0 calls · 0 cached</span>
+        </div>
+        <button type="button" class="js-start-scan inline-flex min-h-[44px] items-center rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white hover:bg-stone-800">Start a scan</button>
+      </div>
+
+      <button type="button" id="mobileMenuBtn" class="flex h-11 w-11 items-center justify-center rounded-lg md:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="hidden border-t border-stone-200 bg-white md:hidden">
+      <nav aria-label="Sections (mobile)" class="mx-auto flex max-w-[1200px] flex-col px-5 py-2 text-[17px] font-medium">
+        <a href="#how" class="mobile-link flex min-h-[48px] items-center border-b border-stone-100">How it works</a>
+        <a href="#modes" class="mobile-link flex min-h-[48px] items-center border-b border-stone-100">Three modes</a>
+        <a href="#scoring" class="mobile-link flex min-h-[48px] items-center border-b border-stone-100">Scoring</a>
+        <a href="#faq" class="mobile-link flex min-h-[48px] items-center border-b border-stone-100">Questions</a>
+        <div class="flex items-center justify-between gap-3 py-3">
+          <span id="creditMeterTextMobile" class="font-mono text-xs text-stone-600 tabular-nums">0 calls · 0 cached</span>
+          <button type="button" class="js-start-scan mobile-link inline-flex min-h-[44px] items-center rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white">Start a scan</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1">
+
+    <!-- ==================== HERO ==================== -->
+    <section id="top" class="no-print">
+      <div class="mx-auto grid max-w-[1200px] items-center gap-10 px-5 pb-16 pt-12 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:pb-24 lg:pt-20">
+        <div class="flex flex-col gap-7">
+          <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">Market intelligence that shows its sources</p>
+          <h1 class="font-display text-[2.75rem] font-extrabold leading-none tracking-[-0.035em] sm:text-6xl lg:text-7xl xl:text-[5.5rem]">Build what people are already <span class="box-decoration-clone bg-orange-500 px-[0.12em] text-stone-950">complaining about.</span></h1>
+          <p class="max-w-[34em] text-lg leading-relaxed text-stone-700 lg:text-xl">GapScope reads live Play Store reviews, Reddit threads, Google Trends, Google News and the open web, finds the problems people keep describing, and returns a decision where every claim links to the post behind it.</p>
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <button type="button" id="heroStartBtn" class="js-start-scan inline-flex min-h-[56px] items-center gap-2.5 rounded-[10px] bg-orange-500 px-7 text-[17px] font-bold text-stone-950 hover:bg-orange-400">
+              Start finding gaps
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button type="button" id="heroSeeResultBtn" class="inline-flex min-h-[44px] items-center text-base font-semibold underline underline-offset-4 hover:text-orange-700">See what a result looks like</button>
+          </div>
+          <p class="font-mono text-[13px] text-stone-600">SerpApi · You.com · Gemini 2.5 Flash · Cached demos cost 0 credits</p>
+        </div>
+
+        <div class="flex flex-col gap-3.5">
+          <p class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Example scan · UPI expense tracker · 1★ complaints</p>
+
+          <article class="flex flex-col gap-2.5 rounded-[10px] border border-stone-300 bg-white px-[18px] py-4 shadow-[0_10px_24px_-18px_rgba(12,10,9,0.45)] md:-rotate-1 mr-0 sm:mr-12">
+            <div class="flex items-center gap-2.5 font-mono text-xs text-stone-600"><span class="rounded border border-stone-950 px-1.5 py-0.5 font-semibold text-stone-950">P1</span><span>Play Store · Axio · 1★</span></div>
+            <p class="text-[15px] leading-normal">Android 15 blocked SMS reading. Now <mark>I have to fix every UPI transaction by hand</mark> to see where my money went.</p>
+          </article>
+          <article class="flex flex-col gap-2.5 rounded-[10px] border border-stone-300 bg-white px-[18px] py-4 shadow-[0_10px_24px_-18px_rgba(12,10,9,0.45)] md:rotate-1 ml-0 sm:ml-12">
+            <div class="flex items-center gap-2.5 font-mono text-xs text-stone-600"><span class="rounded border border-stone-950 px-1.5 py-0.5 font-semibold text-stone-950">R1</span><span>Reddit · r/IndiaInvestments · 142 votes</span></div>
+            <p class="text-[15px] leading-normal">Every chai and split bill with my roommates <mark>gets tagged as an investment</mark>. The app has no idea what a hostel budget looks like.</p>
+          </article>
+          <article class="flex flex-col gap-2.5 rounded-[10px] border border-stone-300 bg-white px-[18px] py-4 shadow-[0_10px_24px_-18px_rgba(12,10,9,0.45)] mr-0 sm:mr-6">
+            <div class="flex items-center gap-2.5 font-mono text-xs text-stone-600"><span class="rounded border border-stone-950 px-1.5 py-0.5 font-semibold text-stone-950">Y1</span><span>You.com Web · forum comment</span></div>
+            <p class="text-[15px] leading-normal">I ended up <mark>tracking hostel expenses in a spreadsheet</mark> because every finance app just pushes personal loans at me.</p>
+          </article>
+
+          <div aria-hidden="true" class="flex flex-col items-center gap-1.5">
+            <div class="h-5 w-0.5 bg-stone-950"></div>
+            <span class="font-mono text-xs font-semibold uppercase tracking-[0.06em]">3 posts, one gap</span>
+            <div class="h-3.5 w-0.5 bg-stone-950"></div>
+          </div>
+
+          <article class="flex flex-col gap-3.5 rounded-xl bg-stone-950 p-[22px] text-white">
+            <div class="flex items-center justify-between gap-3">
+              <p class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-orange-300">Pain cluster</p>
+              <span class="rounded-full border border-stone-600 px-2.5 py-1 font-mono text-xs text-stone-200">PIVOT 58</span>
+            </div>
+            <p class="font-display text-xl font-bold leading-tight tracking-[-0.01em] lg:text-2xl">Students track shared UPI spending by hand: auto-sync breaks on Android 15 and apps mis-tag everyday payments.</p>
+            <div class="flex flex-wrap gap-2 font-mono text-xs text-stone-200">
+              <span class="rounded-full border border-stone-600 px-2.5 py-1">cited P1 R1 Y1</span>
+              <span class="rounded-full border border-stone-600 px-2.5 py-1">46 of 120 reviews</span>
+              <span class="rounded-full border border-stone-600 px-2.5 py-1">severity high</span>
+            </div>
+            <p class="text-sm leading-normal text-stone-300"><strong class="text-white">Idea.</strong> A tracker that needs no SMS access, reads statements through the Account Aggregator framework, and settles roommate splits on its own.</p>
+          </article>
+          <p class="text-[13px] text-stone-600">Illustrative example. A real scan quotes live posts and links to each one.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCAN HUB ==================== -->
+    <section id="scan" class="border-y border-stone-200 bg-stone-100 no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-9 px-5 py-14 sm:px-8 lg:px-12 lg:py-[72px]">
+        <div class="flex max-w-[44em] flex-col gap-4">
+          <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">Run a scan</p>
+          <h2 class="font-display text-[26px] font-bold leading-[1.1] tracking-[-0.02em] lg:text-4xl">Pick a question, type a subject, and get a decision that comes with its receipts.</h2>
+        </div>
+
+        <div id="searchHub" class="flex flex-col gap-6 rounded-[18px] border-2 border-stone-950 bg-white p-5 sm:p-7 lg:p-9">
+          <!-- Mode switch -->
+          <div class="grid gap-2.5 sm:grid-cols-3" role="tablist" aria-label="Scan mode">
+            <button type="button" id="modeBtn1" role="tab" aria-selected="true" aria-controls="scanForm"
+              class="mode-switch-btn group flex flex-col items-start gap-1 rounded-[10px] border-[1.5px] border-stone-300 bg-white px-4 py-3 text-left hover:border-stone-950 aria-selected:border-stone-950 aria-selected:bg-stone-950 aria-selected:text-white">
+              <span class="font-mono text-xs font-semibold text-stone-500 group-aria-selected:text-orange-300">01 · BUILD / PIVOT / KILL</span>
+              <span class="text-[17px] font-bold">Validate an idea</span>
+            </button>
+            <button type="button" id="modeBtn2" role="tab" aria-selected="false" aria-controls="scanForm"
+              class="mode-switch-btn group flex flex-col items-start gap-1 rounded-[10px] border-[1.5px] border-stone-300 bg-white px-4 py-3 text-left hover:border-stone-950 aria-selected:border-stone-950 aria-selected:bg-stone-950 aria-selected:text-white">
+              <span class="font-mono text-xs font-semibold text-stone-500 group-aria-selected:text-orange-300">02 · GROWING / DECLINING</span>
+              <span class="text-[17px] font-bold">Investigate a business</span>
+            </button>
+            <button type="button" id="modeBtn3" role="tab" aria-selected="false" aria-controls="scanForm"
+              class="mode-switch-btn group flex flex-col items-start gap-1 rounded-[10px] border-[1.5px] border-stone-300 bg-white px-4 py-3 text-left hover:border-stone-950 aria-selected:border-stone-950 aria-selected:bg-stone-950 aria-selected:text-white">
+              <span class="font-mono text-xs font-semibold text-stone-500 group-aria-selected:text-orange-300">03 · 3 CONCEPTS</span>
+              <span class="text-[17px] font-bold">Discover an opportunity</span>
+            </button>
+          </div>
+
+          <form id="scanForm" class="flex flex-col gap-5" novalidate>
+            <div id="textInputWrapper" class="flex flex-col gap-3 sm:flex-row">
+              <label for="scanQueryInput" class="sr-only">What should GapScope scan?</label>
+              <input type="text" id="scanQueryInput" autocomplete="off"
+                placeholder="e.g. UPI expense tracker for college students"
+                class="min-h-[56px] w-full flex-1 rounded-[10px] border-[1.5px] border-stone-950 bg-white px-4 text-[17px] text-stone-950 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+              <button type="submit" id="submitScanBtn" class="inline-flex min-h-[56px] items-center justify-center gap-2.5 rounded-[10px] bg-orange-500 px-7 text-[17px] font-bold text-stone-950 hover:bg-orange-400">
+                <span id="scanBtnLabel">Scan</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+
+            <div id="categoryGridWrapper" class="hidden flex flex-col gap-3.5">
+              <p class="font-mono text-[13px] text-stone-600">Pick a category. GapScope scans its top 5 apps and finds the complaints they share.</p>
+              <div class="flex flex-wrap gap-2.5" id="categoryChips">
+                <button type="button" data-category="Personal Finance" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Personal Finance</button>
+                <button type="button" data-category="EdTech" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">EdTech</button>
+                <button type="button" data-category="Healthcare" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Healthcare</button>
+                <button type="button" data-category="Quick-commerce" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Quick-commerce</button>
+                <button type="button" data-category="Travel" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Travel</button>
+                <button type="button" data-category="Mental Health" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Mental Health</button>
+                <button type="button" data-category="Agritech" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Agritech</button>
+                <button type="button" id="catOtherBtn" class="cat-chip rounded-full border-[1.5px] border-dashed border-stone-400 px-[18px] py-2.5 text-[15px] font-semibold text-stone-700 hover:border-stone-950" aria-expanded="false" aria-controls="otherCategoryInputRow">Other…</button>
+              </div>
+              <div id="otherCategoryInputRow" class="hidden flex flex-col gap-3 sm:flex-row">
+                <label for="otherCategoryInput" class="sr-only">Custom category</label>
+                <input type="text" id="otherCategoryInput" placeholder="e.g. Gig worker tools"
+                  class="min-h-[48px] flex-1 rounded-[10px] border-[1.5px] border-stone-950 px-4 text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+                <button type="button" id="confirmOtherCatBtn" class="inline-flex min-h-[48px] items-center justify-center rounded-[10px] bg-orange-500 px-6 text-base font-bold text-stone-950 hover:bg-orange-400">Scan category</button>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2.5 border-t border-dashed border-stone-300 pt-5">
+              <span class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Example scans · cached, so they load instantly</span>
+              <div id="examplePillsContainer" class="flex flex-wrap items-center gap-2"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== RESULTS AREA ==================== -->
+    <div id="results" class="mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-12">
+
+      <!-- Live progress -->
+      <section id="progressArea" class="hidden py-12 lg:py-16 no-print" aria-live="polite" aria-busy="true">
+        <div class="flex flex-col gap-6 rounded-[14px] border border-stone-300 bg-white p-5 shadow-[0_24px_48px_-36px_rgba(12,10,9,0.5)] lg:p-7">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between gap-4">
+              <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">Scanning live sources</p>
+              <span id="progressPercentage" class="font-mono text-sm font-semibold tabular-nums">0%</span>
+            </div>
+            <h3 id="progressStatusHeader" class="font-display text-xl font-bold leading-tight tracking-[-0.01em] lg:text-2xl">Connecting to SerpApi and You.com…</h3>
+            <div class="h-1 w-full overflow-hidden bg-stone-200" role="progressbar" aria-label="Scan progress" aria-valuemin="0" aria-valuemax="100">
+              <div id="scanProgressBar" class="h-1 bg-orange-500 transition-all duration-300" style="width:0%"></div>
+            </div>
+          </div>
+          <ol id="progressStepList" class="flex flex-col"></ol>
+          <div class="grid gap-4 border-t border-dashed border-stone-300 pt-6 md:grid-cols-3 animate-pulse" aria-hidden="true">
+            <div class="h-28 rounded-[10px] bg-stone-100"></div>
+            <div class="h-28 rounded-[10px] bg-stone-100"></div>
+            <div class="h-28 rounded-[10px] bg-stone-100"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Error -->
+      <div id="scanErrorCard" class="hidden flex my-12 flex-col gap-3 rounded-[14px] border-2 border-red-600 bg-white p-6 no-print" role="alert">
+        <p class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-red-700">Scan failed</p>
+        <p id="scanErrorMessage" class="text-base text-stone-800"></p>
+        <div><button type="button" id="retryScanBtn" class="inline-flex min-h-[44px] items-center rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white hover:bg-stone-800">Retry scan</button></div>
+      </div>
+
+      <!-- Report -->
+      <div id="reportContainer" class="hidden flex flex-col gap-14 py-12 lg:gap-20 lg:py-16">
+
+        <div id="reportWarnings" class="hidden flex items-start justify-between gap-3 rounded-[10px] border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900" role="status">
+          <div class="flex items-start gap-2.5">
+            <span class="font-mono text-xs font-semibold uppercase tracking-[0.06em] pt-0.5">Note</span>
+            <div id="reportWarningsContent" class="flex flex-col gap-1 text-[15px]"></div>
+          </div>
+          <button type="button" id="dismissWarningsBtn" class="flex h-8 w-8 flex-none items-center justify-center rounded-md hover:bg-amber-100" aria-label="Dismiss notice">&times;</button>
+        </div>
+
+        <section id="verdictSection" class="card-print"></section>
+
+        <div id="marketContextSection" class="grid items-start gap-5 lg:grid-cols-12">
+          <section id="trendCard" class="card-print flex flex-col gap-5 rounded-[14px] border border-stone-300 bg-white p-5 lg:col-span-7 lg:p-7">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex flex-col gap-1.5">
+                <p id="trendSubtitle" class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Google Trends · India · last 12 months</p>
+                <h3 class="font-display text-2xl font-bold tracking-[-0.01em]">Demand trend</h3>
+              </div>
+              <span id="trendChangeBadge" class="rounded-full border px-2.5 py-1 font-mono text-xs"></span>
+            </div>
+            <div class="relative h-60 w-full"><canvas id="trendChartCanvas" aria-label="Search interest over the last 12 months" role="img"></canvas></div>
+            <div class="flex flex-wrap items-center justify-between gap-2 border-t border-stone-200 pt-3 font-mono text-xs text-stone-600">
+              <span>SerpApi · google_trends</span>
+              <span id="trendKeywordMeta"></span>
+            </div>
+          </section>
+
+          <section id="competitorsCard" class="card-print flex flex-col gap-4 rounded-[14px] border border-stone-300 bg-white p-5 lg:col-span-5 lg:p-7">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex flex-col gap-1.5">
+                <p class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Play Store · You.com web</p>
+                <h3 class="font-display text-2xl font-bold tracking-[-0.01em]">Competitors</h3>
+              </div>
+              <span id="competitorsCountBadge" class="rounded-full border border-stone-400 px-2.5 py-1 font-mono text-xs"></span>
+            </div>
+            <div id="competitorsList" class="flex flex-col"></div>
+          </section>
+        </div>
+
+        <section id="receiptsSection"></section>
+        <section id="opportunitiesSection"></section>
+        <section id="newsSection" class="card-print"></section>
+
+        <footer id="reportFooter" class="flex flex-col items-start justify-between gap-4 border-t-2 border-stone-950 pt-6 sm:flex-row sm:items-center">
+          <p class="font-mono text-[13px] text-stone-600"><span id="footerMetaSources">0 sources</span> · <span id="footerMetaTimestamp"></span></p>
+          <div class="flex flex-wrap items-center gap-3 no-print">
+            <button type="button" id="copyShareLinkBtn" class="inline-flex min-h-[44px] items-center rounded-[10px] border-[1.5px] border-stone-950 px-4 text-[15px] font-bold hover:bg-stone-950 hover:text-white">Copy share link</button>
+            <button type="button" id="printReportBtn" class="inline-flex min-h-[44px] items-center rounded-[10px] border-[1.5px] border-stone-950 px-4 text-[15px] font-bold hover:bg-stone-950 hover:text-white">Print / Save PDF</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ==================== SOURCES ==================== -->
+    <section id="sources" class="border-y border-stone-200 bg-stone-100 no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-9 px-5 py-14 sm:px-8 lg:px-12 lg:py-[72px]">
+        <h2 class="max-w-[22em] font-display text-[26px] font-bold leading-[1.1] tracking-[-0.02em] lg:text-4xl">Five places the market talks. GapScope quotes them word for word and labels everything else as AI.</h2>
+        <div class="grid overflow-hidden rounded-[18px] border-2 border-stone-950 lg:grid-cols-2">
+          <div class="flex flex-col gap-5 bg-white p-6 text-stone-950 lg:p-9">
+            <div class="flex items-end gap-4">
+              <span class="font-display bg-orange-500 px-[0.1em] pb-[0.02em] pt-[0.08em] text-[6rem] font-extrabold leading-[0.8] tracking-[-0.06em] lg:text-[10.5rem]">5</span>
+              <div class="flex flex-col gap-0.5 pb-1.5">
+                <span class="font-mono text-[13px] font-semibold uppercase tracking-[0.08em]">Quoted</span>
+                <span class="font-display text-xl font-bold leading-[1.1] lg:text-[26px]">word for word, with a link</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-start gap-4 border-t border-stone-300 py-3.5"><span class="flex h-10 w-10 flex-none items-center justify-center rounded-md bg-stone-950 font-mono text-[17px] font-semibold text-white">P</span><div class="flex flex-col gap-0.5"><strong class="text-[17px]">Play Store</strong><span class="text-[15px] text-stone-700">1★, 5★ and newest reviews across the top apps, through SerpApi.</span></div></div>
+              <div class="flex items-start gap-4 border-t border-stone-300 py-3.5"><span class="flex h-10 w-10 flex-none items-center justify-center rounded-md bg-stone-950 font-mono text-[17px] font-semibold text-white">R</span><div class="flex flex-col gap-0.5"><strong class="text-[17px]">Reddit</strong><span class="text-[15px] text-stone-700">Threads from Indian subreddits, found with site:reddit.com search.</span></div></div>
+              <div class="flex items-start gap-4 border-t border-stone-300 py-3.5"><span class="flex h-10 w-10 flex-none items-center justify-center rounded-md bg-stone-950 font-mono text-[17px] font-semibold text-white">N</span><div class="flex flex-col gap-0.5"><strong class="text-[17px]">Google News</strong><span class="text-[15px] text-stone-700">Funding, layoffs and launches, with the headline and date.</span></div></div>
+              <div class="flex items-start gap-4 border-t border-stone-300 py-3.5"><span class="flex h-10 w-10 flex-none items-center justify-center rounded-md bg-stone-950 font-mono text-[17px] font-semibold text-white">Y</span><div class="flex flex-col gap-0.5"><strong class="text-[17px]">You.com web and news</strong><span class="text-[15px] text-stone-700">Blogs, forums and market reports, and the fallback when a business has no app.</span></div></div>
+              <div class="flex items-start gap-4 border-t border-stone-300 py-3.5"><span class="flex h-10 w-10 flex-none items-center justify-center rounded-md bg-stone-950 font-mono text-[17px] font-semibold text-white">T</span><div class="flex flex-col gap-0.5"><strong class="text-[17px]">Google Trends</strong><span class="text-[15px] text-stone-700">12 months of search interest in India, used to measure demand.</span></div></div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-5 bg-stone-950 p-6 text-white lg:p-9">
+            <div class="flex items-end gap-4">
+              <span class="font-display pb-[0.02em] pr-[0.1em] pt-[0.08em] text-[6rem] font-extrabold leading-[0.8] tracking-[-0.06em] text-stone-950 lg:text-[10.5rem]" style="-webkit-text-stroke:2px #FDBA74">0</span>
+              <div class="flex flex-col gap-0.5 pb-1.5">
+                <span class="font-mono text-[13px] font-semibold uppercase tracking-[0.08em] text-orange-300">Made-up quotes</span>
+                <span class="font-display text-xl font-bold leading-[1.1] lg:text-[26px]">AI only sorts and names</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+              <span class="rounded-full border-[1.5px] border-dashed border-stone-400 px-[18px] py-2.5 text-[17px] font-semibold">Cluster names</span>
+              <span class="rounded-full border-[1.5px] border-dashed border-stone-400 px-[18px] py-2.5 text-[17px] font-semibold">Keywords</span>
+              <span class="rounded-full border-[1.5px] border-dashed border-stone-400 px-[18px] py-2.5 text-[17px] font-semibold">Ideas</span>
+              <span class="rounded-full border-[1.5px] border-dashed border-stone-400 px-[18px] py-2.5 text-[17px] font-semibold">Hypotheses</span>
+            </div>
+            <p class="max-w-[30em] text-[15px] text-stone-300">Gemini refers to evidence by ID and never writes a quote. The backend checks that every ID exists. A claim with no live post behind it is marked AI-suggested and shows no quote.</p>
+            <span class="mt-auto self-start rounded-md border border-stone-600 px-2.5 py-1.5 font-mono text-xs text-stone-200">AI-suggested: no matching post was found for this one</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== HOW IT WORKS ==================== -->
+    <section id="how" class="no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-12 px-5 py-16 sm:px-8 lg:px-12 lg:py-[104px]">
+        <div class="flex max-w-[44em] flex-col gap-4">
+          <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">What you get from a scan</p>
+          <h2 class="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-5xl lg:text-6xl">Every claim comes with its <span class="box-decoration-clone bg-orange-500 px-[0.12em] text-stone-950">receipts.</span></h2>
+          <p class="text-lg text-stone-700">Type an idea, a business or a category. GapScope groups what people say into clusters, scores the signals with a fixed formula, and shows you the posts behind each one.</p>
+        </div>
+        <div class="grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
+          <div class="flex flex-col gap-3.5">
+            <article class="flex flex-col gap-5 rounded-[14px] border border-stone-300 bg-white p-5 text-stone-950 shadow-[0_24px_48px_-36px_rgba(12,10,9,0.5)] lg:p-7">
+              <div class="flex items-start gap-3.5"><span aria-hidden="true" class="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full bg-stone-950 font-mono text-[13px] font-semibold text-white">1</span><p class="font-display text-[19px] font-bold leading-tight tracking-[-0.01em] lg:text-[23px]">Quick-commerce users get orders cancelled after paying, and refunds take a week to come back to UPI.</p></div>
+              <div class="flex items-start gap-3.5"><span aria-hidden="true" class="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full bg-stone-950 font-mono text-[13px] font-semibold text-white">2</span>
+                <div class="flex min-w-0 flex-1 flex-col gap-2.5">
+                  <div class="flex flex-col gap-1.5 rounded-[10px] border border-stone-200 px-3.5 py-3"><span class="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-xs text-stone-600"><strong class="text-orange-700">Play Store</strong><span>Dunzo · 1★</span></span><span class="text-sm leading-normal">"Paid ₹640, the order was <mark>auto-cancelled after 40 minutes</mark> and support is a bot."</span></div>
+                  <div class="flex flex-col gap-1.5 rounded-[10px] border border-stone-200 px-3.5 py-3"><span class="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-xs text-stone-600"><strong class="text-orange-700">Reddit</strong><span>r/bangalore · 88 votes</span></span><span class="text-sm leading-normal">"Third cancelled order this month. <mark>The refund still has not reached my account</mark>."</span></div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3.5"><span aria-hidden="true" class="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full bg-stone-950 font-mono text-[13px] font-semibold text-white">3</span><div class="flex flex-wrap gap-2 font-mono text-xs"><span class="rounded-full border border-stone-400 px-2.5 py-1">severity high</span><span class="rounded-full border border-stone-400 px-2.5 py-1">41 of 200 reviews</span><span class="rounded-full border border-stone-400 px-2.5 py-1">seen in 3 apps</span></div></div>
+              <div class="flex items-start gap-3.5"><span aria-hidden="true" class="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full bg-stone-950 font-mono text-[13px] font-semibold text-white">4</span><p class="text-[15px] leading-relaxed text-stone-700"><strong class="text-stone-950">Verdict.</strong> DECLINING. Ratings in the last 90 days are below the all-time average, search interest fell 31%, and the news covers layoffs.</p></div>
+              <div class="flex items-center gap-3.5 border-t border-dashed border-stone-300 pt-[18px]"><span aria-hidden="true" class="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full bg-stone-950 font-mono text-[13px] font-semibold text-white">5</span><span class="rounded-md border border-stone-300 bg-stone-100 px-2.5 py-1.5 font-mono text-xs text-stone-700">AI-suggested: no matching post was found for this one</span></div>
+            </article>
+            <p class="text-[13px] text-stone-600">Illustrative example of a receipt card. The last row shows the label a claim carries when no post backs it.</p>
+          </div>
+          <ol class="flex flex-col">
+            <li class="flex gap-[18px] border-t border-stone-200 py-5"><span class="w-[22px] flex-none font-mono text-sm font-semibold">1</span><div class="flex flex-col gap-1"><strong class="text-[17px]">The problem, in plain words</strong><span class="text-[15px] text-stone-700">What goes wrong and for whom, written as a short summary of the cluster.</span></div></li>
+            <li class="flex gap-[18px] border-t border-stone-200 py-5"><span class="w-[22px] flex-none font-mono text-sm font-semibold">2</span><div class="flex flex-col gap-1"><strong class="text-[17px]">The posts behind it</strong><span class="text-[15px] text-stone-700">Up to three, quoted as written, each with a View original link.</span></div></li>
+            <li class="flex gap-[18px] border-t border-stone-200 py-5"><span class="w-[22px] flex-none font-mono text-sm font-semibold">3</span><div class="flex flex-col gap-1"><strong class="text-[17px]">How often it comes up</strong><span class="text-[15px] text-stone-700">Counted from the reviews scanned, such as 38 of 300. Not a guess.</span></div></li>
+            <li class="flex gap-[18px] border-t border-stone-200 py-5"><span class="w-[22px] flex-none font-mono text-sm font-semibold">4</span><div class="flex flex-col gap-1"><strong class="text-[17px]">A score you can check</strong><span class="text-[15px] text-stone-700">A fixed formula over measured signals. Each factor shows its math and its sources.</span></div></li>
+            <li class="flex gap-[18px] border-t border-b border-stone-200 py-5"><span class="w-[22px] flex-none font-mono text-sm font-semibold">5</span><div class="flex flex-col gap-1"><strong class="text-[17px]">Or an honest label</strong><span class="text-[15px] text-stone-700">When no post backs a claim, it says AI-suggested. It never wears a made-up quote.</span></div></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== THREE MODES ==================== -->
+    <section id="modes" class="border-t border-stone-200 no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-10 px-5 py-16 sm:px-8 lg:px-12 lg:py-[104px]">
+        <div class="flex max-w-[44em] flex-col gap-4">
+          <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">Three modes</p>
+          <h2 class="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-5xl lg:text-6xl">Three questions worth asking.</h2>
+          <p class="text-lg text-stone-700">Validating an idea, diagnosing a business and hunting for a gap need different evidence. Each mode collects its own. Pick one to start.</p>
+        </div>
+        <div class="flex flex-col gap-5 lg:gap-7">
+          <button type="button" data-mode="1" class="mode-jump flex max-w-full flex-col gap-2 self-start text-left md:max-w-[680px]">
+            <span class="font-display rounded-[26px] rounded-bl-[4px] border-2 border-stone-950 px-5 py-4 text-[22px] font-bold leading-[1.15] tracking-[-0.02em] hover:bg-stone-100 sm:text-3xl lg:px-[30px] lg:py-6 lg:text-4xl">I have an idea. <mark class="mark-strong">Is there a real</mark> opportunity?</span>
+            <span class="px-1.5 font-mono text-[13px] text-stone-700"><strong class="text-stone-950">01 Validate</strong> · a 0–100 score and BUILD, PIVOT or KILL</span>
+          </button>
+          <button type="button" data-mode="2" class="mode-jump flex max-w-full flex-col items-end gap-2 self-end text-right md:mr-16 md:max-w-[680px]">
+            <span class="font-display rounded-[26px] rounded-br-[4px] border-2 border-stone-950 bg-stone-950 px-5 py-4 text-left text-[22px] font-bold leading-[1.15] tracking-[-0.02em] text-white hover:bg-stone-800 sm:text-3xl lg:px-[30px] lg:py-6 lg:text-4xl">Why is this business <mark class="mark-strong">winning</mark> or <mark class="mark-strong">losing</mark>?</span>
+            <span class="px-1.5 font-mono text-[13px] text-stone-700"><strong class="text-stone-950">02 Investigate</strong> · GROWING, STAGNATING or DECLINING, with what users love and hate</span>
+          </button>
+          <button type="button" data-mode="3" class="mode-jump flex max-w-full flex-col gap-2 self-start text-left md:ml-24 md:max-w-[680px]">
+            <span class="font-display rounded-[26px] rounded-bl-[4px] border-2 border-stone-950 px-5 py-4 text-[22px] font-bold leading-[1.15] tracking-[-0.02em] hover:bg-stone-100 sm:text-3xl lg:px-[30px] lg:py-6 lg:text-4xl">No idea yet. <mark class="mark-strong">Find me something</mark> worth building.</span>
+            <span class="px-1.5 font-mono text-[13px] text-stone-700"><strong class="text-stone-950">03 Discover</strong> · 3 concepts from complaints that repeat across competitors</span>
+          </button>
+          <p class="mt-2 text-[15px] text-stone-600">Click a question to start a scan in that mode.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PIPELINE (DARK) ==================== -->
+    <section class="bg-stone-950 text-white no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-11 px-5 py-16 sm:px-8 lg:px-12 lg:py-[104px]">
+        <div class="flex max-w-[44em] flex-col gap-4">
+          <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-orange-300">During the scan</p>
+          <h2 class="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-5xl lg:text-6xl">From a search to a decision, in one place.</h2>
+          <p class="text-lg text-stone-300">Calls run in parallel and every response is cached, so one scan uses 8 SerpApi calls at most.</p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="flex flex-col gap-3 rounded-xl border border-stone-800 bg-stone-900 p-[22px]"><div class="flex items-baseline justify-between gap-3 font-mono text-[13px]"><span class="text-stone-400">01</span><span class="text-orange-300">Gemini</span></div><strong class="font-display text-2xl tracking-[-0.01em]">Keywords</strong><span class="text-[15px] text-stone-300">Turns a messy idea into a broad trend keyword and specific search terms.</span></div>
+          <div class="flex flex-col gap-3 rounded-xl border border-stone-800 bg-stone-900 p-[22px]"><div class="flex items-baseline justify-between gap-3 font-mono text-[13px]"><span class="text-stone-400">02</span><span class="text-orange-300">SerpApi</span></div><strong class="font-display text-2xl tracking-[-0.01em]">Demand</strong><span class="text-[15px] text-stone-300">12 months of Google Trends for India, plus the slope and autocomplete.</span></div>
+          <div class="flex flex-col gap-3 rounded-xl border border-stone-800 bg-stone-900 p-[22px]"><div class="flex items-baseline justify-between gap-3 font-mono text-[13px]"><span class="text-stone-400">03</span><span class="text-orange-300">SerpApi</span></div><strong class="font-display text-2xl tracking-[-0.01em]">Reviews</strong><span class="text-[15px] text-stone-300">The top Play Store apps and their 1★, 5★ and newest reviews.</span></div>
+          <div class="flex flex-col gap-3 rounded-xl border border-stone-800 bg-stone-900 p-[22px]"><div class="flex items-baseline justify-between gap-3 font-mono text-[13px]"><span class="text-stone-400">04</span><span class="text-orange-300">SerpApi</span></div><strong class="font-display text-2xl tracking-[-0.01em]">Reddit and news</strong><span class="text-[15px] text-stone-300">Forum threads and headlines that confirm or contradict the reviews.</span></div>
+          <div class="flex flex-col gap-3 rounded-xl border border-stone-800 bg-stone-900 p-[22px]"><div class="flex items-baseline justify-between gap-3 font-mono text-[13px]"><span class="text-stone-400">05</span><span class="text-orange-300">You.com</span></div><strong class="font-display text-2xl tracking-[-0.01em]">Web research</strong><span class="text-[15px] text-stone-300">Competitors, funding and pricing, with citations. Covers businesses with no app.</span></div>
+          <div class="flex flex-col gap-3 rounded-xl border border-stone-800 bg-stone-900 p-[22px]"><div class="flex items-baseline justify-between gap-3 font-mono text-[13px]"><span class="text-stone-400">06</span><span class="text-orange-300">Python</span></div><strong class="font-display text-2xl tracking-[-0.01em]">Score</strong><span class="text-[15px] text-stone-300">A fixed formula over the measured signals. No LLM opinion in the number.</span></div>
+        </div>
+        <p class="max-w-[60em] text-[15px] text-stone-400">Also in every report: a competitor list, news and web coverage, a share link and a print-ready PDF.</p>
+      </div>
+    </section>
+
+    <!-- ==================== SCORING ==================== -->
+    <section id="scoring" class="no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-11 px-5 py-16 sm:px-8 lg:px-12 lg:py-[104px]">
+        <div class="flex max-w-[44em] flex-col gap-4">
+          <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">Scoring</p>
+          <h2 class="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-5xl lg:text-6xl">A verdict you can check.</h2>
+          <p class="text-lg text-stone-700">The Viability Score adds up demand, pain, competition and momentum. Each factor shows its points, its math and the posts it came from.</p>
+        </div>
+        <div class="grid items-stretch gap-5 lg:grid-cols-3">
+          <div class="flex flex-col gap-5 rounded-[14px] border border-stone-300 p-7">
+            <div class="flex flex-col gap-1.5">
+              <strong class="font-mono text-[13px] uppercase tracking-[0.08em]">Build</strong>
+              <div class="flex items-baseline gap-2"><span class="font-display text-[52px] font-extrabold leading-none tracking-[-0.03em]">65+</span><span class="text-[15px] text-stone-700">out of 100</span></div>
+              <span class="text-[15px] text-stone-700">Real demand, real pain, room to win.</span>
+            </div>
+            <ul class="flex flex-1 flex-col gap-2.5 text-[15px]">
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold text-green-700">✓</span><span>Search interest is rising</span></li>
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold text-green-700">✓</span><span>Complaints repeat across apps</span></li>
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold text-green-700">✓</span><span>Incumbents rate below 4.0</span></li>
+            </ul>
+            <button type="button" data-mode="1" class="mode-jump flex min-h-[48px] items-center justify-center rounded-[10px] border-[1.5px] border-stone-950 text-base font-bold hover:bg-stone-950 hover:text-white">Validate an idea</button>
+          </div>
+          <div class="flex flex-col gap-5 rounded-[14px] border-2 border-stone-950 bg-orange-50 p-7 text-stone-950">
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between gap-3"><strong class="font-mono text-[13px] uppercase tracking-[0.08em]">Pivot</strong><span class="rounded bg-orange-500 px-2 py-[3px] font-mono text-xs font-semibold text-stone-950">Most common</span></div>
+              <div class="flex items-baseline gap-2"><span class="font-display text-[52px] font-extrabold leading-none tracking-[-0.03em]">40–64</span></div>
+              <span class="text-[15px] text-stone-700">The pain is real, but the obvious version is crowded.</span>
+            </div>
+            <ul class="flex flex-1 flex-col gap-2.5 text-[15px]">
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold">✓</span><span>3 ways to differentiate, each tied to a cluster</span></li>
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold">✓</span><span>The complaints rivals ignore</span></li>
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold">✓</span><span>The audience that is underserved</span></li>
+            </ul>
+            <button type="button" id="scoringDemoBtn" class="flex min-h-[48px] items-center justify-center rounded-[10px] bg-orange-500 text-base font-bold text-stone-950 hover:bg-orange-400">See a PIVOT report</button>
+          </div>
+          <div class="flex flex-col gap-5 rounded-[14px] border border-stone-300 p-7">
+            <div class="flex flex-col gap-1.5">
+              <strong class="font-mono text-[13px] uppercase tracking-[0.08em]">Kill</strong>
+              <div class="flex items-baseline gap-2"><span class="font-display text-[52px] font-extrabold leading-none tracking-[-0.03em]">&lt;40</span><span class="text-[15px] text-stone-700">out of 100</span></div>
+              <span class="text-[15px] text-stone-700">Save the months. Look somewhere else.</span>
+            </div>
+            <ul class="flex flex-1 flex-col gap-2.5 text-[15px]">
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold text-red-700">✕</span><span>Flat or falling demand</span></li>
+              <li class="flex gap-2.5"><span aria-hidden="true" class="w-[18px] flex-none text-center font-bold text-red-700">✕</span><span>Users are mostly happy with what exists</span></li>
+              <li class="flex gap-2.5 text-stone-600"><span aria-hidden="true" class="w-[18px] flex-none text-center">·</span><span>Try Discover mode for a better gap</span></li>
+            </ul>
+            <button type="button" data-mode="3" class="mode-jump flex min-h-[48px] items-center justify-center rounded-[10px] border-[1.5px] border-stone-950 text-base font-bold hover:bg-stone-950 hover:text-white">Discover an opportunity</button>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-[18px] border-t-2 border-stone-950 pt-7">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+            <h3 class="font-display text-[26px] font-bold tracking-[-0.02em]">What one scan costs</h3>
+            <span class="text-[15px] text-stone-700">Cached calls cost nothing, and the demo presets are pre-warmed.</span>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="flex min-h-[64px] items-baseline justify-between gap-3 rounded-xl border border-stone-300 px-5 py-[18px]"><span class="font-mono text-[15px]">SerpApi calls</span><strong class="font-display text-[26px]">≤ 8</strong></div>
+            <div class="flex min-h-[64px] items-baseline justify-between gap-3 rounded-xl border border-stone-300 px-5 py-[18px]"><span class="font-mono text-[15px]">You.com calls</span><strong class="font-display text-[26px]">≤ 2</strong></div>
+            <div class="flex min-h-[64px] items-baseline justify-between gap-3 rounded-xl border border-stone-300 px-5 py-[18px]"><span class="font-mono text-[15px]">Cache hit</span><strong class="font-display text-[26px]">0</strong></div>
+            <div class="flex min-h-[64px] items-baseline justify-between gap-3 rounded-xl border border-stone-300 px-5 py-[18px]"><span class="font-mono text-[15px]">Typical time</span><strong class="font-display text-[26px]">~20s</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FAQ ==================== -->
+    <section id="faq" class="border-t border-stone-200 bg-stone-100 no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-10 px-5 py-16 sm:px-8 lg:px-12 lg:py-[104px]">
+        <h2 class="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-5xl lg:text-6xl">Fair questions.</h2>
+        <div class="grid gap-x-16 lg:grid-cols-2">
+          <div class="flex flex-col gap-2 border-t border-stone-300 py-6"><h3 class="text-[19px] font-bold">Are the quotes real?</h3><p class="text-base text-stone-700">Yes. Every quote is fetched from its source during the scan and links to the original. Gemini only refers to evidence by ID, and the backend drops any ID it cannot find.</p></div>
+          <div class="flex flex-col gap-2 border-t border-stone-300 py-6"><h3 class="text-[19px] font-bold">Is the score written by an AI?</h3><p class="text-base text-stone-700">No. The Viability Score and the Trajectory come from fixed formulas over measured signals such as the Trends slope, the share of 1★ reviews and competitor ratings. Each factor shows its working.</p></div>
+          <div class="flex flex-col gap-2 border-t border-stone-300 py-6"><h3 class="text-[19px] font-bold">What if my idea has no app?</h3><p class="text-base text-stone-700">For B2B SaaS, D2C brands or offline businesses, You.com web research supplies the competitors, complaints and coverage instead of the Play Store.</p></div>
+          <div class="flex flex-col gap-2 border-t border-stone-300 py-6"><h3 class="text-[19px] font-bold">Which sources does it read?</h3><p class="text-base text-stone-700">Play Store reviews, Google Trends, Google News, Reddit and Google Autocomplete through SerpApi, plus web and news search through You.com.</p></div>
+          <div class="flex flex-col gap-2 border-t border-stone-300 py-6"><h3 class="text-[19px] font-bold">Is it built for India?</h3><p class="text-base text-stone-700">Yes. Trends use geo=IN, reviews come from the Indian Play Store, and numbers are formatted the Indian way.</p></div>
+          <div class="flex flex-col gap-2 border-t border-stone-300 py-6"><h3 class="text-[19px] font-bold">What does AI-suggested mean?</h3><p class="text-base text-stone-700">No live post supports that claim, so treat it as a hypothesis. It is shown with a dashed border and never carries a quote.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== CLOSING CTA ==================== -->
+    <section class="bg-stone-950 text-white no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col items-start gap-8 px-5 py-20 sm:px-8 lg:px-12 lg:py-[120px]">
+        <h2 class="max-w-[12em] font-display text-[2.5rem] font-extrabold leading-none tracking-[-0.035em] sm:text-6xl lg:text-[5.25rem]">Somebody is describing your next product <span class="box-decoration-clone bg-orange-500 px-[0.12em] text-stone-950">right now.</span></h2>
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-3.5">
+          <button type="button" class="js-start-scan inline-flex min-h-[56px] items-center gap-2.5 rounded-[10px] bg-orange-500 px-7 text-[17px] font-bold text-stone-950 hover:bg-orange-400">
+            Start finding gaps
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <span class="font-mono text-[13px] text-stone-300">Three modes · every claim sourced · demos cost 0 credits</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== SITE FOOTER ==================== -->
+  <footer class="site-footer relative border-t border-orange-500/20 bg-neutral-950 text-neutral-400 no-print">
+    <div class="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-12 lg:gap-12">
+        <div class="sm:col-span-2 md:col-span-4">
+          <a class="group mb-6 inline-flex items-center gap-3" href="index.html">
+            <svg width="36" height="36" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#1c1917"/><circle cx="12.5" cy="12.5" r="5.5" stroke="#f97316" stroke-width="2.6"/><path d="M16.8 16.8l4.6 4.6" stroke="#f97316" stroke-width="2.6" stroke-linecap="round"/></svg>
+            <span class="flex flex-col">
+              <span class="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-lg font-bold text-transparent">GapScope</span>
+              <span class="-mt-1 text-[9px] font-medium tracking-wider text-neutral-500">MARKET INTELLIGENCE</span>
+            </span>
+          </a>
+          <p class="mb-6 max-w-xs text-sm leading-relaxed text-neutral-500">Stop guessing what to build. GapScope pulls live reviews, threads, trends and news, and shows you the post behind every claim it makes.</p>
+          <div class="flex items-center gap-2 text-sm text-neutral-500">Beyond 9to5 Buildathon · Bengaluru</div>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Product</h3>
+          <ul class="space-y-3">
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="#scan">Run a scan</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="#how">How it works</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="#scoring">Scoring</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="#faq">Questions</a></li>
+          </ul>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Modes</h3>
+          <ul class="space-y-3">
+            <li><button type="button" data-mode="1" class="mode-jump text-sm text-neutral-500 transition-colors hover:text-orange-400">Validate an idea</button></li>
+            <li><button type="button" data-mode="2" class="mode-jump text-sm text-neutral-500 transition-colors hover:text-orange-400">Investigate a business</button></li>
+            <li><button type="button" data-mode="3" class="mode-jump text-sm text-neutral-500 transition-colors hover:text-orange-400">Discover an opportunity</button></li>
+          </ul>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Built with</h3>
+          <ul class="space-y-3">
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="https://serpapi.com" target="_blank" rel="noopener noreferrer">SerpApi</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="https://you.com" target="_blank" rel="noopener noreferrer">You.com Search API</a></li>
+            <li><span class="text-sm text-neutral-500">Gemini 2.5 Flash</span></li>
+          </ul>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Tracks</h3>
+          <ul class="space-y-3">
+            <li><span class="text-sm text-neutral-500">01 · Best use of SerpApi</span></li>
+            <li><span class="text-sm text-neutral-500">02 · You.com</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 border-t border-white/5 py-4">
+        <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-xs text-neutral-600">
+          <span>5 live sources</span><span>Deterministic scoring</span><span>Evidence by ID</span><span>Zero made-up quotes</span>
+        </div>
+      </div>
+      <div class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
+        <p class="text-center text-sm text-neutral-600">© 2026 GapScope. <span class="text-orange-500/50">Find gaps worth building.</span></p>
+        <div class="flex items-center gap-1 text-xs text-neutral-600"><span>Made with</span><span class="text-orange-400">♥</span><span>in Bengaluru</span></div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+  <!-- ==================== EVIDENCE DRAWER ==================== -->
+  <div id="evidenceDrawer" class="fixed inset-0 z-50 hidden no-print" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div id="drawerBackdrop" class="drawer-backdrop fixed inset-0"></div>
+    <div class="drawer-panel fixed inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-[18px] border-t-2 border-stone-950 bg-white sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[560px] sm:rounded-none sm:border-l-2 sm:border-t-0">
+      <div class="flex items-start justify-between gap-4 border-b border-stone-200 px-5 py-5 sm:px-7">
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <p class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-orange-700">Receipts</p>
+          <h2 id="drawerTitle" class="font-display text-2xl font-bold leading-tight tracking-[-0.01em]">Evidence</h2>
+          <p id="drawerSubtitle" class="font-mono text-xs text-stone-600"></p>
+        </div>
+        <button type="button" id="closeDrawerBtn" class="flex h-11 w-11 flex-none items-center justify-center rounded-full hover:bg-stone-100" aria-label="Close receipts">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="drawerSourceFilters" class="flex flex-wrap items-center gap-2 border-b border-stone-200 px-5 py-3 sm:px-7" role="group" aria-label="Filter by source"></div>
+      <div id="drawerEvidenceList" class="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5 sm:px-7"></div>
+      <div class="flex items-center justify-between border-t border-stone-200 px-5 py-3 font-mono text-xs text-stone-600 sm:px-7">
+        <span id="drawerItemsCount">0 items</span><span>Esc to close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST ==================== -->
+  <div id="toast" class="fixed bottom-6 left-1/2 z-[60] hidden -translate-x-1/2 rounded-[10px] bg-stone-950 px-4 py-3 font-mono text-[13px] text-white shadow-xl no-print" role="status" aria-live="polite">
+    <span id="toastMessage">Copied</span>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

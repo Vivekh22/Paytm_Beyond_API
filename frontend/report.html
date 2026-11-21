@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared report | GapScope</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <link rel="stylesheet" href="css/gapscope.css">
+</head>
+<body class="bg-white text-stone-950 antialiased overflow-x-hidden">
+
+  <header class="sticky top-0 z-40 border-b border-stone-200 bg-white/95 backdrop-blur no-print">
+    <div class="mx-auto flex min-h-[72px] max-w-[1200px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
+      <a class="flex min-h-[44px] items-center gap-2 group" href="index.html" aria-label="GapScope home">
+        <span class="group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="#0c0a09"/><circle cx="12.5" cy="12.5" r="5.5" stroke="#f97316" stroke-width="2.6"/><path d="M16.8 16.8l4.6 4.6" stroke="#f97316" stroke-width="2.6" stroke-linecap="round"/></svg>
+        </span>
+        <span class="font-display text-[21px] font-extrabold tracking-[-0.02em]">GapScope</span>
+        <span class="ml-2 hidden font-mono text-xs uppercase tracking-[0.06em] text-stone-600 sm:inline">Shared report</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <div class="hidden min-h-[36px] items-center gap-2 rounded-full border border-stone-300 px-3 font-mono text-xs text-stone-700 sm:inline-flex">
+          <span class="h-1.5 w-1.5 rounded-full bg-orange-500" aria-hidden="true"></span>
+          <span id="creditMeterText" class="tabular-nums">cached report</span>
+        </div>
+        <a href="index.html#scan" class="inline-flex min-h-[44px] items-center rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white hover:bg-stone-800">Run a new scan</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-12">
+    <div id="loadingState" class="flex flex-col items-center gap-4 py-24" role="status">
+      <span class="gs-spin block h-6 w-6 rounded-full border-2 border-stone-300 border-t-orange-500" aria-hidden="true"></span>
+      <p class="font-mono text-[13px] text-stone-600">Loading report…</p>
+    </div>
+
+    <div id="errorState" class="hidden my-16 flex flex-col gap-3 rounded-[14px] border-2 border-red-600 p-6" role="alert">
+      <p class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-red-700">Report not found</p>
+      <p id="errorMessage" class="text-base text-stone-800"></p>
+      <div><a href="index.html" class="inline-flex min-h-[44px] items-center rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white">Back to GapScope</a></div>
+    </div>
+
+    <div id="reportContainer" class="hidden flex flex-col gap-14 py-12 lg:gap-20 lg:py-16">
+      <div id="reportWarnings" class="hidden flex items-start gap-2.5 rounded-[10px] border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900" role="status">
+        <span class="font-mono text-xs font-semibold uppercase tracking-[0.06em] pt-0.5">Note</span>
+        <div id="reportWarningsContent" class="flex flex-col gap-1 text-[15px]"></div>
+      </div>
+
+      <section id="verdictSection" class="card-print"></section>
+
+      <div class="grid items-start gap-5 lg:grid-cols-12">
+        <section id="trendCard" class="card-print flex flex-col gap-5 rounded-[14px] border border-stone-300 bg-white p-5 lg:col-span-7 lg:p-7">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="flex flex-col gap-1.5">
+              <p class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Google Trends · India · last 12 months</p>
+              <h3 class="font-display text-2xl font-bold tracking-[-0.01em]">Demand trend</h3>
+            </div>
+            <span id="trendChangeBadge" class="rounded-full border px-2.5 py-1 font-mono text-xs"></span>
+          </div>
+          <div class="relative h-60 w-full"><canvas id="trendChartCanvas" aria-label="Search interest over the last 12 months" role="img"></canvas></div>
+          <div class="flex flex-wrap items-center justify-between gap-2 border-t border-stone-200 pt-3 font-mono text-xs text-stone-600">
+            <span>SerpApi · google_trends</span><span id="trendKeywordMeta"></span>
+          </div>
+        </section>
+        <section id="competitorsCard" class="card-print flex flex-col gap-4 rounded-[14px] border border-stone-300 bg-white p-5 lg:col-span-5 lg:p-7">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="flex flex-col gap-1.5">
+              <p class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Play Store · You.com web</p>
+              <h3 class="font-display text-2xl font-bold tracking-[-0.01em]">Competitors</h3>
+            </div>
+            <span id="competitorsCountBadge" class="rounded-full border border-stone-400 px-2.5 py-1 font-mono text-xs"></span>
+          </div>
+          <div id="competitorsList" class="flex flex-col"></div>
+        </section>
+      </div>
+
+      <section id="receiptsSection"></section>
+      <section id="opportunitiesSection"></section>
+      <section id="newsSection" class="card-print"></section>
+
+      <footer class="flex flex-col items-start justify-between gap-4 border-t-2 border-stone-950 pt-6 sm:flex-row sm:items-center">
+        <p class="font-mono text-[13px] text-stone-600"><span id="footerMetaSources">0 sources</span> · <span id="footerMetaTimestamp"></span></p>
+        <div class="flex flex-wrap items-center gap-3 no-print">
+          <button type="button" id="copyLinkBtn" class="inline-flex min-h-[44px] items-center rounded-[10px] border-[1.5px] border-stone-950 px-4 text-[15px] font-bold hover:bg-stone-950 hover:text-white">Copy link</button>
+          <button type="button" id="printBtn" class="inline-flex min-h-[44px] items-center rounded-[10px] border-[1.5px] border-stone-950 px-4 text-[15px] font-bold hover:bg-stone-950 hover:text-white">Print / Save PDF</button>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Evidence drawer -->
+  <div id="evidenceDrawer" class="fixed inset-0 z-50 hidden no-print" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div id="drawerBackdrop" class="drawer-backdrop fixed inset-0"></div>
+    <div class="drawer-panel fixed inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-[18px] border-t-2 border-stone-950 bg-white sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[560px] sm:rounded-none sm:border-l-2 sm:border-t-0">
+      <div class="flex items-start justify-between gap-4 border-b border-stone-200 px-5 py-5 sm:px-7">
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <p class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-orange-700">Receipts</p>
+          <h2 id="drawerTitle" class="font-display text-2xl font-bold leading-tight tracking-[-0.01em]">Evidence</h2>
+        </div>
+        <button type="button" id="closeDrawerBtn" class="flex h-11 w-11 flex-none items-center justify-center rounded-full hover:bg-stone-100" aria-label="Close receipts">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="drawerSourceFilters" class="flex flex-wrap items-center gap-2 border-b border-stone-200 px-5 py-3 sm:px-7" role="group" aria-label="Filter by source"></div>
+      <div id="drawerEvidenceList" class="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5 sm:px-7"></div>
+      <div class="flex items-center justify-between border-t border-stone-200 px-5 py-3 font-mono text-xs text-stone-600 sm:px-7">
+        <span id="drawerItemsCount">0 items</span><span>Esc to close</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 z-[60] hidden -translate-x-1/2 rounded-[10px] bg-stone-950 px-4 py-3 font-mono text-[13px] text-white shadow-xl no-print" role="status" aria-live="polite"></div>
+
+  <script type="module">
+    import { getReport } from './js/api.js';
+    import { CONFIG } from './js/config.js';
+    import {
+      esc, renderVerdictHero, renderCompetitors, renderReceiptsSection, renderOpportunities,
+      renderNewsSection, renderDrawerContent, resolveEvidence, formatDate, formatNum
+    } from './js/render.js';
+    import { renderScoreGauge, renderTrendLineChart } from './js/charts.js';
+
+    const $ = id => document.getElementById(id);
+    let drawerItems = [];
+    let drawerFilter = 'all';
+    let returnFocus = null;
+
+    function toast(msg) {
+      $('toast').textContent = msg;
+      $('toast').classList.remove('hidden');
+      setTimeout(() => $('toast').classList.add('hidden'), 2200);
+    }
+
+    async function load() {
+      const scanId = new URLSearchParams(window.location.search).get('id') || 'mock_1_demo';
+      try {
+        const report = await getReport(scanId);
+        $('loadingState').classList.add('hidden');
+        render(report);
+      } catch (err) {
+        $('loadingState').classList.add('hidden');
+        $('errorState').classList.remove('hidden');
+        $('errorMessage').textContent = err.message || 'Unable to load this report.';
+      }
+    }
+
+    function render(report) {
+      document.title = `${report.query || 'Report'} | GapScope`;
+      const c = report.credits || {};
+      const total = (c.serpapi_live || 0) + (c.serpapi_cached || 0) + (c.youcom_live || 0) + (c.youcom_cached || 0);
+      const cached = (c.serpapi_cached || 0) + (c.youcom_cached || 0);
+      if (total) $('creditMeterText').textContent = `${total} calls · ${cached} cached`;
+
+      if (report.warnings && report.warnings.length) {
+        $('reportWarningsContent').innerHTML = report.warnings.map(w => `<p>${esc(w)}</p>`).join('');
+        $('reportWarnings').classList.remove('hidden');
+      }
+
+      $('verdictSection').innerHTML = renderVerdictHero(report);
+      if (report.mode === 1 && report.verdict) {
+        setTimeout(() => renderScoreGauge('gaugeCanvas', report.verdict.score, report.verdict.label), 50);
+      }
+
+      const t = report.trend;
+      if (t && t.points && t.points.length) {
+        const dir = (t.direction || 'flat').toLowerCase();
+        const arrow = dir === 'rising' ? '▲' : dir === 'falling' ? '▼' : '→';
+        const cls = dir === 'rising' ? 'border-orange-500 bg-orange-500 text-stone-950 font-semibold'
+                  : dir === 'falling' ? 'border-red-600 text-red-700 font-semibold' : 'border-stone-400 text-stone-700';
+        $('trendChangeBadge').className = `rounded-full border px-2.5 py-1 font-mono text-xs tabular-nums ${cls}`;
+        $('trendChangeBadge').textContent = `${arrow} ${Math.abs(Number(t.change_pct) || 0).toFixed(1).replace(/\.0$/, '')}% ${dir}`;
+        $('trendKeywordMeta').textContent = `“${t.keyword || ''}” · geo=${t.geo || 'IN'}`;
+        setTimeout(() => renderTrendLineChart('trendChartCanvas', t), 60);
+      } else {
+        $('trendCard').classList.add('hidden');
+      }
+
+      $('competitorsCountBadge').textContent = `${(report.competitors || []).length} found`;
+      $('competitorsList').innerHTML = renderCompetitors(report.competitors);
+      $('receiptsSection').innerHTML = renderReceiptsSection(report);
+      $('opportunitiesSection').innerHTML = renderOpportunities(report.opportunities, report.evidence || {}, report.clusters || []);
+      $('newsSection').innerHTML = renderNewsSection(report.news, report.evidence || {});
+
+      $('footerMetaSources').textContent = `${formatNum(Object.keys(report.evidence || {}).length)} sources`;
+      $('footerMetaTimestamp').textContent = `generated ${formatDate(report.generated_at)}`;
+      $('reportContainer').classList.remove('hidden');
+      wire(report);
+    }
+
+    function wire(report) {
+      const pool = report.evidence || {};
+      document.querySelectorAll('.btn-open-cluster-drawer, .btn-factor-evidence').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const title = btn.getAttribute('data-cluster-title') || btn.getAttribute('data-title') || 'Receipts';
+          const ids = JSON.parse(btn.getAttribute('data-evidence-ids') || '[]');
+          openDrawer(title, resolveEvidence(ids, pool));
+        });
+      });
+      document.querySelectorAll('.btn-jump-to-cluster').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const el = document.getElementById(btn.getAttribute('data-target-cluster'));
+          if (!el) return;
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.remove('cluster-highlighted'); void el.offsetWidth; el.classList.add('cluster-highlighted');
+        });
+      });
+    }
+
+    function openDrawer(title, items) {
+      drawerItems = items; drawerFilter = 'all';
+      returnFocus = document.activeElement;
+      $('drawerTitle').textContent = title;
+      renderDrawer();
+      $('evidenceDrawer').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      $('closeDrawerBtn').focus();
+    }
+    function closeDrawer() {
+      $('evidenceDrawer').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+      if (returnFocus && returnFocus.focus) returnFocus.focus();
+    }
+    function renderDrawer() {
+      const counts = { all: drawerItems.length };
+      drawerItems.forEach(i => { counts[i.source] = (counts[i.source] || 0) + 1; });
+      const keys = ['all', ...Object.keys(CONFIG.SOURCE_METAS).filter(k => counts[k])];
+      $('drawerSourceFilters').innerHTML = keys.map(k => {
+        const active = k === drawerFilter;
+        const label = k === 'all' ? 'All sources' : CONFIG.SOURCE_METAS[k].name;
+        return `<button type="button" data-filter="${k}" aria-pressed="${active}" class="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 font-mono text-xs ${active ? 'border-stone-950 bg-stone-950 text-white' : 'border-stone-400 hover:border-stone-950'}">${esc(label)} <span class="opacity-70">${counts[k] || 0}</span></button>`;
+      }).join('');
+      $('drawerSourceFilters').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { drawerFilter = b.dataset.filter; renderDrawer(); }));
+      const filtered = drawerFilter === 'all' ? drawerItems : drawerItems.filter(i => i.source === drawerFilter);
+      $('drawerEvidenceList').innerHTML = renderDrawerContent(filtered);
+      $('drawerItemsCount').textContent = `${filtered.length} of ${drawerItems.length} receipts`;
+    }
+
+    $('closeDrawerBtn').addEventListener('click', closeDrawer);
+    $('drawerBackdrop').addEventListener('click', closeDrawer);
+    window.addEventListener('keydown', e => {
+      if ($('evidenceDrawer').classList.contains('hidden')) return;
+      if (e.key === 'Escape') closeDrawer();
+      if (e.key === 'Tab') {
+        const f = [...$('evidenceDrawer').querySelectorAll('button, a[href]')].filter(el => el.offsetParent !== null);
+        if (!f.length) return;
+        if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+      }
+    });
+    $('printBtn').addEventListener('click', () => window.print());
+    $('copyLinkBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href).then(() => toast('Link copied')).catch(() => toast(window.location.href));
+    });
+
+    load();
+  </script>
+</body>
+</html>
