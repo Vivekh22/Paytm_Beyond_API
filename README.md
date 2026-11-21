@@ -69,52 +69,12 @@ Built for the **Beyond 9 to 5 Buildathon**
 ## 🏛️ System Architecture
 
 ```mermaid
-flowchart TD
-    subgraph Client[" Frontend Client (:8080)"]
-        UI["User Interface\n(Modes 1, 2, 3, 4)"]
-        SSE["SSE Stream Listener\n& Live Progress Tracker"]
-        Drawer["Interactive Evidence Drawer\n& Verification Vault"]
-    end
-
-    subgraph Backend[" Flask Engine (:5000)"]
-        Router["REST & SSE Gateway\n(/api/scan & /api/scan/id/stream)"]
-        Pool["ThreadPoolExecutor\nParallel Dispatch Worker"]
-        Cache[("SQLite WAL Cache\n72h TTL & SHA-256 Hashes")]
-        Limiter["Sliding-Window Limiter\n(45 Calls/Hr Safety Guard)"]
-    end
-
-    subgraph Providers[" Live Intelligence Ingestion"]
-        direction TB
-        subgraph Track1["Track 01: SerpApi Engine"]
-            GT["Google Trends (IN)"]
-            GP["Google Play Reviews\n(1★, 5★, Newest)"]
-            GN["Google News (Headlines)"]
-            GR["Reddit Discussions"]
-            GM["Google Maps & Jobs"]
-        end
-        subgraph Track2["Track 02: You.com Search API"]
-            YW["Live Web Index"]
-            YN["Market News & Reports"]
-        end
-    end
-
-    subgraph Core[" Intelligence Synthesis Engine"]
-        Normalizer["Evidence Normalizer\n(Stable IDs: ev_0001...)"]
-        Gemini["Google Gemini 2.5 Flash\n(Strict ID-Based Clustering)"]
-        Math["Deterministic Python Scoring\n(Viability & Trajectory Formulas)"]
-    end
-
-    UI --> Router
-    Router --> Pool
-    Pool <--> Cache
-    Pool --> Limiter
-    Limiter --> Track1 & Track2
-    Track1 & Track2 --> Normalizer
-    Normalizer --> Gemini
-    Gemini --> Math
-    Math --> SSE
-    SSE --> UI
-    UI --> Drawer
+flowchart LR
+    A["👤 User Input\n(Validate / Investigate / Discover)"] --> B["⚡ Flask Backend\n(REST API & Cache)"]
+    B --> C["🌐 Live Data Sources\n• SerpApi (Reviews & Trends)\n• You.com (Web Search)"]
+    C --> D["🧠 Gemini 2.5 Flash\n(Evidence Clustering)"]
+    D --> E["📊 Python Scoring\n(Viability 0–100)"]
+    E --> F["📑 Evidence Report\n(Verifiable Receipts)"]
 ```
 
 ---
