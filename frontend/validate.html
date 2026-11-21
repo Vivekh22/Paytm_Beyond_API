@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validate your idea · Find gaps worth building, with the posts to prove it | GapScope</title>
+  <meta name="description" content="GapScope reads live Play Store reviews, Reddit, Google Trends, Google News and the open web, and returns a decision where every claim links to its source.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <link rel="stylesheet" href="css/gapscope.css">
+</head>
+<body class="bg-white text-stone-950 antialiased overflow-x-hidden">
+<div class="min-h-screen flex flex-col overflow-x-clip">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="sticky top-0 z-40 border-b border-stone-200 bg-white/95 backdrop-blur no-print">
+    <div class="mx-auto flex min-h-[72px] max-w-[1200px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
+      <a class="flex min-h-[44px] items-center gap-2 group" href="index.html" aria-label="GapScope home">
+        <span class="group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="#0c0a09"/><circle cx="12.5" cy="12.5" r="5.5" stroke="#f97316" stroke-width="2.6"/><path d="M16.8 16.8l4.6 4.6" stroke="#f97316" stroke-width="2.6" stroke-linecap="round"/></svg>
+        </span>
+        <span class="font-display text-[21px] font-extrabold tracking-[-0.02em]">GapScope</span>
+      </a>
+
+      <nav aria-label="Main" class="hidden items-center gap-0.5 text-[14px] font-medium lg:flex">
+        <a href="index.html" class="inline-flex min-h-[40px] items-center whitespace-nowrap rounded-lg px-2.5 hover:bg-stone-100">Home</a>
+        <a href="index.html#how" class="inline-flex min-h-[40px] items-center whitespace-nowrap rounded-lg px-2.5 hover:bg-stone-100">How it works</a>
+        <a href="#validate" data-mode="1" class="nav-mode inline-flex min-h-[40px] items-center whitespace-nowrap rounded-lg px-2.5 hover:bg-stone-100 aria-[current=true]:bg-stone-950 aria-[current=true]:text-white">Validate your idea</a>
+        <a href="#investigate" data-mode="2" class="nav-mode inline-flex min-h-[40px] items-center whitespace-nowrap rounded-lg px-2.5 hover:bg-stone-100 aria-[current=true]:bg-stone-950 aria-[current=true]:text-white">Investigate</a>
+        <a href="#discover" data-mode="3" class="nav-mode inline-flex min-h-[40px] items-center whitespace-nowrap rounded-lg px-2.5 hover:bg-stone-100 aria-[current=true]:bg-stone-950 aria-[current=true]:text-white">Discover</a>
+        <a href="#protect" data-mode="4" class="nav-mode inline-flex min-h-[40px] items-center whitespace-nowrap rounded-lg px-2.5 hover:bg-stone-100 aria-[current=true]:bg-stone-950 aria-[current=true]:text-white">Protect</a>
+      </nav>
+
+      <div class="hidden items-center gap-3 lg:flex">
+        <div id="creditMeter" class="hidden xl:inline-flex min-h-[36px] items-center gap-2 rounded-full border border-stone-300 px-3 font-mono text-xs text-stone-700" title="API calls for this scan: total and served from cache">
+          <span class="h-1.5 w-1.5 rounded-full bg-orange-500" aria-hidden="true"></span>
+          <span id="creditMeterText" class="tabular-nums">0 calls · 0 cached</span>
+        </div>
+        <button type="button" class="js-start-scan inline-flex min-h-[44px] items-center whitespace-nowrap rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white hover:bg-stone-800">Start a scan</button>
+      </div>
+
+      <button type="button" id="mobileMenuBtn" class="flex h-11 w-11 items-center justify-center rounded-lg lg:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="hidden border-t border-stone-200 bg-white lg:hidden">
+      <nav aria-label="Main (mobile)" class="mx-auto flex max-w-[1200px] flex-col px-5 py-2 text-[17px] font-medium">
+        <a href="index.html" class="mobile-link flex min-h-[48px] items-center border-b border-stone-100">Home</a>
+        <a href="index.html#how" class="mobile-link flex min-h-[48px] items-center border-b border-stone-100">How it works</a>
+        <a href="#validate" data-mode="1" class="nav-mode mobile-link flex min-h-[48px] items-center border-b border-stone-100 aria-[current=true]:font-semibold aria-[current=true]:text-orange-700">Validate your idea</a>
+        <a href="#investigate" data-mode="2" class="nav-mode mobile-link flex min-h-[48px] items-center border-b border-stone-100 aria-[current=true]:font-semibold aria-[current=true]:text-orange-700">Investigate</a>
+        <a href="#discover" data-mode="3" class="nav-mode mobile-link flex min-h-[48px] items-center border-b border-stone-100 aria-[current=true]:font-semibold aria-[current=true]:text-orange-700">Discover</a>
+        <a href="#protect" data-mode="4" class="nav-mode mobile-link flex min-h-[48px] items-center border-b border-stone-100 aria-[current=true]:font-semibold aria-[current=true]:text-orange-700">Protect</a>
+        <div class="flex items-center justify-between gap-3 py-3">
+          <span id="creditMeterTextMobile" class="font-mono text-xs text-stone-600 tabular-nums">0 calls · 0 cached</span>
+          <button type="button" class="js-start-scan mobile-link inline-flex min-h-[44px] items-center rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white">Start a scan</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1">
+
+    <!-- ==================== SCAN HUB ==================== -->
+    <section id="scan" class="border-y border-stone-200 bg-stone-100 no-print">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-9 px-5 py-14 sm:px-8 lg:px-12 lg:py-[72px]">
+        <div class="flex max-w-[44em] flex-col gap-4">
+          <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">Validate your idea</p>
+          <h1 class="font-display text-[26px] font-bold leading-[1.1] tracking-[-0.02em] lg:text-4xl">Type your idea below and get a decision that comes with its receipts.</h1>
+        </div>
+
+        <div id="searchHub" class="flex flex-col gap-6 rounded-[18px] border-2 border-stone-950 bg-white p-5 sm:p-7 lg:p-9">
+          <!-- Mode switch -->
+          <div class="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4" role="tablist" aria-label="Scan mode">
+            <button type="button" id="modeBtn1" role="tab" aria-selected="true" aria-controls="scanForm"
+              class="mode-switch-btn group flex flex-col items-start gap-1 rounded-[10px] border-[1.5px] border-stone-300 bg-white px-4 py-3 text-left hover:border-stone-950 aria-selected:border-stone-950 aria-selected:bg-stone-950 aria-selected:text-white">
+              <span class="font-mono text-xs font-semibold text-stone-500 group-aria-selected:text-orange-300">01 · BUILD / PIVOT / KILL</span>
+              <span class="text-[17px] font-bold">Validate an idea</span>
+            </button>
+            <button type="button" id="modeBtn2" role="tab" aria-selected="false" aria-controls="scanForm"
+              class="mode-switch-btn group flex flex-col items-start gap-1 rounded-[10px] border-[1.5px] border-stone-300 bg-white px-4 py-3 text-left hover:border-stone-950 aria-selected:border-stone-950 aria-selected:bg-stone-950 aria-selected:text-white">
+              <span class="font-mono text-xs font-semibold text-stone-500 group-aria-selected:text-orange-300">02 · GROWING / DECLINING</span>
+              <span class="text-[17px] font-bold">Investigate a business</span>
+            </button>
+            <button type="button" id="modeBtn3" role="tab" aria-selected="false" aria-controls="scanForm"
+              class="mode-switch-btn group flex flex-col items-start gap-1 rounded-[10px] border-[1.5px] border-stone-300 bg-white px-4 py-3 text-left hover:border-stone-950 aria-selected:border-stone-950 aria-selected:bg-stone-950 aria-selected:text-white">
+              <span class="font-mono text-xs font-semibold text-stone-500 group-aria-selected:text-orange-300">03 · 3 CONCEPTS</span>
+              <span class="text-[17px] font-bold">Discover an opportunity</span>
+            </button>
+            <button type="button" id="modeBtn4" role="tab" aria-selected="false" aria-controls="scanForm"
+              class="mode-switch-btn group flex flex-col items-start gap-1 rounded-[10px] border-[1.5px] border-stone-300 bg-white px-4 py-3 text-left hover:border-stone-950 aria-selected:border-stone-950 aria-selected:bg-stone-950 aria-selected:text-white">
+              <span class="font-mono text-xs font-semibold text-stone-500 group-aria-selected:text-orange-300">04 · SUSPECTED FAKES</span>
+              <span class="text-[17px] font-bold">Protect a brand</span>
+            </button>
+          </div>
+          <p id="modeHint" class="-mt-1 text-[15px] text-stone-700"></p>
+
+          <form id="scanForm" class="flex flex-col gap-5" novalidate>
+            <div id="textInputWrapper" class="flex flex-col gap-3 sm:flex-row">
+              <label for="scanQueryInput" class="sr-only">What should GapScope scan?</label>
+              <input type="text" id="scanQueryInput" autocomplete="off"
+                placeholder="e.g. UPI expense tracker for college students"
+                class="min-h-[56px] w-full flex-1 rounded-[10px] border-[1.5px] border-stone-950 bg-white px-4 text-[17px] text-stone-950 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+              <button type="submit" id="submitScanBtn" class="inline-flex min-h-[56px] items-center justify-center gap-2.5 rounded-[10px] bg-orange-500 px-7 text-[17px] font-bold text-stone-950 hover:bg-orange-400">
+                <span id="scanBtnLabel">Scan</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+
+            <details id="protectFieldsWrapper" class="hidden rounded-[10px] border border-stone-300 bg-stone-50 px-4 py-3">
+              <summary class="cursor-pointer text-[15px] font-semibold">Your official records <span class="font-normal text-stone-600">(optional, but needed to flag anything)</span></summary>
+              <div class="mt-3 grid gap-3 md:grid-cols-3">
+                <label class="flex flex-col gap-1.5 text-sm font-medium">Official websites
+                  <input type="text" id="officialDomainsInput" placeholder="bluedart.com" autocomplete="off"
+                    class="min-h-[44px] rounded-lg border-[1.5px] border-stone-400 bg-white px-3 text-[15px] font-normal focus:border-stone-950 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </label>
+                <label class="flex flex-col gap-1.5 text-sm font-medium">Official helpline numbers
+                  <input type="text" id="officialPhonesInput" placeholder="1860 233 1234, 1800 …" autocomplete="off"
+                    class="min-h-[44px] rounded-lg border-[1.5px] border-stone-400 bg-white px-3 text-[15px] font-normal focus:border-stone-950 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </label>
+                <label class="flex flex-col gap-1.5 text-sm font-medium">Official Play Store app IDs
+                  <input type="text" id="officialAppsInput" placeholder="com.example.app" autocomplete="off"
+                    class="min-h-[44px] rounded-lg border-[1.5px] border-stone-400 bg-white px-3 text-[15px] font-normal focus:border-stone-950 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </label>
+              </div>
+              <p class="mt-2 font-mono text-xs text-stone-600">Separate several with commas. Saved for later scans of the same brand.</p>
+            </details>
+
+            <div id="categoryGridWrapper" class="hidden flex flex-col gap-3.5">
+              <div class="flex flex-wrap gap-2.5" id="categoryChips">
+                <button type="button" data-category="Personal Finance" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Personal Finance</button>
+                <button type="button" data-category="EdTech" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">EdTech</button>
+                <button type="button" data-category="Healthcare" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Healthcare</button>
+                <button type="button" data-category="Quick-commerce" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Quick-commerce</button>
+                <button type="button" data-category="Travel" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Travel</button>
+                <button type="button" data-category="Mental Health" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Mental Health</button>
+                <button type="button" data-category="Agritech" class="cat-chip rounded-full border-[1.5px] border-stone-950 px-[18px] py-2.5 text-[15px] font-semibold hover:bg-stone-950 hover:text-white">Agritech</button>
+                <button type="button" id="catOtherBtn" class="cat-chip rounded-full border-[1.5px] border-dashed border-stone-400 px-[18px] py-2.5 text-[15px] font-semibold text-stone-700 hover:border-stone-950" aria-expanded="false" aria-controls="otherCategoryInputRow">Other…</button>
+              </div>
+              <div id="otherCategoryInputRow" class="hidden flex flex-col gap-3 sm:flex-row">
+                <label for="otherCategoryInput" class="sr-only">Custom category</label>
+                <input type="text" id="otherCategoryInput" placeholder="e.g. Gig worker tools"
+                  class="min-h-[48px] flex-1 rounded-[10px] border-[1.5px] border-stone-950 px-4 text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+                <button type="button" id="confirmOtherCatBtn" class="inline-flex min-h-[48px] items-center justify-center rounded-[10px] bg-orange-500 px-6 text-base font-bold text-stone-950 hover:bg-orange-400">Scan category</button>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2.5 border-t border-dashed border-stone-300 pt-5">
+              <span id="examplesLabel" class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Examples</span>
+              <div id="examplePillsContainer" class="flex flex-wrap items-center gap-2"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== RESULTS AREA ==================== -->
+    <div id="results" class="mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-12">
+
+      <!-- Live progress -->
+      <section id="progressArea" class="hidden py-12 lg:py-16 no-print" aria-live="polite" aria-busy="true">
+        <div class="flex flex-col gap-6 rounded-[14px] border border-stone-300 bg-white p-5 shadow-[0_24px_48px_-36px_rgba(12,10,9,0.5)] lg:p-7">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between gap-4">
+              <p class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-stone-600">Scanning live sources</p>
+              <span id="progressPercentage" class="font-mono text-sm font-semibold tabular-nums">0%</span>
+            </div>
+            <h3 id="progressStatusHeader" class="font-display text-xl font-bold leading-tight tracking-[-0.01em] lg:text-2xl">Connecting to SerpApi and You.com…</h3>
+            <div class="h-1 w-full overflow-hidden bg-stone-200" role="progressbar" aria-label="Scan progress" aria-valuemin="0" aria-valuemax="100">
+              <div id="scanProgressBar" class="h-1 bg-orange-500 transition-all duration-300" style="width:0%"></div>
+            </div>
+          </div>
+          <ol id="progressStepList" class="flex flex-col"></ol>
+          <div class="grid gap-4 border-t border-dashed border-stone-300 pt-6 md:grid-cols-3 animate-pulse" aria-hidden="true">
+            <div class="h-28 rounded-[10px] bg-stone-100"></div>
+            <div class="h-28 rounded-[10px] bg-stone-100"></div>
+            <div class="h-28 rounded-[10px] bg-stone-100"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Error -->
+      <div id="scanErrorCard" class="hidden flex my-12 flex-col gap-3 rounded-[14px] border-2 border-red-600 bg-white p-6 no-print" role="alert">
+        <p class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-red-700">Scan failed</p>
+        <p id="scanErrorMessage" class="text-base text-stone-800"></p>
+        <div><button type="button" id="retryScanBtn" class="inline-flex min-h-[44px] items-center rounded-lg bg-stone-950 px-4 text-[15px] font-semibold text-white hover:bg-stone-800">Retry scan</button></div>
+      </div>
+
+      <!-- Report -->
+      <div id="reportContainer" class="hidden flex flex-col gap-14 py-12 lg:gap-20 lg:py-16">
+
+        <div id="reportWarnings" class="hidden flex items-start justify-between gap-3 rounded-[10px] border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900" role="status">
+          <div class="flex items-start gap-2.5">
+            <span class="font-mono text-xs font-semibold uppercase tracking-[0.06em] pt-0.5">Note</span>
+            <div id="reportWarningsContent" class="flex flex-col gap-1 text-[15px]"></div>
+          </div>
+          <button type="button" id="dismissWarningsBtn" class="flex h-8 w-8 flex-none items-center justify-center rounded-md hover:bg-amber-100" aria-label="Dismiss notice">&times;</button>
+        </div>
+
+        <section id="verdictSection" class="card-print"></section>
+
+        <div id="marketContextSection" class="grid items-start gap-5 lg:grid-cols-12">
+          <section id="trendCard" class="card-print flex flex-col gap-5 rounded-[14px] border border-stone-300 bg-white p-5 lg:col-span-7 lg:p-7">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex flex-col gap-1.5">
+                <p id="trendSubtitle" class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Google Trends · India · last 12 months</p>
+                <h3 class="font-display text-2xl font-bold tracking-[-0.01em]">Demand trend</h3>
+              </div>
+              <span id="trendChangeBadge" class="rounded-full border px-2.5 py-1 font-mono text-xs"></span>
+            </div>
+            <div class="relative h-60 w-full"><canvas id="trendChartCanvas" aria-label="Search interest over the last 12 months" role="img"></canvas></div>
+            <div class="flex flex-wrap items-center justify-between gap-2 border-t border-stone-200 pt-3 font-mono text-xs text-stone-600">
+              <span>SerpApi · google_trends</span>
+              <span id="trendKeywordMeta"></span>
+            </div>
+          </section>
+
+          <section id="competitorsCard" class="card-print flex flex-col gap-4 rounded-[14px] border border-stone-300 bg-white p-5 lg:col-span-5 lg:p-7">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex flex-col gap-1.5">
+                <p class="font-mono text-xs uppercase tracking-[0.06em] text-stone-600">Play Store · You.com web</p>
+                <h3 class="font-display text-2xl font-bold tracking-[-0.01em]">Competitors</h3>
+              </div>
+              <span id="competitorsCountBadge" class="rounded-full border border-stone-400 px-2.5 py-1 font-mono text-xs"></span>
+            </div>
+            <div id="competitorsList" class="flex flex-col"></div>
+          </section>
+        </div>
+
+        <section id="findingsSection" class="hidden"></section>
+        <section id="receiptsSection"></section>
+        <section id="opportunitiesSection"></section>
+        <section id="newsSection" class="card-print"></section>
+
+        <footer id="reportFooter" class="flex flex-col items-start justify-between gap-4 border-t-2 border-stone-950 pt-6 sm:flex-row sm:items-center">
+          <p class="font-mono text-[13px] text-stone-600"><span id="footerMetaSources">0 sources</span> · <span id="footerMetaTimestamp"></span></p>
+          <div class="flex flex-wrap items-center gap-3 no-print">
+            <button type="button" id="copyShareLinkBtn" class="inline-flex min-h-[44px] items-center rounded-[10px] border-[1.5px] border-stone-950 px-4 text-[15px] font-bold hover:bg-stone-950 hover:text-white">Copy share link</button>
+            <button type="button" id="printReportBtn" class="inline-flex min-h-[44px] items-center rounded-[10px] border-[1.5px] border-stone-950 px-4 text-[15px] font-bold hover:bg-stone-950 hover:text-white">Print / Save PDF</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== SITE FOOTER ==================== -->
+  <footer class="site-footer relative border-t border-orange-500/20 bg-neutral-950 text-neutral-400 no-print">
+    <div class="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-12 lg:gap-12">
+        <div class="sm:col-span-2 md:col-span-4">
+          <a class="group mb-6 inline-flex items-center gap-3" href="index.html">
+            <svg width="36" height="36" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#1c1917"/><circle cx="12.5" cy="12.5" r="5.5" stroke="#f97316" stroke-width="2.6"/><path d="M16.8 16.8l4.6 4.6" stroke="#f97316" stroke-width="2.6" stroke-linecap="round"/></svg>
+            <span class="flex flex-col">
+              <span class="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-lg font-bold text-transparent">GapScope</span>
+              <span class="-mt-1 text-[9px] font-medium tracking-wider text-neutral-500">MARKET INTELLIGENCE</span>
+            </span>
+          </a>
+          <p class="mb-6 max-w-xs text-sm leading-relaxed text-neutral-500">Stop guessing what to build. GapScope pulls live reviews, threads, trends and news, and shows you the post behind every claim it makes.</p>
+          <div class="flex items-center gap-2 text-sm text-neutral-500">Beyond 9to5 Buildathon · Bengaluru</div>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Product</h3>
+          <ul class="space-y-3">
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="#scan">Run a scan</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="index.html#how">How it works</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="index.html#scoring">Scoring</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="index.html#faq">Questions</a></li>
+          </ul>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Modes</h3>
+          <ul class="space-y-3">
+            <li><button type="button" data-mode="1" class="mode-jump text-sm text-neutral-500 transition-colors hover:text-orange-400">Validate an idea</button></li>
+            <li><button type="button" data-mode="2" class="mode-jump text-sm text-neutral-500 transition-colors hover:text-orange-400">Investigate a business</button></li>
+            <li><button type="button" data-mode="3" class="mode-jump text-sm text-neutral-500 transition-colors hover:text-orange-400">Discover an opportunity</button></li>
+            <li><button type="button" data-mode="4" class="mode-jump text-sm text-neutral-500 transition-colors hover:text-orange-400">Protect a brand</button></li>
+          </ul>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Built with</h3>
+          <ul class="space-y-3">
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="https://serpapi.com" target="_blank" rel="noopener noreferrer">SerpApi</a></li>
+            <li><a class="text-sm text-neutral-500 transition-colors hover:text-orange-400" href="https://you.com" target="_blank" rel="noopener noreferrer">You.com Search API</a></li>
+            <li><span class="text-sm text-neutral-500">Gemini 2.5 Flash</span></li>
+          </ul>
+        </div>
+        <div class="md:col-span-2">
+          <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-orange-400/80">Tracks</h3>
+          <ul class="space-y-3">
+            <li><span class="text-sm text-neutral-500">01 · Best use of SerpApi</span></li>
+            <li><span class="text-sm text-neutral-500">02 · You.com</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 border-t border-white/5 py-4">
+        <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-xs text-neutral-600">
+          <span>5 live sources</span><span>Deterministic scoring</span><span>Evidence by ID</span><span>Zero made-up quotes</span>
+        </div>
+      </div>
+      <div class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
+        <p class="text-center text-sm text-neutral-600">© 2026 GapScope. <span class="text-orange-500/50">Find gaps worth building.</span></p>
+        <div class="flex items-center gap-1 text-xs text-neutral-600"><span>Made with</span><span class="text-orange-400">♥</span><span>in Bengaluru</span></div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+  <!-- ==================== EVIDENCE DRAWER ==================== -->
+  <div id="evidenceDrawer" class="fixed inset-0 z-50 hidden no-print" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div id="drawerBackdrop" class="drawer-backdrop fixed inset-0"></div>
+    <div class="drawer-panel fixed inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-[18px] border-t-2 border-stone-950 bg-white sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[560px] sm:rounded-none sm:border-l-2 sm:border-t-0">
+      <div class="flex items-start justify-between gap-4 border-b border-stone-200 px-5 py-5 sm:px-7">
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <p class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-orange-700">Receipts</p>
+          <h2 id="drawerTitle" class="font-display text-2xl font-bold leading-tight tracking-[-0.01em]">Evidence</h2>
+          <p id="drawerSubtitle" class="font-mono text-xs text-stone-600"></p>
+        </div>
+        <button type="button" id="closeDrawerBtn" class="flex h-11 w-11 flex-none items-center justify-center rounded-full hover:bg-stone-100" aria-label="Close receipts">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="drawerSourceFilters" class="flex flex-wrap items-center gap-2 border-b border-stone-200 px-5 py-3 sm:px-7" role="group" aria-label="Filter by source"></div>
+      <div id="drawerEvidenceList" class="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5 sm:px-7"></div>
+      <div class="flex items-center justify-between border-t border-stone-200 px-5 py-3 font-mono text-xs text-stone-600 sm:px-7">
+        <span id="drawerItemsCount">0 items</span><span>Esc to close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST ==================== -->
+  <div id="toast" class="fixed bottom-6 left-1/2 z-[60] hidden -translate-x-1/2 rounded-[10px] bg-stone-950 px-4 py-3 font-mono text-[13px] text-white shadow-xl no-print" role="status" aria-live="polite">
+    <span id="toastMessage">Copied</span>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -6,7 +6,8 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from cache import cached_call
-from config import GEMINI_API_KEY, GEMINI_MODEL, LLM_SAMPLE_SIZE
+from config import GEMINI_API_KEY, GEMINI_FALLBACK_MODELS, GEMINI_MODEL, GEMINI_RETRIES, LLM_SAMPLE_SIZE
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -75,57 +76,53 @@ def _interleave_sample(items: List[Dict[str, Any]], limit: int) -> List[Dict[str
     return sample
 
 
+_RETRYABLE = ("503", "429", "500", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "DEADLINE", "overloaded", "high demand")
+
+
 def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
-    """Call Gemini with strict JSON mode, fast single-attempt failover, and zero-hang execution."""
+def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
+    """
+    Call Gemini in strict JSON mode with multi-model fallback and fast failover.
+    """
     client = get_genai_client()
     if not client:
         return None
+    from google.genai import types
 
-    try:
-        from google.genai import types
-
-        config = types.GenerateContentConfig(
-            response_mime_type="application/json",
-            temperature=0.2,
-        )
-
-        # Fast execution: try primary model once without blocking
-        model_name = GEMINI_MODEL or "gemini-3.1-flash-lite"
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-                config=config,
-            )
-            text = response.text or ""
-            parsed = json.loads(text)
-            _set_gemini_error(None)
-            return parsed
-        except json.JSONDecodeError:
-            if retry:
+    config = types.GenerateContentConfig(response_mime_type="application/json", temperature=0.2)
+    models = list(dict.fromkeys([GEMINI_MODEL] + GEMINI_FALLBACK_MODELS))
+    last_err = None
+    for model in models:
+        for attempt in range(max(1, GEMINI_RETRIES)):
+            try:
+                response = client.models.generate_content(model=model, contents=prompt, config=config)
+                text = response.text or ""
                 try:
-                    repair_prompt = (
-                        f"{prompt}\n\nIMPORTANT: The previous output was invalid JSON. "
-                        "Output ONLY valid JSON without markdown fences."
-                    )
-                    repair_resp = client.models.generate_content(
-                        model=model_name,
-                        contents=repair_prompt,
-                        config=config,
-                    )
-                    parsed = json.loads(repair_resp.text or "")
-                    _set_gemini_error(None)
-                    return parsed
-                except Exception:
-                    pass
-            return None
-        except Exception as exc:
-            err_str = str(exc)
-            logger.warning("Gemini %s fast call notice: %s", model_name, err_str[:100])
-            return None
-    except Exception as exc:
-        logger.error("Gemini API call failed: %s", exc)
-        return None
+                    parsed = json.loads(text)
+                except json.JSONDecodeError:
+                    if not retry:
+                        raise
+                    repair = f"{prompt}\n\nIMPORTANT: The previous output was invalid JSON. Output ONLY valid JSON without markdown fences."
+                    response = client.models.generate_content(model=model, contents=repair, config=config)
+                    parsed = json.loads(response.text or "")
+                if model != GEMINI_MODEL:
+                    logger.warning("Gemini answered with fallback model %s", model)
+                _set_gemini_error(None)
+                return parsed
+            except json.JSONDecodeError as exc:
+                last_err = f"{model}: invalid JSON ({exc})"
+                break
+            except Exception as exc:
+                last_err = f"{model}: {type(exc).__name__}: {str(exc)[:180]}"
+                if any(k in str(exc) for k in _RETRYABLE) and attempt < GEMINI_RETRIES - 1:
+                    wait = (1, 3)[min(attempt, 1)]
+                    logger.warning("Gemini busy (%s), retrying in %ss", model, wait)
+                    time.sleep(wait)
+                    continue
+                break
+    logger.error("Gemini failed on all models: %s", last_err)
+    _set_gemini_error(f"All Gemini models failed. Last error: {last_err}")
+    return None
 
 
 def extract_keywords(idea: str) -> Dict[str, Any]:

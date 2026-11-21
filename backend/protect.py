@@ -82,6 +82,10 @@ REPORT_CHANNELS = {
     "fake_app": [
         {"channel": "Google Play", "how": "Open the app listing → ⋮ → 'Flag as inappropriate' → impersonation; or Play's IP/impersonation complaint form."},
     ],
+    "chat_group": [
+        {"channel": "Telegram / WhatsApp", "how": "Open the group or channel → Report → impersonation / scam."},
+        {"channel": "Sanchar Saathi Chakshu", "how": "Report the group link and any phone numbers in it."},
+    ],
     "scam_report": [
         {"channel": "Public notice", "how": "Publish your verified official channels and link the report so users can check."},
     ],
@@ -140,13 +144,16 @@ def mode4_protect(
         f4 = ex.submit(play_search, brand, tracker)
         f5 = ex.submit(serp_news, f"{brand} scam fraud", tracker)
         f6 = ex.submit(google_search, f"{brand} official website login", tracker, "google_lookalike")
+        f7 = ex.submit(google_search, f'"{brand}" job OR internship OR earn site:t.me OR site:chat.whatsapp.com OR site:wa.me',
+                       tracker, "google_chatgroups")
         helpline_res, w1 = f1.result()
         maps_res, w2 = f2.result()
         jobs_res, w3 = f3.result()
         apps_res, w4 = f4.result()
         scam_res, w5 = f5.result()
         site_res, w6 = f6.result()
-    for w in (w1, w2, w3, w4, w5, w6):
+        chat_res, w7 = f7.result()
+    for w in (w1, w2, w3, w4, w5, w6, w7):
         if w and w not in warnings:
             warnings.append(w)
 
@@ -154,6 +161,7 @@ def mode4_protect(
     col = EvidenceCollector(max_items=200)
     col.add_generic(helpline_res, source="google_search", entity="Google Search", priority=90)
     col.add_generic(site_res, source="google_search", entity="Google Search", priority=85)
+    col.add_generic(chat_res, source="google_search", entity="Telegram / WhatsApp", priority=92)
     col.add_generic(
         [{"title": m.get("title"), "snippet": f"{m.get('title', '')} · phone {m.get('phone', '')} · {m.get('address', '')}",
           "link": m.get("link") or m.get("website") or ""} for m in maps_res],
@@ -171,12 +179,29 @@ def mode4_protect(
     def eid_for(source, url, title):
         return by_text.get((source, url or "", title or ""))
 
+    auto_phones = set()
+    if off_domains and not off_phones:
+        for r in helpline_res + site_res:
+            if _is_official_domain(domain_of(r.get("link", "")), off_domains):
+                for m in PHONE_RE.findall(f"{r.get('title', '')} {r.get('snippet', '')}"):
+                    if len(norm_phone(m)) >= 10:
+                        auto_phones.add(norm_phone(m))
+        for m in maps_res:
+            if _is_official_domain(domain_of(m.get("website") or ""), off_domains) and len(norm_phone(m.get("phone", ""))) >= 10:
+                auto_phones.add(norm_phone(m.get("phone", "")))
+        if auto_phones:
+            off_phones = set(auto_phones)
+            warnings = [w for w in warnings if not w.startswith("No official helpline numbers")]
+            warnings.append(f"Official numbers auto-detected from {', '.join(off_domains)}: {', '.join(sorted(auto_phones))}. "
+                            "Add the full list to flag with more confidence.")
+    num_sev = "medium" if auto_phones else "high"
+
     _emit(progress_callback, "matching", "Comparing against your official records", 75)
     findings: List[Dict[str, Any]] = []
     seen = set()
 
     def add(ftype, value, title, why, severity, url, eids):
-        key = (ftype, value)
+        key = (ftype, norm_phone(str(value)) if ftype == "helpline" else value)
         if key in seen:
             return
         seen.add(key)
@@ -195,7 +220,7 @@ def mode4_protect(
             dom = domain_of(r.get("link", ""))
             if _is_official_domain(dom, off_domains):
                 continue  # shown on your own site
-            sev = "high" if off_phones else "info"
+            sev = num_sev if off_phones else "info"
             why = ("Not on your official helpline list" if off_phones
                    else "Shown under your name; add your official numbers to confirm")
             add("helpline", m.strip(), f"Number shown for '{brand} customer care' on {dom or 'search'}", why, sev,
@@ -206,7 +231,7 @@ def mode4_protect(
             continue
         if token and token not in re.sub(r"[^a-z0-9]", "", (m.get("title") or "").lower()):
             continue
-        sev = "high" if off_phones else "info"
+        sev = num_sev if off_phones else "info"
         add("helpline", m.get("phone"), f"Maps listing '{m.get('title')}' uses your name", 
             "Maps listing with your name and a number not on your official list" if off_phones
             else "Maps listing with your name; add your official numbers to confirm", sev,
@@ -258,6 +283,19 @@ def mode4_protect(
         elif text:
             f["why"] += "; page read, no login or payment fields found"
 
+    # 3c. Telegram / WhatsApp groups using the name for jobs or "earning" offers
+    for r in chat_res:
+        dom = domain_of(r.get("link", ""))
+        if not any(dom == d or dom.endswith("." + d) for d in ("t.me", "telegram.me", "chat.whatsapp.com", "wa.me", "whatsapp.com")):
+            continue
+        text = f"{r.get('title', '')} {r.get('snippet', '')}"
+        if token and token not in re.sub(r"[^a-z0-9]", "", text.lower()):
+            continue
+        risky = bool(FEE_RE.search(text) or re.search(r"\bearn|task|work from home|part[- ]time|daily payout|invest", text, re.I))
+        add("chat_group", r.get("link"), f"{'Telegram' if 't.me' in dom or 'telegram' in dom else 'WhatsApp'} group: {r.get('title') or dom}",
+            "Group uses your name" + (" and offers jobs, tasks or earnings" if risky else ""),
+            "high" if risky else "medium", r.get("link"), [eid_for("google_search", r.get("link"), r.get("title"))])
+
     # 4. Play Store apps using the name
     for a in apps_res:
         flat_title = re.sub(r"[^a-z0-9]", "", (a.get("title") or "").lower())
@@ -291,6 +329,7 @@ def mode4_protect(
         f["id"] = f"fd_{i}"
 
     types = [("helpline", "Suspected helpline numbers"), ("job_post", "Suspicious job posts"),
+             ("chat_group", "Telegram / WhatsApp groups"),
              ("lookalike_site", "Look-alike websites"), ("fake_app", "Apps using your name"),
              ("scam_report", "Public scam reports")]
     breakdown = []
@@ -306,7 +345,8 @@ def mode4_protect(
         "mode": 4,
         "query": brand,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "keywords": {"broad": brand, "specific": [f"{brand} customer care number", f"{brand} jobs", f"{brand} scam fraud"],
+        "keywords": {"broad": brand, "specific": [f"{brand} customer care number", f"{brand} jobs", f"{brand} scam fraud",
+                                                  f"{brand} Telegram / WhatsApp groups"],
                      "category": "Brand protection"},
         "credits": tracker.to_dict(),
         "verdict": {"kind": "protection", "label": None, "score": None,
@@ -320,7 +360,8 @@ def mode4_protect(
         "opportunities": [],
         "news": [],
         "findings": findings,
-        "official": {"domains": off_domains, "phones": sorted(off_phones), "app_ids": sorted(off_apps)},
+        "official": {"domains": off_domains, "phones": sorted(off_phones), "app_ids": sorted(off_apps),
+                     "auto_phones": sorted(auto_phones)},
         "allowed_count": allowed_count,
         "new_count": sum(1 for f in findings if f.get("is_new")),
         "evidence": evidence_map,

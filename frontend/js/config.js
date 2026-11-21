@@ -4,12 +4,10 @@
  */
 
 export const CONFIG = {
-  // On HTTPS (Vercel cloud), route to same-origin /api. On local HTTP, use port 5000.
-  API_BASE: (typeof window !== 'undefined' && window.location.protocol === 'https:')
-    ? ''
-    : `http://${(typeof window !== 'undefined' && window.location.hostname) || 'localhost'}:5000`,
+  // Backend runs locally on port 5000 (same machine, or the laptop's IP when opened from a phone on the same Wi-Fi)
+  API_BASE: `http://${window.location.hostname || 'localhost'}:5000`,
 
-  // Set to true only if backend is not running at all
+  // Local only (no hosted deployment). Set to true only to build the UI without the backend running.
   USE_MOCK: false,
 
   // Demo presets for one-click instant evaluation

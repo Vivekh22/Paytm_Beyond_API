@@ -23,13 +23,13 @@ def estimate_serpapi_calls() -> Dict[str, Any]:
     - Mode 1: Trends (1) + Trends regions (1) + Play Search (1) + News (1) + Reddit (1) + Play Reviews (3) = 8 calls
     - Mode 2: Play Search (1) + 1★ Reviews (1) + 5★ Reviews (1) + Newest Reviews (1) + News (1) + Trends (1) + Reddit (1) = 7 calls
     - Mode 3: Play Search (1) + Play Reviews (5) + Reddit (1) + Trends (1) = 8 calls
-    - Mode 4: Google x2 + Maps + Jobs + Play Search + News + Extract (up to 2) = 8 calls
+    - Mode 4: Google x3 (helpline, look-alike, Telegram/WhatsApp) + Maps + Jobs + Play + News + Extract (up to 2) = 9 calls
     """
     estimates = []
     total = 0
     for preset in DEMO_PRESETS:
         mode = preset["mode"]
-        calls = {1: 8, 2: 7, 3: 8, 4: 8}.get(mode, 8)
+        calls = {1: 8, 2: 7, 3: 8, 4: 9}.get(mode, 8)
         estimates.append(
             {
                 "mode": mode,

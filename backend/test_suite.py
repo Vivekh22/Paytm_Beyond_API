@@ -300,7 +300,7 @@ class TestFlaskEndpoints(unittest.TestCase):
     def test_prewarm_dry_run_estimation(self):
         est = estimate_serpapi_calls()
         self.assertEqual(len(est["presets"]), 11)
-        self.assertEqual(est["total_estimated_serpapi_calls"], 85)  # 3x8 + 3x7 + 3x8 + 2x8
+        self.assertEqual(est["total_estimated_serpapi_calls"], 87)  # 3x8 + 3x7 + 3x8 + 2x9
 
     def test_scan_and_stream_endpoints(self):
         resp = self.client.post("/api/scan", json={"mode": 1, "query": "Test Scanner"})

@@ -44,10 +44,9 @@ def compute_trend_metrics(points: List[Dict[str, Any]]) -> Tuple[float, str, flo
     values = [p.get("value", 0) for p in points]
     mean_val = sum(values) / len(values)
 
-    if len(values) >= 12:
-        prev_9 = values[:9]
-        last_3 = values[9:]
-    elif len(values) >= 4:
+    # Trends returns weekly points for "today 12-m" (about 53), so split by share of the
+    # series, not by count: the last quarter of the period vs the first three quarters.
+    if len(values) >= 4:
         split_idx = int(len(values) * 0.75)
         prev_9 = values[:split_idx]
         last_3 = values[split_idx:]

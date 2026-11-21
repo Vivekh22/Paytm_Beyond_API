@@ -39,6 +39,9 @@ YOUCOM_NEWS_FIELD = "news"
 
 # Gemini LLM Settings
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+GEMINI_FALLBACK_MODELS = [m.strip() for m in os.getenv(
+    "GEMINI_FALLBACK_MODELS", "gemini-3.8-flash,gemini-3.5-flash-lite").split(",") if m.strip()]
+GEMINI_RETRIES = int(os.getenv("GEMINI_RETRIES", "2"))
 
 # Scoring Thresholds
 VIABILITY_BUILD_THRESHOLD = 65
