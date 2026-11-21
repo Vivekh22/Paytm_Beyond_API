@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import re
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from cache import cached_call
@@ -75,7 +76,7 @@ def _interleave_sample(items: List[Dict[str, Any]], limit: int) -> List[Dict[str
 
 
 def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
-    """Call Gemini with strict JSON mode, retrying once on JSON parse failure."""
+    """Call Gemini with strict JSON mode, automatic model fallback, and backoff retry."""
     client = get_genai_client()
     if not client:
         _set_gemini_error("GEMINI_API_KEY missing or google-genai client could not start")
@@ -88,30 +89,55 @@ def _call_gemini_json_live(prompt: str, retry: bool = True) -> Optional[Any]:
             response_mime_type="application/json",
             temperature=0.2,
         )
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            config=config,
-        )
-        text = response.text or ""
-        parsed = json.loads(text)
-        _set_gemini_error(None)
-        return parsed
-    except json.JSONDecodeError:
-        if retry:
-            try:
-                repair_prompt = (
-                    f"{prompt}\n\nIMPORTANT: The previous output was invalid JSON. "
-                    "Output ONLY valid JSON without markdown fences."
-                )
-                response = client.models.generate_content(
-                    model=GEMINI_MODEL,
-                    contents=repair_prompt,
-                    config=config,
-                )
-                return json.loads(response.text or "")
-            except Exception as e:
-                logger.error("Gemini JSON retry failed: %s", e)
+
+        # Fallback model priority
+        models_to_try = [GEMINI_MODEL]
+        for fallback in ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash"]:
+            if fallback not in models_to_try:
+                models_to_try.append(fallback)
+
+        last_error = None
+        for model_name in models_to_try:
+            for attempt in range(2):
+                try:
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config=config,
+                    )
+                    text = response.text or ""
+                    parsed = json.loads(text)
+                    _set_gemini_error(None)
+                    return parsed
+                except json.JSONDecodeError:
+                    if retry:
+                        try:
+                            repair_prompt = (
+                                f"{prompt}\n\nIMPORTANT: The previous output was invalid JSON. "
+                                "Output ONLY valid JSON without markdown fences."
+                            )
+                            repair_resp = client.models.generate_content(
+                                model=model_name,
+                                contents=repair_prompt,
+                                config=config,
+                            )
+                            parsed = json.loads(repair_resp.text or "")
+                            _set_gemini_error(None)
+                            return parsed
+                        except Exception as e:
+                            logger.error("Gemini JSON retry failed on %s: %s", model_name, e)
+                    break
+                except Exception as exc:
+                    last_error = exc
+                    err_str = str(exc)
+                    logger.warning("Gemini %s attempt %d: %s", model_name, attempt + 1, err_str[:120])
+                    if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                        time.sleep(0.5)
+                        break
+                    time.sleep(1.0)
+
+        if last_error:
+            _set_gemini_error(f"{type(last_error).__name__}: {str(last_error)[:200]}")
         return None
     except Exception as exc:
         logger.error("Gemini API call failed: %s", exc)

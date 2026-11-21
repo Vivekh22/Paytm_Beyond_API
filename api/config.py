@@ -38,7 +38,7 @@ YOUCOM_WEB_FIELD = "web"
 YOUCOM_NEWS_FIELD = "news"
 
 # Gemini LLM Settings
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 
 # Scoring Thresholds
 VIABILITY_BUILD_THRESHOLD = 65
