@@ -47,5 +47,6 @@ The user submits an idea, business, or category. GapScope fetches live multi-sou
 - [x] Integrated Mode 4 Protect (`protect.py`, `monitor.py`, `notify.py`, `timeline.py`, `compare.py`).
 - [x] Configured serverless runtime: `api/index.py`, `requirements.txt`, and `vercel.json` rewrites.
 - [x] Fixed Vercel 404 routing by removing legacy `version: 2`, bundling runtime modules directly into `api/`, and enabling on-demand SSE streaming.
+- [x] Resolved Gemini 503/429 high demand & quota limits: default model updated to `gemini-3.1-flash-lite` with automatic fallback chain (`gemini-3.1-flash-lite` -> `gemini-3.5-flash-lite` -> `gemini-3.8-flash`) and backoff retry.
 - [x] Verified live deployment on Vercel (`https://qwer-beta-ten.vercel.app`): `/api/health` returns HTTP 200, `/api/scan` returns HTTP 202, and SSE streams live progress chunks.
 - [x] All code committed and synchronized across both `Vivekh22/Paytm_Beyond_API` and `AM-iSMAIL/qwer`.
